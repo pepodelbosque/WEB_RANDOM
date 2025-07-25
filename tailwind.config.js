@@ -24,6 +24,7 @@ export default {
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+        'pulse-glow-red': 'pulseGlowRed 2s ease-in-out infinite',
         'slide-up': 'slideUp 0.8s ease-out',
         'slide-left': 'slideLeft 0.8s ease-out',
         'zoom-in': 'zoomIn 0.3s ease-out',
@@ -36,6 +37,10 @@ export default {
         pulseGlow: {
           '0%, 100%': { boxShadow: '0 0 20px rgba(255, 0, 0, 0.5)' },
           '50%': { boxShadow: '0 0 40px rgba(255, 115, 0, 0.8)' },
+        },
+        pulseGlowRed: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(220, 38, 38, 0.5)' },
+          '50%': { boxShadow: '0 0 40px rgba(239, 68, 68, 0.8)' },
         },
         slideUp: {
           '0%': { transform: 'translateY(100px)', opacity: '0' },
