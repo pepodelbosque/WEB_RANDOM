@@ -63,7 +63,7 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.05, rotateZ: 2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#portfolio')}
-              className="px-3 py-2 bg-gradient-to-r from-primary to-secondary text-white font-avenuex rounded-full hover:shadow-2xl transition-all duration-300 animate-pulse-glow text-sm"
+              className="w-24 px-3 py-2 bg-gradient-to-r from-primary to-secondary text-white font-avenuex rounded-full hover:shadow-2xl transition-all duration-300 animate-pulse-glow text-sm"
             >
               {t(language, 'hero.viewPortfolio')}
             </motion.button>
@@ -72,7 +72,7 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.05, rotateZ: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#contact')}
-              className="px-3 py-2 border-2 border-primary text-primary dark:text-white font-avenuex rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm"
+              className="w-24 px-3 py-2 border-2 border-primary text-primary dark:text-white font-avenuex rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm"
             >
               {t(language, 'hero.getInTouch')}
             </motion.button>
