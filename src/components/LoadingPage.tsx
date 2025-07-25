@@ -72,7 +72,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
                 {Math.round(progress)}% {language === 'es' ? 'Completado' : 'Complete'}
               </p>
             </motion.div>
-             
+              
             {/* Loading Text */}
             <motion.p
               initial={{ opacity: 0 }}
