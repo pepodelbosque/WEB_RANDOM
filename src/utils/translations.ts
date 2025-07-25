@@ -17,8 +17,8 @@ export const translations = {
       title: 'RANDOM',
       subtitle: 'A crossover between creativity and technology through the techniques of Machinima and Experimental 3D Cinema.',
       description: '',
-      viewPortfolio: 'View Portfolio',
-      getInTouch: 'Get In Touch',
+      viewPortfolio: 'Dreams',
+      getInTouch: 'Nightmares',
     },
     // About Section
     about: {
@@ -206,8 +206,8 @@ export const translations = {
       title: 'RANDOM',
       subtitle: 'Cruce entre la creatividad y la tecnología a través de la técnica del Machinima y el Cine 3D Experimental.',
       description: '',
-      viewPortfolio: 'Ver Portafolio',
-      getInTouch: 'Contactar',
+      viewPortfolio: 'Sueños',
+      getInTouch: 'Pesadillas',
     },
     // About Section
     about: {

@@ -31,7 +31,7 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-6xl md:text-8xl font-bold font-dirtyline uppercase tracking-wider"
+              className="text-6xl md:text-8xl font-bold font-dirtyline uppercase tracking-wider text-center -mb-2"
               style={{ fontVariant: 'small-caps' }}
             >
               <GradientText 
@@ -47,7 +47,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="text-xs md:text-sm font-avenuex text-red-600 dark:text-white max-w-lg mx-auto leading-tight mt-2"
+            className="text-xs md:text-sm font-avenuex text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4"
           >
             {t(language, 'hero.subtitle')}
           </motion.p>
