@@ -47,7 +47,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="text-sm md:text-base font-avenuex text-red-600 dark:text-white max-w-xl mx-auto leading-snug"
+            className="text-xs md:text-sm font-avenuex text-red-600 dark:text-white max-w-lg mx-auto leading-tight mt-2"
           >
             {t(language, 'hero.subtitle')}
           </motion.p>
@@ -57,13 +57,13 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-12"
+            className="flex flex-row gap-4 justify-center items-center mt-12"
           >
             <motion.button
               whileHover={{ scale: 1.05, rotateZ: 2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#portfolio')}
-              className="px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-avenuex rounded-full hover:shadow-2xl transition-all duration-300 animate-pulse-glow"
+              className="px-3 py-2 bg-gradient-to-r from-primary to-secondary text-white font-avenuex rounded-full hover:shadow-2xl transition-all duration-300 animate-pulse-glow text-sm"
             >
               {t(language, 'hero.viewPortfolio')}
             </motion.button>
@@ -72,7 +72,7 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.05, rotateZ: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#contact')}
-              className="px-8 py-4 border-2 border-primary text-primary dark:text-white font-avenuex rounded-full hover:bg-primary hover:text-white transition-all duration-300"
+              className="px-3 py-2 border-2 border-primary text-primary dark:text-white font-avenuex rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm"
             >
               {t(language, 'hero.getInTouch')}
             </motion.button>
