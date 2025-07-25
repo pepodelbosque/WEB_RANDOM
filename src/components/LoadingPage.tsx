@@ -79,7 +79,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1 }}
               className="text-base font-avenuex text-orange-500 dark:text-gray-400 mt-8"
-            >
+            > 
               {language === 'es' 
                 ? 'Inicializando experiencia digital...'
                 : 'Initializing digital experience...'
