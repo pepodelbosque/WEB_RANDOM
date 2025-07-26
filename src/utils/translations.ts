@@ -6,6 +6,7 @@ export const translations = {
     nav: {
       home: 'Home',
       about: 'What´s this think?',
+      poems: 'Poems',
       portfolio: 'Interpretations',
       services: 'Process',
       fantasma: 'FNTSM',
@@ -19,6 +20,20 @@ export const translations = {
       description: '',
       viewPortfolio: 'Dreams',
       getInTouch: 'Nightmares',
+    },
+    // Poems Section
+    poems: {
+      title: 'Digital Verses',
+      description1: "In the realm of digital poetry, words transform into living entities that dance between reality and virtuality. Here, verses are born from the intersection of human emotion and algorithmic beauty.",
+      description2: "Each poem emerges as a fragment of consciousness, captured through the lens of machinima and digital storytelling. The boundaries between author and algorithm blur in this creative space.",
+      description3: "Poetry becomes a bridge between the tangible and the ethereal, where each word carries the weight of dreams and the lightness of digital whispers. These verses challenge traditional narrative structures.",
+      poeticElements: 'Poetic Elements',
+      types: {
+        narrative: 'Narrative Poetry',
+        lyrical: 'Lyrical Expression',
+        emotional: 'Emotional Depth',
+        experimental: 'Experimental Form',
+      },
     },
     // About Section
     about: {
@@ -195,6 +210,7 @@ export const translations = {
     nav: {
       home: 'Inicio',
       about: 'Qué es esta cosa?',
+      poems: 'Poemas',
       portfolio: 'Interpretaciones',
       services: 'Proceso',
       fantasma: 'FNTSM',
@@ -208,6 +224,20 @@ export const translations = {
       description: '',
       viewPortfolio: 'Sueños',
       getInTouch: 'Pesadillas',
+    },
+    // Poems Section
+    poems: {
+      title: 'Versos Digitales',
+      description1: 'En el reino de la poesía digital, las palabras se transforman en entidades vivientes que danzan entre la realidad y la virtualidad. Aquí, los versos nacen de la intersección entre la emoción humana y la belleza algorítmica.',
+      description2: 'Cada poema emerge como un fragmento de conciencia, capturado a través del lente del machinima y la narrativa digital. Los límites entre autor y algoritmo se difuminan en este espacio creativo.',
+      description3: 'La poesía se convierte en un puente entre lo tangible y lo etéreo, donde cada palabra lleva el peso de los sueños y la ligereza de los susurros digitales. Estos versos desafían las estructuras narrativas tradicionales.',
+      poeticElements: 'Elementos Poéticos',
+      types: {
+        narrative: 'Poesía Narrativa',
+        lyrical: 'Expresión Lírica',
+        emotional: 'Profundidad Emocional',
+        experimental: 'Forma Experimental',
+      },
     },
     // About Section
     about: {

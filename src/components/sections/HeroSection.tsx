@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import GradientText from '../GradientText';
@@ -76,23 +75,6 @@ const HeroSection: React.FC = () => {
             >
               {t(language, 'hero.getInTouch')}
             </motion.button>
-          </motion.div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          onClick={() => scrollToSection('#about')}
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-primary cursor-pointer hover:scale-110 transition-transform"
-          >
-            <ArrowDown size={30} />
           </motion.div>
         </motion.div>
       </div>

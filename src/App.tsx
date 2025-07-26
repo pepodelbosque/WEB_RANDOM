@@ -6,6 +6,7 @@ import { t } from './utils/translations';
 import LoadingPage from './components/LoadingPage';
 import Navigation from './components/Navigation';
 import HeroSection from './components/sections/HeroSection';
+import PoemsSection from './components/sections/PoemsSection';
 import AboutSection from './components/sections/AboutSection';
 import PortfolioSection from './components/sections/PortfolioSection';
 import ServicesSection from './components/sections/ServicesSection';
@@ -60,6 +61,7 @@ function App() {
       {/* Main Content without Fade-In */}
       <main className="relative z-10">
         <HeroSection />
+        <PoemsSection />
         <AboutSection />
         <PortfolioSection />
         <ServicesSection />

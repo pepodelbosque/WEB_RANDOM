@@ -22,7 +22,7 @@ const AboutSection: React.FC = () => {
   return (
     <section id="about" ref={ref} className="min-h-screen py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-1 gap-16 items-center">
           {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -100 }}
@@ -98,50 +98,7 @@ const AboutSection: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Visual Element */}
-          <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, delay: 0.3 }}
-            className="relative"
-          >
-            <div className="relative w-full h-96 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
-              {/* Animated geometric shapes */}
-              <motion.div
-                animate={{ 
-                  rotate: [0, 360],
-                  scale: [1, 1.2, 1],
-                }}
-                transition={{ duration: 20, repeat: Infinity }}
-                className="absolute top-10 left-10 w-20 h-20 bg-gradient-to-r from-primary to-transparent rounded-full opacity-60"
-              />
-              <motion.div
-                animate={{ 
-                  rotate: [360, 0],
-                  scale: [1.2, 1, 1.2],
-                }}
-                transition={{ duration: 15, repeat: Infinity }}
-                className="absolute bottom-20 right-16 w-32 h-32 bg-gradient-to-l from-secondary to-transparent rounded-3xl opacity-50"
-              />
-              <motion.div
-                animate={{ 
-                  y: [0, -30, 0],
-                  rotate: [0, 180, 360],
-                }}
-                transition={{ duration: 12, repeat: Infinity }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full"
-              />
-              
-              {/* Organic blob shape */}
-              <motion.div
-                animate={{ 
-                  borderRadius: ['30% 70% 70% 30% / 30% 30% 70% 70%', '70% 30% 30% 70% / 70% 70% 30% 30%', '30% 70% 70% 30% / 30% 30% 70% 70%'],
-                }}
-                transition={{ duration: 8, repeat: Infinity }}
-                className="absolute inset-8 bg-gradient-to-br from-primary/30 to-secondary/30 opacity-70"
-              />
-            </div>
-          </motion.div>
+          {/* Visual Element was here */}
         </div>
       </div>
     </section>
