@@ -41,7 +41,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen text-orange-900 dark:text-gray-900 font-avenuex relative">
+    <div className="min-h-screen bg-black text-orange-900 dark:text-gray-900 font-avenuex relative">
       {/* Reactive Parallax DarkVeil Background */}
       <div className="fixed inset-0 z-0">
         <DarkVeil 

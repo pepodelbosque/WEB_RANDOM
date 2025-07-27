@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Brain, Heart, Lightbulb, Target } from 'lucide-react';
@@ -11,6 +11,44 @@ const AboutSection: React.FC = () => {
     threshold: 0.3,
     triggerOnce: true,
   });
+  
+  const sectionRef = useRef<HTMLElement>(null);
+  const wasInViewRef = useRef(false);
+
+  // Detect scroll up from AboutSection
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            wasInViewRef.current = true;
+          } else if (wasInViewRef.current) {
+            // Section was in view but now isn't - check scroll direction
+            const rect = section.getBoundingClientRect();
+            if (rect.top > window.innerHeight * 0.5) {
+              // Section is below viewport center - user scrolled up
+              const event = new CustomEvent('scrollUpFromAbout');
+              window.dispatchEvent(event);
+              wasInViewRef.current = false;
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '-10% 0px -10% 0px'
+      }
+    );
+
+    observer.observe(section);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const skills = [
     { name: t(language, 'about.skills.creativeThinking'), icon: Brain, level: 95 },
@@ -20,7 +58,7 @@ const AboutSection: React.FC = () => {
   ];
 
   return (
-    <section id="about" ref={ref} className="min-h-screen py-20 relative">
+    <section id="about" ref={(el) => { ref(el); sectionRef.current = el; }} className="min-h-screen py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-1 gap-16 items-center">
           {/* Text Content */}

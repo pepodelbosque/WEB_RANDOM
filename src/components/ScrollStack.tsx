@@ -16,6 +16,7 @@ export interface ScrollStackProps {
   onStackComplete?: () => void;
   autoScrollToCenter?: boolean;
   autoScrollToTop?: boolean;
+  initialCardIndex?: number; // Add this prop
   onReachBottom?: () => void;
   onReachTop?: () => void;
 }
@@ -47,6 +48,7 @@ const ScrollStack = ({
   onStackComplete,
   autoScrollToCenter = true,
   autoScrollToTop = false,
+  initialCardIndex = 0, // Add this prop with default value
   onReachBottom,
   onReachTop,
 }: ScrollStackProps) => {
@@ -88,79 +90,42 @@ const ScrollStack = ({
 
     cardsRef.current.forEach((card, i) => {
       if (!card) return;
-
+  
       const cardTop = card.offsetTop;
       
-      // For the first card, require double scroll movement
-      const scrollMultiplier = i === 0 ? 2 : 1;
-      const adjustedTriggerStart = cardTop - stackPositionPx - (itemStackDistance * i * scrollMultiplier);
-      const adjustedPinStart = cardTop - stackPositionPx - (itemStackDistance * i * scrollMultiplier);
-      
-      const triggerStart = adjustedTriggerStart;
+      // Remove individual card multipliers - all cards move the same way
+      const triggerStart = cardTop - stackPositionPx - (itemStackDistance * i);
       const triggerEnd = cardTop - scaleEndPositionPx;
-      const pinStart = adjustedPinStart;
+      const pinStart = cardTop - stackPositionPx - (itemStackDistance * i);
       const pinEnd = endElementTop - containerHeight / 2;
-
+  
       const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
       const targetScale = baseScale + (i * itemScale);
       const scale = 1 - scaleProgress * (1 - targetScale);
       const rotation = rotationAmount ? i * rotationAmount * scaleProgress : 0;
-
-      // Calculate opacity for fade effect
-      let opacity;
+  
+      // Unified opacity calculation for all cards
+      const fadeInStart = cardTop - containerHeight * 1.2;
+      const fadeInEnd = cardTop - containerHeight * 0.5;
+      const fadeInProgress = calculateProgress(scrollTop, fadeInStart, fadeInEnd);
       
-      if (i === 0) {
-        // First card (Card 1) - always visible, no fade in effect
-        opacity = 1;
-        
-        // Only fade out when overlapped by next card
-        const nextCardTrigger = cardsRef.current[i + 1] ? 
-          cardsRef.current[i + 1].offsetTop - stackPositionPx - itemStackDistance : Infinity;
-        const fadeOutStart = nextCardTrigger - containerHeight * 0.8;
-        const fadeOutEnd = nextCardTrigger + containerHeight * 0.5;
-        const fadeOutProgress = calculateProgress(scrollTop, fadeOutStart, fadeOutEnd);
-        
-        opacity = 1 - fadeOutProgress;
-      } else if (i === 1) {
-        // Second card (Card 2) - start from 0% opacity and fade in
-        const fadeInStart = cardTop - containerHeight * 1.2;
-        const fadeInEnd = cardTop - containerHeight * 0.5;
-        const fadeInProgress = calculateProgress(scrollTop, fadeInStart, fadeInEnd);
-        
-        // Fade out when overlapped by next card
-        const nextCardTrigger = cardsRef.current[i + 1] ? 
-          cardsRef.current[i + 1].offsetTop - stackPositionPx - itemStackDistance : Infinity;
-        const fadeOutStart = nextCardTrigger - containerHeight * 0.8;
-        const fadeOutEnd = nextCardTrigger + containerHeight * 0.5;
-        const fadeOutProgress = calculateProgress(scrollTop, fadeOutStart, fadeOutEnd);
-        
-        // Start at 0% opacity and fade to 100%
-        opacity = fadeInProgress * (1 - fadeOutProgress);
-      } else {
-        // All other cards (Card 3, 4, etc.) - keep current behavior
-        const fadeInStart = cardTop - containerHeight * 1.2;
-        const fadeInEnd = cardTop - containerHeight * 0.5;
-        const fadeInProgress = calculateProgress(scrollTop, fadeInStart, fadeInEnd);
-        
-        // Fade out when overlapped by next card
-        const nextCardTrigger = cardsRef.current[i + 1] ? 
-          cardsRef.current[i + 1].offsetTop - stackPositionPx - itemStackDistance : Infinity;
-        const fadeOutStart = nextCardTrigger - containerHeight * 0.8;
-        const fadeOutEnd = nextCardTrigger + containerHeight * 0.5;
-        const fadeOutProgress = calculateProgress(scrollTop, fadeOutStart, fadeOutEnd);
-        
-        opacity = fadeInProgress * (1 - fadeOutProgress);
-      }
+      // Fade out when overlapped by next card
+      const nextCardTrigger = cardsRef.current[i + 1] ? 
+        cardsRef.current[i + 1].offsetTop - stackPositionPx - itemStackDistance : Infinity;
+      const fadeOutStart = nextCardTrigger - containerHeight * 0.8;
+      const fadeOutEnd = nextCardTrigger + containerHeight * 0.5;
+      const fadeOutProgress = calculateProgress(scrollTop, fadeOutStart, fadeOutEnd);
       
+      let opacity = fadeInProgress * (1 - fadeOutProgress);
       opacity = Math.max(0, Math.min(1, opacity));
-
+  
       let blur = 0;
       if (blurAmount) {
         let topCardIndex = 0;
         for (let j = 0; j < cardsRef.current.length; j++) {
           const jCardTop = cardsRef.current[j].offsetTop;
-          const jScrollMultiplier = j === 0 ? 2 : 1;
-          const jTriggerStart = jCardTop - stackPositionPx - (itemStackDistance * j * jScrollMultiplier);
+          // Remove individual multipliers for blur calculation too
+          const jTriggerStart = jCardTop - stackPositionPx - (itemStackDistance * j);
           if (scrollTop >= jTriggerStart) {
             topCardIndex = j;
           }
@@ -171,16 +136,17 @@ const ScrollStack = ({
           blur = Math.max(0, depthInStack * blurAmount);
         }
       }
-
+  
       let translateY = 0;
       const isPinned = scrollTop >= pinStart && scrollTop <= pinEnd;
       
       if (isPinned) {
-        translateY = scrollTop - cardTop + stackPositionPx + (itemStackDistance * i * scrollMultiplier);
+        // Remove individual multipliers for translateY calculation
+        translateY = scrollTop - cardTop + stackPositionPx + (itemStackDistance * i);
       } else if (scrollTop > pinEnd) {
-        translateY = pinEnd - cardTop + stackPositionPx + (itemStackDistance * i * scrollMultiplier);
+        translateY = pinEnd - cardTop + stackPositionPx + (itemStackDistance * i);
       }
-
+  
       const newTransform = {
         translateY: Math.round(translateY * 100) / 100,
         scale: Math.round(scale * 1000) / 1000,
@@ -188,7 +154,7 @@ const ScrollStack = ({
         blur: Math.round(blur * 100) / 100,
         opacity: Math.round(opacity * 1000) / 1000
       };
-
+  
       const lastTransform = lastTransformsRef.current.get(i);
       const hasChanged = !lastTransform ||
         Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
@@ -196,18 +162,18 @@ const ScrollStack = ({
         Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
         Math.abs(lastTransform.blur - newTransform.blur) > 0.1 ||
         Math.abs((lastTransform.opacity || 1) - newTransform.opacity) > 0.01;
-
+  
       if (hasChanged) {
         const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
         const filter = newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : '';
-
+  
         card.style.transform = transform;
         card.style.filter = filter;
         card.style.opacity = newTransform.opacity.toString();
         
         lastTransformsRef.current.set(i, newTransform);
       }
-
+  
       if (i === cardsRef.current.length - 1) {
         const isInView = scrollTop >= pinStart && scrollTop <= pinEnd;
         if (isInView && !stackCompletedRef.current) {
@@ -218,7 +184,7 @@ const ScrollStack = ({
         }
       }
     });
-
+  
     isUpdatingRef.current = false;
   }, [
     itemScale,
@@ -267,17 +233,17 @@ const ScrollStack = ({
   const setupLenis = useCallback(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
-
+  
     const lenis = new Lenis({
       wrapper: scroller,
       content: scroller.querySelector('.scroll-stack-inner'),
-      duration: 5.0, // Increased from 2.5 to 5.0 for much slower scroll
+      duration: 3.5, // Much slower: increased from 1.2 to 3.5
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      touchMultiplier: 1, // Reduced from 2 to 1 for slower touch scroll
+      touchMultiplier: 0.8, // Much slower: reduced from 2.5 to 0.8
       infinite: false,
-      wheelMultiplier: 0.5, // Reduced from 1 to 0.5 for half speed wheel scroll
-      lerp: 0.05, // Reduced from 0.1 to 0.05 for smoother, slower interpolation
+      wheelMultiplier: 0.4, // Much slower: reduced from 1.5 to 0.4
+      lerp: 0.05, // Much slower: reduced from 0.15 to 0.05
       syncTouch: true,
     });
 
@@ -303,6 +269,9 @@ const ScrollStack = ({
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
+    // Force scroll to top immediately on mount/refresh
+    scroller.scrollTop = 0;
+
     // Collect card references
     cardsRef.current = Array.from(scroller.querySelectorAll('.scroll-stack-card'));
 
@@ -325,17 +294,37 @@ const ScrollStack = ({
     };
   }, [checkScrollPosition]);
 
-  // Auto-scroll on mount
+  // Auto-scroll on mount with initialCardIndex support
   useEffect(() => {
-    if (lenisRef.current && scrollerRef.current) {
-      if (autoScrollToCenter) {
-        const center = scrollerRef.current.scrollHeight / 2;
-        lenisRef.current.scrollTo(center, { duration: 1.5 });
-      } else if (autoScrollToTop) {
-        lenisRef.current.scrollTo(0, { duration: 1.5 });
+    if (lenisRef.current && scrollerRef.current && cardsRef.current.length > 0) {
+      const targetCard = cardsRef.current[initialCardIndex];
+      
+      if (targetCard && initialCardIndex > 0) {
+        // Scroll to specific card immediately
+        const containerHeight = scrollerRef.current.clientHeight;
+        const stackPositionPx = parsePercentage(stackPosition, containerHeight);
+        const targetScrollPosition = targetCard.offsetTop - stackPositionPx - (itemStackDistance * initialCardIndex);
+        
+        lenisRef.current.scrollTo(targetScrollPosition, { duration: 0, immediate: true });
+        
+        // Optional smooth scroll after initial positioning
+        setTimeout(() => {
+          if (autoScrollToTop && initialCardIndex === 0) {
+            lenisRef.current.scrollTo(0, { duration: 3.0 }); // Much slower: increased from 1.5 to 3.0
+          }
+        }, 200); // Slower delay: increased from 100 to 200
+      } else {
+        // Default behavior for card 1
+        lenisRef.current.scrollTo(0, { duration: 0, immediate: true });
+        
+        setTimeout(() => {
+          if (autoScrollToTop) {
+            lenisRef.current.scrollTo(0, { duration: 3.0 }); // Much slower: increased from 1.5 to 3.0
+          }
+        }, 200); // Slower delay: increased from 100 to 200
       }
     }
-  }, []);
+  }, [autoScrollToTop, initialCardIndex, stackPosition, itemStackDistance, parsePercentage]);
 
   return (
     <div
