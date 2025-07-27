@@ -86,7 +86,7 @@ const PoemsSection: React.FC = () => {
               
               const startPosition = window.pageYOffset;
               const distance = targetPosition;
-              const duration = window.innerWidth < 768 ? 3000 : 4000; // Much slower: increased from 1000/1200 to 3000/4000
+              const duration = window.innerWidth < 768 ? 1500 : 1800; // Balanced: faster than 3000/4000 but smoother than 1000/1200
               let startTime = null;
               
               const easeInOutCubic = (t) => {
@@ -110,7 +110,7 @@ const PoemsSection: React.FC = () => {
               };
               
               requestAnimationFrame(animateScroll);
-            }, window.innerWidth < 768 ? 200 : 300); // Much slower response: increased from 50/100 to 200/300
+            }, window.innerWidth < 768 ? 200 : 300); // Responsive: reduced from 200 to 100
           }
         });
       },
@@ -139,7 +139,7 @@ const PoemsSection: React.FC = () => {
     let scrollTimeout;
     const debouncedScrollHandler = () => {
       clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(handleScroll, window.innerWidth < 768 ? 300 : 500); // Much slower debounce
+      scrollTimeout = setTimeout(handleScroll, window.innerWidth < 768 ? 150 : 200); // More responsive debounce
     };
 
     window.addEventListener('scroll', debouncedScrollHandler, { passive: true });
@@ -166,7 +166,7 @@ const PoemsSection: React.FC = () => {
             stackPosition="20%"
             scaleEndPosition="10%"
             baseScale={window.innerWidth < 768 ? 0.9 : 0.85}
-            scaleDuration={1.5} // Much slower: increased from 0.5 to 1.5
+            scaleDuration={0.8} // Smoother: reduced from 1.5 to 0.8
             rotationAmount={1}
             blurAmount={1.5}
             autoScrollToCenter={false}

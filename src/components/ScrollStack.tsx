@@ -237,13 +237,13 @@ const ScrollStack = ({
     const lenis = new Lenis({
       wrapper: scroller,
       content: scroller.querySelector('.scroll-stack-inner'),
-      duration: 3.5, // Much slower: increased from 1.2 to 3.5
+      duration: 1.8, // Balanced: reduced from 3.5 to 1.8 for better fluidity
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      touchMultiplier: 0.8, // Much slower: reduced from 2.5 to 0.8
+      touchMultiplier: 1.5, // More responsive: increased from 0.8 to 1.5
       infinite: false,
-      wheelMultiplier: 0.4, // Much slower: reduced from 1.5 to 0.4
-      lerp: 0.05, // Much slower: reduced from 0.15 to 0.05
+      wheelMultiplier: 0.8, // Balanced: increased from 0.4 to 0.8
+      lerp: 0.1, // Smoother interpolation: increased from 0.05 to 0.1
       syncTouch: true,
     });
 
@@ -310,18 +310,18 @@ const ScrollStack = ({
         // Optional smooth scroll after initial positioning
         setTimeout(() => {
           if (autoScrollToTop && initialCardIndex === 0) {
-            lenisRef.current.scrollTo(0, { duration: 3.0 }); // Much slower: increased from 1.5 to 3.0
+            lenisRef.current.scrollTo(0, { duration: 2.0 }); // More fluid: reduced from 3.0 to 2.0
           }
-        }, 200); // Slower delay: increased from 100 to 200
+        }, 150); // More responsive: reduced from 200 to 150
       } else {
         // Default behavior for card 1
         lenisRef.current.scrollTo(0, { duration: 0, immediate: true });
         
         setTimeout(() => {
           if (autoScrollToTop) {
-            lenisRef.current.scrollTo(0, { duration: 3.0 }); // Much slower: increased from 1.5 to 3.0
+            lenisRef.current.scrollTo(0, { duration: 2.0 }); // More fluid: reduced from 3.0 to 2.0
           }
-        }, 200); // Slower delay: increased from 100 to 200
+        }, 150); // More responsive: reduced from 200 to 150
       }
     }
   }, [autoScrollToTop, initialCardIndex, stackPosition, itemStackDistance, parsePercentage]);
