@@ -50,12 +50,12 @@ const FantasmaSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-6xl md:text-8xl font-bold font-dirtyline text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6"
-            style={{ fontVariant: 'small-caps' }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold font-dirtyline text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6 px-4 max-w-full overflow-hidden"
+            style={{ fontVariant: 'small-caps', wordBreak: 'break-word' }}
           >
             {t(language, 'fantasma.title')}
           </motion.h2>
-          <p className="text-xl font-avenuex text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
             {t(language, 'fantasma.description')}
           </p>
         </motion.div>
@@ -122,10 +122,10 @@ const FantasmaSection: React.FC = () => {
                   whileHover={{ opacity: 1, y: 0 }}
                   className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent"
                 >
-                  <h3 className="text-2xl font-bold font-avenuex text-white mb-2">
+                  <h3 className="text-2xl font-bold font-lincolnmitre text-white mb-2">
                     {project.title}
                   </h3>
-                  <p className="text-white/80 font-avenuex text-sm leading-relaxed">
+                  <p className="text-white/80 font-lincolnmitre text-sm leading-relaxed">
                     {project.description}
                   </p>
                 </motion.div>

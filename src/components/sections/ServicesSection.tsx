@@ -67,10 +67,10 @@ const ServicesSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="text-center mb-20"
         >
-          <h2 className="text-5xl font-bold font-avenuex text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
             {t(language, 'services.title')}
           </h2>
-          <p className="text-xl font-avenuex text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
             {t(language, 'services.description')}
           </p>
         </motion.div>
@@ -106,33 +106,33 @@ const ServicesSection: React.FC = () => {
               {/* Icon */}
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 10 }}
-                className={`inline-flex p-4 bg-gradient-to-r ${service.color} rounded-2xl mb-6 relative z-10`}
+                className={`inline-flex p-3 bg-gradient-to-r ${service.color} rounded-2xl mb-4 relative z-10`}
               >
-                <service.icon size={32} className="text-white" />
+                <service.icon size={24} className="text-white" />
               </motion.div>
 
               {/* Content */}
               <div className="relative z-10">
-                <h3 className="text-2xl font-bold font-avenuex text-orange-800 dark:text-white mb-4">
+                <h3 className="text-lg font-bold font-lincolnmitre text-orange-800 dark:text-white mb-3">
                   {service.title}
                 </h3>
-                <p className="text-orange-600 dark:text-gray-300 font-avenuex mb-6 leading-relaxed">
+                <p className="text-sm font-lincolnmitre text-orange-600 dark:text-gray-300 mb-4 leading-relaxed">
                   {service.description}
                 </p>
 
                 {/* Features */}
-                <ul className="space-y-2">
+                <ul className="space-y-1">
                   {service.features.map((feature, featureIndex) => (
                     <motion.li
                       key={feature}
                       initial={{ opacity: 0, x: -20 }}
                       animate={inView ? { opacity: 1, x: 0 } : {}}
                       transition={{ delay: (index * 0.15) + (featureIndex * 0.1) + 0.5 }}
-                      className="flex items-center text-sm font-avenuex text-orange-600 dark:text-gray-400"
+                      className="flex items-center text-xs font-lincolnmitre text-orange-600 dark:text-gray-400"
                     >
                       <motion.div 
                         whileHover={{ scale: 1.2 }}
-                        className="w-2 h-2 bg-gradient-to-r from-primary to-secondary rounded-full mr-3"
+                        className="w-1.5 h-1.5 bg-gradient-to-r from-primary to-secondary rounded-full mr-2"
                       />
                       {feature}
                     </motion.li>
@@ -147,7 +147,7 @@ const ServicesSection: React.FC = () => {
                   opacity: [0.3, 0.6, 0.3],
                 }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute bottom-4 left-4 w-4 h-4 bg-primary rounded-full opacity-30"
+                className="absolute bottom-4 left-4 w-3 h-3 bg-primary rounded-full opacity-30"
               />
               <motion.div
                 animate={{ 
@@ -155,7 +155,7 @@ const ServicesSection: React.FC = () => {
                   opacity: [0.6, 0.3, 0.6],
                 }}
                 transition={{ duration: 5, repeat: Infinity }}
-                className="absolute top-8 right-12 w-3 h-3 bg-secondary rounded-full opacity-30"
+                className="absolute top-8 right-12 w-2 h-2 bg-secondary rounded-full opacity-30"
               />
             </motion.div>
           ))}

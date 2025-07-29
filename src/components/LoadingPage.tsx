@@ -164,7 +164,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
                   </span>
                 </motion.div>
 
-                {/* Smaller fixed size file info container */}
+                {/* Smaller fixed size file info container with gradient fire colors */}
                 <motion.div
                   className="mt-1 h-3 flex items-center justify-center w-48 mx-auto"
                   initial={{ opacity: 0 }}
@@ -177,7 +177,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -3 }}
                     transition={{ duration: 0.2 }}
-                    className="font-lincolnmitre text-gray-600 lowercase tracking-wide"
+                    className="font-lincolnmitre bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent lowercase tracking-wide"
                     style={{ fontSize: '8px', lineHeight: '12px' }}
                   >
                     {currentLoadingItem}
