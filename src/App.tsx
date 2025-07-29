@@ -49,7 +49,7 @@ function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="min-h-screen bg-black text-orange-900 dark:text-gray-900 font-avenuex relative"
+            className="min-h-screen bg-black text-orange-900 dark:text-gray-900 font-avenuex relative overflow-x-hidden"
           >
             {/* Reactive Parallax DarkVeil Background */}
             <motion.div 
@@ -79,7 +79,7 @@ function App() {
             </motion.div>
             
             {/* Main Content with hero section priority */}
-            <motion.main className="relative z-10">
+            <motion.main className="relative z-10 overflow-x-hidden">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -105,7 +105,7 @@ function App() {
             
             {/* Footer */}
             <motion.footer 
-              className="relative z-10 bg-black/90 backdrop-blur-lg text-white py-8"
+              className="relative z-10 bg-black/90 backdrop-blur-lg text-white py-8 overflow-x-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1 }}
@@ -123,7 +123,7 @@ function App() {
                     max="360"
                     value={hueShift}
                     onChange={(e) => setHueShift(Number(e.target.value))}
-                    className="w-48"
+                    className="w-32 sm:w-48"
                   />
                 </div>
               </div>
