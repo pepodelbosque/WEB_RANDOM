@@ -59,13 +59,13 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6 }}
-            className="flex flex-row gap-4 justify-center items-center mt-12"
+            className="flex flex-row justify-center items-center mt-12 gap-1"
           >
             <motion.button
               whileHover={{ scale: 1.05, rotateZ: 2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#portfolio')}
-              className="w-24 px-3 py-2 bg-gradient-to-r from-primary to-secondary text-white font-avenuex rounded-full hover:shadow-2xl transition-all duration-300 animate-pulse-glow text-sm"
+              className="w-16 h-8 px-2 py-1 bg-black border border-red-600 text-red-500 font-lincolnmitre hover:bg-red-900 hover:text-red-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
             >
               {t(language, 'hero.viewPortfolio')}
             </motion.button>
@@ -74,7 +74,7 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.05, rotateZ: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#contact')}
-              className="w-24 px-3 py-2 border-2 border-primary text-primary dark:text-white font-avenuex rounded-full hover:bg-primary hover:text-white transition-all duration-300 animate-pulse-glow-red text-sm"
+              className="w-20 h-8 px-2 py-1 bg-black border border-red-600 text-red-500 font-lincolnmitre hover:bg-red-900 hover:text-red-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
             >
               {t(language, 'hero.getInTouch')}
             </motion.button>
