@@ -62,10 +62,10 @@ const ExperienceSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="text-center mb-20"
         >
-          <h2 className="text-5xl font-bold font-avenuex text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
+          <h2 className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
             {t(language, 'experience.title')}
           </h2>
-          <p className="text-xl font-avenuex text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
             {t(language, 'experience.description')}
           </p>
         </motion.div>
@@ -93,11 +93,11 @@ const ExperienceSection: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={inView ? { opacity: 1 } : {}}
                 transition={{ duration: 2, delay: 0.6 + index * 0.1 }}
-                className="text-3xl font-bold font-avenuex text-primary mb-2"
+                className="text-3xl font-bold font-lincolnmitre text-primary mb-2"
               >
                 {stat.number}
               </motion.div>
-              <div className="text-sm font-avenuex text-orange-600 dark:text-gray-400">
+              <div className="text-sm font-lincolnmitre text-orange-600 dark:text-gray-400">
                 {stat.label}
               </div>
             </motion.div>
@@ -138,31 +138,31 @@ const ExperienceSection: React.FC = () => {
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
                   <div>
-                    <h3 className="text-2xl font-bold font-avenuex text-orange-800 dark:text-white mb-2">
+                    <h3 className="text-2xl font-bold font-lincolnmitre text-orange-800 dark:text-white mb-2">
                       {exp.title}
                     </h3>
-                    <div className="text-lg font-avenuex text-primary mb-2">
+                    <div className="text-lg font-lincolnmitre text-primary mb-2">
                       {exp.company}
                     </div>
                   </div>
                   <div className="flex flex-col md:items-end space-y-2">
-                    <div className="flex items-center text-sm font-avenuex text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center text-sm font-lincolnmitre text-gray-600 dark:text-gray-400">
                       <Calendar size={16} className="mr-2" />
                       {exp.period}
                     </div>
-                    <div className="flex items-center text-sm font-avenuex text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center text-sm font-lincolnmitre text-gray-600 dark:text-gray-400">
                       <MapPin size={16} className="mr-2" />
                       {exp.location}
                     </div>
                   </div>
                 </div>
 
-                <p className="text-orange-600 dark:text-gray-300 font-avenuex mb-6 leading-relaxed">
+                <p className="text-orange-600 dark:text-gray-300 font-lincolnmitre mb-6 leading-relaxed">
                   {exp.description}
                 </p>
 
                 <div>
-                  <h4 className="text-lg font-bold font-avenuex text-orange-800 dark:text-white mb-4">
+                  <h4 className="text-lg font-bold font-lincolnmitre text-orange-800 dark:text-white mb-4">
                     {t(language, 'experience.keyAchievements')}
                   </h4>
                   <ul className="space-y-2">
@@ -172,7 +172,7 @@ const ExperienceSection: React.FC = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={inView ? { opacity: 1, x: 0 } : {}}
                         transition={{ delay: 0.8 + index * 0.2 + achIndex * 0.1 }}
-                        className="flex items-start text-sm font-avenuex text-orange-600 dark:text-gray-400"
+                        className="flex items-start text-sm font-lincolnmitre text-orange-600 dark:text-gray-400"
                       >
                         <motion.div 
                           whileHover={{ scale: 1.3 }}

@@ -91,7 +91,7 @@ const Navigation: React.FC = () => {
           opacity: shouldShowNav || isMenuOpen ? 1 : 0
         }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/10 dark:bg-black/20 backdrop-blur-lg border-b border-white/20"
+        className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-lg border-b border-white/20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -99,7 +99,7 @@ const Navigation: React.FC = () => {
             <motion.div 
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('#home')}
-              className="text-xl md:text-2xl font-bold font-dirtyline text-orange-400 dark:text-primary uppercase tracking-wider hover:text-red-600 transition-colors cursor-pointer"
+              className="text-xl md:text-2xl font-bold font-dirtyline text-red-600 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer"
               style={{ fontVariant: 'small-caps' }}
             >
               RANDOM
@@ -118,7 +118,7 @@ const Navigation: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.1 }}
-                  className="text-sm font-avenuex text-orange-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-primary transition-colors cursor-pointer"
+                  className="text-sm font-lincolnmitre text-red-600 hover:text-orange-500 transition-colors cursor-pointer"
                 >
                   {item.label}
                 </motion.a>
@@ -130,10 +130,10 @@ const Navigation: React.FC = () => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                  className="p-2 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-sm flex items-center space-x-1 text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary transition-colors"
+                  className="p-3 rounded-full bg-red-600/20 backdrop-blur-sm flex items-center justify-center space-x-1 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200 min-w-[44px] min-h-[44px]"
                 >
-                  <Globe size={20} />
-                  <span className="text-xs font-avenuex">{language.toUpperCase()}</span>
+                  <Globe size={18} className="flex-shrink-0" />
+                  <span className="text-xs font-lincolnmitre">{language.toUpperCase()}</span>
                 </motion.button>
                 
                 <AnimatePresence>
@@ -142,17 +142,17 @@ const Navigation: React.FC = () => {
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute top-12 right-0 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-xl border border-white/20 overflow-hidden z-60 min-w-[100px]"
+                      className="absolute top-12 right-0 bg-black/80 backdrop-blur-lg rounded-xl border border-red-600/30 overflow-hidden z-60 min-w-[100px]"
                     >
                       <button
                         onClick={() => handleLanguageChange('en')}
-                        className="block w-full px-3 py-2 text-sm font-avenuex text-left text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary hover:bg-primary/20 transition-colors"
+                        className="block w-full px-4 py-3 text-sm font-lincolnmitre text-left text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-colors"
                       >
                         English
                       </button>
                       <button
                         onClick={() => handleLanguageChange('es')}
-                        className="block w-full px-3 py-2 text-sm font-avenuex text-left text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary hover:bg-primary/20 transition-colors"
+                        className="block w-full px-4 py-3 text-sm font-lincolnmitre text-left text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-colors"
                       >
                         Español
                       </button>
@@ -166,9 +166,9 @@ const Navigation: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
-                className="p-2 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-sm text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary transition-colors"
+                className="p-3 rounded-full bg-red-600/20 backdrop-blur-sm text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
-                {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                {isDark ? <Sun size={18} className="flex-shrink-0" /> : <Moon size={18} className="flex-shrink-0" />}
               </motion.button>
             </div>
 
@@ -179,10 +179,10 @@ const Navigation: React.FC = () => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                  className="p-2 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-sm flex items-center space-x-1 text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary transition-colors"
+                  className="p-3 rounded-full bg-red-600/20 backdrop-blur-sm flex items-center justify-center space-x-1 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200 min-w-[40px] min-h-[40px]"
                 >
-                  <Globe size={14} />
-                  <span className="text-xs font-avenuex">{language.toUpperCase()}</span>
+                  <Globe size={14} className="flex-shrink-0" />
+                  <span className="text-xs font-lincolnmitre">{language.toUpperCase()}</span>
                 </motion.button>
                 
                 <AnimatePresence>
@@ -191,17 +191,17 @@ const Navigation: React.FC = () => {
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute top-12 right-0 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-xl border border-white/20 overflow-hidden z-60 min-w-[100px]"
+                      className="absolute top-12 right-0 bg-black/80 backdrop-blur-lg rounded-xl border border-red-600/30 overflow-hidden z-60 min-w-[100px]"
                     >
                       <button 
                         onClick={() => handleLanguageChange('en')} 
-                        className="block w-full px-3 py-2 text-sm font-avenuex text-left text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary hover:bg-primary/20 transition-colors"
+                        className="block w-full px-4 py-3 text-sm font-lincolnmitre text-left text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-colors"
                       >
                         English
                       </button>
                       <button 
                         onClick={() => handleLanguageChange('es')} 
-                        className="block w-full px-3 py-2 text-sm font-avenuex text-left text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary hover:bg-primary/20 transition-colors"
+                        className="block w-full px-4 py-3 text-sm font-lincolnmitre text-left text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-colors"
                       >
                         Español
                       </button>
@@ -214,18 +214,18 @@ const Navigation: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
-                className="p-2 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-sm text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary transition-colors"
+                className="p-3 rounded-full bg-red-600/20 backdrop-blur-sm text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center"
               >
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                {isDark ? <Sun size={16} className="flex-shrink-0" /> : <Moon size={16} className="flex-shrink-0" />}
               </motion.button>
               
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-full bg-white/20 dark:bg-black/20 backdrop-blur-sm text-orange-400 dark:text-white hover:text-red-600 dark:hover:text-primary transition-colors"
+                className="p-3 rounded-full bg-red-600/20 backdrop-blur-sm text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200 min-w-[40px] min-h-[40px] flex items-center justify-center"
               >
-                {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+                {isMenuOpen ? <X size={16} className="flex-shrink-0" /> : <Menu size={16} className="flex-shrink-0" />}
               </motion.button>
             </div>
           </div>
@@ -238,7 +238,7 @@ const Navigation: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-white/10 dark:bg-black/20 backdrop-blur-lg border-t border-white/20"
+              className="md:hidden bg-black/80 backdrop-blur-lg border-t border-red-600/30"
             >
               <div className="px-4 py-4 space-y-3 text-right">
                 {navItems.map((item, index) => (
@@ -251,7 +251,7 @@ const Navigation: React.FC = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="block text-base font-avenuex text-orange-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-primary transition-colors cursor-pointer text-right py-2"
+                    className="block text-base font-lincolnmitre text-red-600 hover:text-orange-500 transition-colors cursor-pointer text-right py-2"
                   >
                     {item.label}
                   </motion.a>

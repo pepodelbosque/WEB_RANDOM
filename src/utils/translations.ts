@@ -220,7 +220,7 @@ export const translations = {
     // Hero Section
     hero: {
       title: 'RANDOM',
-      subtitle: 'Cruce entre la creatividad y la tecnología a través de la técnica del Machinima y el Cine 3D Experimental.',
+      subtitle: 'Cruce entre el arte digital y la tecnología a través del Cine Experimental y la libre interpretación.',
       description: '',
       viewPortfolio: 'Sueños',
       getInTouch: 'Pesadillas',

@@ -32,7 +32,7 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
 
     return () => clearInterval(interval);
   }, [onLoadingComplete]);
-
+  
   return (
     <AnimatePresence>
       {!isComplete && (

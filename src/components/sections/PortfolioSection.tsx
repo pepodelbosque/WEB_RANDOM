@@ -57,10 +57,10 @@ const PortfolioSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="text-center mb-20"
         >
-          <h2 className="text-5xl font-bold font-avenuex text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
+          <h2 className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
             {t(language, 'portfolio.title')}
           </h2>
-          <p className="text-xl font-avenuex text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
             {t(language, 'portfolio.description')}
           </p>
         </motion.div>
@@ -122,10 +122,10 @@ const PortfolioSection: React.FC = () => {
 
               {/* Project Content */}
               <div className="p-8">
-                <h3 className="text-2xl font-bold font-avenuex text-orange-800 dark:text-white mb-3">
+                <h3 className="text-2xl font-bold font-lincolnmitre text-orange-800 dark:text-white mb-3">
                   {project.title}
                 </h3>
-                <p className="text-orange-600 dark:text-gray-300 font-avenuex mb-6 leading-relaxed">
+                <p className="text-orange-600 dark:text-gray-300 font-lincolnmitre mb-6 leading-relaxed">
                   {project.description}
                 </p>
                 
@@ -137,7 +137,7 @@ const PortfolioSection: React.FC = () => {
                       initial={{ opacity: 0, scale: 0 }}
                       animate={inView ? { opacity: 1, scale: 1 } : {}}
                       transition={{ delay: (index * 0.2) + (techIndex * 0.1) + 0.5 }}
-                      className="px-3 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 text-sm font-avenuex rounded-full border border-primary/30"
+                      className="px-3 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 text-sm font-lincolnmitre rounded-full border border-primary/30"
                     >
                       {tech}
                     </motion.span>

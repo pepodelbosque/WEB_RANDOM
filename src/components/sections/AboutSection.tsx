@@ -70,18 +70,18 @@ const AboutSection: React.FC = () => {
           >
             <motion.h2 
               initial={{ opacity: 0, y: 50 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-5xl font-bold font-avenuex text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+              className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
             >
               {t(language, 'about.title')}
             </motion.h2>
 
             <motion.div
               initial={{ opacity: 0, y: 50 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 1, delay: 0.4 }}
-              className="space-y-6 text-base md:text-lg font-avenuex text-red-600 dark:text-white max-w-2xl mx-auto leading-normal"
+              className="space-y-6 text-base md:text-lg font-lincolnmitre text-red-600 dark:text-white max-w-2xl mx-auto leading-normal"
             >
               <p>
                 {t(language, 'about.description1')}

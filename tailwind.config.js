@@ -20,6 +20,8 @@ export default {
       fontFamily: {
         'avenuex': ['AvenueX', 'Arial', 'sans-serif'],
         'dirtyline': ['Dirtyline', 'Fira Code', 'monospace'],
+        'servermono': ['ServerMono', 'Fira Code', 'monospace'],
+        'lincolnmitre': ['LincolnMITRE', 'monospace'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

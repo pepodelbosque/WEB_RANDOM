@@ -46,7 +46,10 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="text-xs md:text-sm font-avenuex text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4"
+            className="text-xs md:text-sm font-lincolnmitre text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4"
+            style={{ 
+              letterSpacing: '-0.5px'
+            }}
           >
             {t(language, 'hero.subtitle')}
           </motion.p>
