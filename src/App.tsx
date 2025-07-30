@@ -6,7 +6,7 @@ import { t } from './utils/translations';
 import LoadingPage from './components/LoadingPage';
 import Navigation from './components/Navigation';
 import HeroSection from './components/sections/HeroSection';
-import PoemsSection from './components/sections/PoemsSection';
+// import PoemsSection from './components/sections/PoemsSection'; - REMOVED
 import AboutSection from './components/sections/AboutSection';
 import PortfolioSection from './components/sections/PortfolioSection';
 import ServicesSection from './components/sections/ServicesSection';
@@ -93,7 +93,6 @@ function App() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
               >
-                <PoemsSection />
                 <AboutSection />
                 <PortfolioSection />
                 <ServicesSection />
@@ -105,27 +104,18 @@ function App() {
             
             {/* Footer */}
             <motion.footer 
-              className="relative z-10 bg-black/90 backdrop-blur-lg text-white py-8 overflow-x-hidden"
+              className="relative z-10 bg-black/90 backdrop-blur-lg text-white py-4 overflow-x-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1 }}
             >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <p className="font-avenuex text-sm opacity-80">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
+                <p className="font-lincolnmitre text-xs opacity-80">
                   {t(language, 'footer.copyright')}
                 </p>
-                <div className="mt-4">
-                  <label htmlFor="hueShift" className="text-sm mr-2">Hue Shift: {hueShift}</label>
-                  <input
-                    id="hueShift"
-                    type="range"
-                    min="0"
-                    max="360"
-                    value={hueShift}
-                    onChange={(e) => setHueShift(Number(e.target.value))}
-                    className="w-32 sm:w-48"
-                  />
-                </div>
+                <p className="font-lincolnmitre text-[10px] opacity-60 leading-tight max-w-4xl mx-auto">
+                  {t(language, 'This artwork was created for artistic purposes and does not necessarily reflect objective information nor endorse any specific viewpoint. The content is for creative purposes and should not be interpreted as a representation of reality')}
+                </p>
               </div>
             </motion.footer>
           </motion.div>

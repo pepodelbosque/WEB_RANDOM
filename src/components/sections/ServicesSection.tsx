@@ -105,10 +105,12 @@ const ServicesSection: React.FC = () => {
 
               {/* Icon */}
               <motion.div
-                whileHover={{ scale: 1.1, rotate: 10 }}
-                className={`inline-flex p-3 bg-gradient-to-r ${service.color} rounded-2xl mb-4 relative z-10`}
+                whileHover={{ scale: 1.1, rotate: 2 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                className="inline-flex p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 mb-4 relative z-10"
               >
-                <service.icon size={24} className="text-white" />
+                <service.icon size={24} className="text-red-600" />
               </motion.div>
 
               {/* Content */}

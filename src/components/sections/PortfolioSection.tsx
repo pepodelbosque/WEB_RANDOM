@@ -97,23 +97,26 @@ const PortfolioSection: React.FC = () => {
                   className="absolute inset-0 flex items-center justify-center space-x-4 bg-black/50"
                 >
                   <motion.button
-                    whileHover={{ scale: 1.2, rotate: 5 }}
+                    whileHover={{ scale: 1.1, rotate: 2 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-3 bg-primary rounded-full text-white hover:bg-secondary transition-colors"
+                    transition={{ duration: 0.2 }}
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
                   >
                     <Eye size={20} />
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.2, rotate: -5 }}
+                    whileHover={{ scale: 1.1, rotate: -2 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-3 bg-secondary rounded-full text-white hover:bg-primary transition-colors"
+                    transition={{ duration: 0.2 }}
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
                   >
                     <Github size={20} />
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.2, rotate: 5 }}
+                    whileHover={{ scale: 1.1, rotate: 2 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-3 bg-accent rounded-full text-white hover:bg-primary transition-colors"
+                    transition={{ duration: 0.2 }}
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
                   >
                     <ExternalLink size={20} />
                   </motion.button>

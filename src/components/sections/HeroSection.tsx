@@ -64,19 +64,41 @@ const HeroSection: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05, rotateZ: 2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => scrollToSection('#portfolio')}
-              className="w-16 h-8 px-2 py-1 bg-black border border-red-600 text-red-500 font-lincolnmitre hover:bg-red-900 hover:text-red-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
+              onClick={() => scrollToSection('#about')}
+              className="w-16 h-8 px-2 py-1 bg-black/50 border border-red-600 text-red-500 font-lincolnmitre hover:bg-orange-900 hover:text-orange-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
+              aria-label="Navigate to About section"
             >
-              {t(language, 'hero.viewPortfolio')}
+              {t(language, 'nav.about')}
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05, rotateZ: -2 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => scrollToSection('#portfolio')}
+              className="w-16 h-8 px-2 py-1 bg-black/50 border border-red-600 text-red-500 font-lincolnmitre hover:bg-orange-900 hover:text-orange-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
+              aria-label="Navigate to Portfolio section"
+            >
+              {t(language, 'nav.portfolio')}
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05, rotateZ: 2 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => scrollToSection('#services')}
+              className="w-20 h-8 px-2 py-1 bg-black/50 border border-red-600 text-red-500 font-lincolnmitre hover:bg-orange-900 hover:text-orange-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
+              aria-label="Navigate to Services section"
+            >
+              {t(language, 'nav.services')}
             </motion.button>
             
             <motion.button
               whileHover={{ scale: 1.05, rotateZ: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('#contact')}
-              className="w-20 h-8 px-2 py-1 bg-black border border-red-600 text-red-500 font-lincolnmitre hover:bg-red-900 hover:text-red-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
+              className="w-16 h-8 px-2 py-1 bg-black/50 border border-red-600 text-red-500 font-lincolnmitre hover:bg-orange-900 hover:text-orange-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
+              aria-label="Navigate to Contact section"
             >
-              {t(language, 'hero.getInTouch')}
+              {t(language, 'nav.contact')}
             </motion.button>
           </motion.div>
         </motion.div>

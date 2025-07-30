@@ -114,9 +114,14 @@ const ContactSection: React.FC = () => {
                   whileHover={{ scale: 1.02, x: 10 }}
                   className="flex items-center space-x-4 p-4 bg-white/10 dark:bg-black/20 backdrop-blur-lg rounded-2xl border border-white/20 hover:border-primary/50 transition-all duration-300"
                 >
-                  <div className="p-3 bg-gradient-to-r from-primary to-secondary rounded-xl">
-                    <info.icon size={24} className="text-white" />
-                  </div>
+                  <motion.div 
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800"
+                    whileHover={{ scale: 1.1, rotate: 2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <info.icon size={24} className="text-red-600" />
+                  </motion.div>
                   <div>
                     <div className="text-sm font-lincolnmitre text-gray-600 dark:text-gray-400">
                       {info.label}
@@ -151,7 +156,7 @@ const ContactSection: React.FC = () => {
                     transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
                     whileHover={{ scale: 1.2, rotate: 10 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-3 bg-gradient-to-r from-primary to-secondary rounded-xl text-white hover:shadow-lg transition-all duration-300"
+                    className="p-3 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:bg-gradient-to-r hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 hover:text-white hover:shadow-lg transition-all duration-300"
                   >
                     <social.icon size={24} />
                   </motion.a>
@@ -257,13 +262,13 @@ const ContactSection: React.FC = () => {
                 transition={{ duration: 0.8, delay: 0.9 }}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-lincolnmitre rounded-2xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+                className="w-full px-8 py-4 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 font-lincolnmitre hover:bg-gradient-to-r hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 hover:text-white hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                 {isSubmitting ? (
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full"
                   />
                 ) : (
                   <>

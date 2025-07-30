@@ -94,23 +94,26 @@ const FantasmaSection: React.FC = () => {
                   className="absolute inset-0 flex items-center justify-center space-x-4"
                 >
                   <motion.button
-                    whileHover={{ scale: 1.2, rotate: 10 }}
+                    whileHover={{ scale: 1.1, rotate: 2 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-4 bg-white/20 backdrop-blur-lg rounded-full text-white hover:bg-primary/50 transition-colors border border-white/30"
+                    transition={{ duration: 0.2 }}
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
                   >
                     <Eye size={24} />
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.2, rotate: -10 }}
+                    whileHover={{ scale: 1.1, rotate: -2 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-4 bg-white/20 backdrop-blur-lg rounded-full text-white hover:bg-secondary/50 transition-colors border border-white/30"
+                    transition={{ duration: 0.2 }}
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
                   >
                     <Play size={24} />
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.2, rotate: 10 }}
+                    whileHover={{ scale: 1.1, rotate: 2 }}
                     whileTap={{ scale: 0.9 }}
-                    className="p-4 bg-white/20 backdrop-blur-lg rounded-full text-white hover:bg-accent/50 transition-colors border border-white/30"
+                    transition={{ duration: 0.2 }}
+                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
                   >
                     <Maximize size={24} />
                   </motion.button>

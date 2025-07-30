@@ -86,9 +86,14 @@ const ExperienceSection: React.FC = () => {
               whileHover={{ scale: 1.05, y: -5 }}
               className="text-center bg-white/10 dark:bg-black/20 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
             >
-              <div className="inline-flex p-3 bg-gradient-to-r from-primary to-secondary rounded-xl mb-4">
-                <stat.icon size={24} className="text-white" />
-              </div>
+              <motion.div 
+                className="inline-flex p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 mb-4"
+                whileHover={{ scale: 1.1, rotate: 2 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <stat.icon size={24} className="text-red-600" />
+              </motion.div>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={inView ? { opacity: 1 } : {}}
