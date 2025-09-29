@@ -114,7 +114,7 @@ export const translations = {
     // FANTASMA Section
     fantasma: {
       title: ' * FANTASMA ',
-      description: 'Explorando la intersección de sueños y realidad digital a través del machinima',
+      description: 'Exploring the intersection of dreams and digital reality through machinima',
       projects: {
         dreamscape: {
           title: 'Digital Dreamscape',

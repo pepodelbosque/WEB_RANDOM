@@ -62,7 +62,7 @@ const FantasmaSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-sm sm:text-sm md:text-base lg:text-base xl:text-lg font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6 px-4 max-w-full overflow-hidden"
+            className="text-sm sm:text-sm md:text-base lg:text-base xl:text-lg font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6 px-4 max-w-full overflow-hidden opacity-50"
             style={{ fontVariant: 'small-caps', wordBreak: 'break-word' }}
           >
             {t(language, 'fantasma.title')}
