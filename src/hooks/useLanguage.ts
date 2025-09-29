@@ -3,13 +3,17 @@ import { useState, useEffect } from 'react';
 export type Language = 'en' | 'es';
 
 export const useLanguage = () => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>('es');
   const [, forceUpdate] = useState({});
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') as Language;
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
       setLanguage(savedLanguage);
+    } else {
+      // If no saved language, set Spanish as default
+      setLanguage('es');
+      localStorage.setItem('language', 'es');
     }
 
     // Listen for language change events to force re-render
