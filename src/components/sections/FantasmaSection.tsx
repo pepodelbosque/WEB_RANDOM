@@ -46,11 +46,23 @@ const FantasmaSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="text-center mb-20"
         >
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={inView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="flex justify-center mb-0 px-4"
+          >
+            <img 
+              src="/images/logo-fntsm.png" 
+              alt="FNTSM Logo"
+              className="h-18 sm:h-18 md:h-24 lg:h-24 xl:h-30 w-auto object-contain"
+            />
+          </motion.div>
           <motion.h2 
             initial={{ opacity: 0, scale: 0.5 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold font-dirtyline text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6 px-4 max-w-full overflow-hidden"
+            className="text-sm sm:text-sm md:text-base lg:text-base xl:text-lg font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6 px-4 max-w-full overflow-hidden"
             style={{ fontVariant: 'small-caps', wordBreak: 'break-word' }}
           >
             {t(language, 'fantasma.title')}
