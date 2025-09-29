@@ -46,7 +46,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="text-xs md:text-sm font-lincolnmitre text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4"
+            className="text-xs md:text-sm font-lincolnmitre text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4 hover:text-red-400 dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer"
             style={{ 
               letterSpacing: '-0.5px'
             }}
