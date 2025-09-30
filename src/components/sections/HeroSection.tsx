@@ -30,15 +30,17 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-6xl md:text-8xl font-bold font-dirtyline uppercase tracking-wider text-center -mb-2"
+              className="text-6xl md:text-8xl font-bold font-dirtyline uppercase tracking-wider text-center -mb-2 flex justify-center items-center"
               style={{ fontVariant: 'small-caps' }}
             >
-              <GradientText 
-                colors={["#D95B00", "#AE2400", "#8C1B00", "#AE2400", "#D95B00"]} 
-                animationSpeed={10} 
-              >
-                {t(language, 'hero.title')}
-              </GradientText>
+              <img 
+                src="/images/logo-rndm.png" 
+                alt="RANDOM Logo"
+                className="h-20 md:h-32 w-auto object-contain"
+                style={{
+                  filter: 'hue-rotate(15deg) saturate(1.2) brightness(1.1)',
+                }}
+              />
             </motion.h1>
           </div>
 
