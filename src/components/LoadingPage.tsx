@@ -35,7 +35,6 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
   useEffect(() => {
     let currentIndex = 0;
     const itemDuration = 200; // 200ms per item
-    const totalDuration = loadingItems.length * itemDuration;
     
     const loadNextItem = () => {
       if (currentIndex < loadingItems.length) {

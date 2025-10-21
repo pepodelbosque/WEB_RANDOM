@@ -15,6 +15,13 @@ const AboutSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const wasInViewRef = useRef(false);
 
+  const handleRef = (el: HTMLElement | null) => {
+    ref(el);
+    if (el) {
+      (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el;
+    }
+  };
+
   // Detect scroll up from AboutSection
   useEffect(() => {
     const section = sectionRef.current;
@@ -58,7 +65,7 @@ const AboutSection: React.FC = () => {
   ];
 
   return (
-    <section id="about" ref={(el) => { ref(el); sectionRef.current = el; }} className="min-h-screen py-20 relative">
+    <section id="about" ref={handleRef} className="min-h-screen py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-1 gap-16 items-center">
           {/* Text Content */}
@@ -72,7 +79,7 @@ const AboutSection: React.FC = () => {
               initial={{ opacity: 0, y: 50 }}
               animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+              className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary max-w-2xl mx-auto"
             >
               {t(language, 'about.title')}
             </motion.h2>
