@@ -10,6 +10,7 @@ const ServicesSection: React.FC = () => {
   const [ref, inView] = useInView({
     threshold: 0.2,
     triggerOnce: true,
+    fallbackInView: true
   });
 
   const services = [
@@ -130,7 +131,7 @@ const ServicesSection: React.FC = () => {
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 100 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
           className="text-center mb-20"
         >
@@ -148,7 +149,11 @@ const ServicesSection: React.FC = () => {
             <motion.div
               key={member.name}
               initial={{ opacity: 0, y: 100, rotateY: -15 }}
-              animate={inView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
+              animate={
+                inView
+                  ? { opacity: 1, y: 0, rotateY: 0 }
+                  : { opacity: 1, y: 0, rotateY: 0 }
+              }
               transition={{ duration: 1, delay: index * 0.15 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
               className="group relative aspect-square rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden"
@@ -178,7 +183,11 @@ const ServicesSection: React.FC = () => {
                     <motion.span
                       key={skill}
                       initial={{ opacity: 0, scale: 0 }}
-                      animate={inView ? { opacity: 1, scale: 1 } : {}}
+                      animate={
+                        inView
+                          ? { opacity: 1, scale: 1 }
+                          : { opacity: 1, scale: 1 }
+                      }
                       transition={{
                         delay: index * 0.15 + skillIndex * 0.1 + 0.4,
                       }}
