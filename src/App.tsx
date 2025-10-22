@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLenis } from './hooks/useLenis';
 import { useLanguage } from './hooks/useLanguage';
@@ -17,11 +17,11 @@ import DarkVeil from './components/DarkVeil';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [showMainContent, setShowMainContent] = useState(false);
+  // showMainContent removed – not needed since we rely on isLoading alone
   useLenis();
   const { language } = useLanguage();
   const [, forceUpdate] = useState({});
-  const [hueShift, setHueShift] = useState(234);
+  const hueShift = 234;
 
   useEffect(() => {
     const handleLanguageChange = () => {
@@ -35,7 +35,7 @@ function App() {
   const handleLoadingComplete = () => {
     setIsLoading(false);
     // Immediate transition to prevent gap
-    setShowMainContent(true);
+    // setShowMainContent(true); // removed – state no longer exists
   };
 
   return (

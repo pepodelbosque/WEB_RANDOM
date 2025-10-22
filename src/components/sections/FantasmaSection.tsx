@@ -27,13 +27,6 @@ const FantasmaSection: React.FC = () => {
       image: 'https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg?auto=compress&cs=tinysrgb&w=800',
       gradient: 'from-blue-600 via-purple-600 to-pink-600',
     },
-    {
-      id: 3,
-      title: t(language, 'fantasma.projects.convergence.title'),
-      description: t(language, 'fantasma.projects.convergence.description'),
-      image: 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=800',
-      gradient: 'from-green-600 via-blue-600 to-purple-600',
-    },
   ];
 
   return (
@@ -73,96 +66,60 @@ const FantasmaSection: React.FC = () => {
         </motion.div>
 
         {/* Gallery Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-3xl">
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 100, rotateX: -15 }}
               animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
               transition={{ duration: 1, delay: index * 0.3 }}
-              whileHover={{ 
-                y: -20,
-                rotateY: 10,
-                scale: 1.05,
-              }}
-              className="group relative bg-white/5 dark:bg-black/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-primary/30 transition-all duration-700"
+              whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
+              className="group relative aspect-square rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden"
             >
-              {/* Image Container */}
-              <div className="relative h-80 overflow-hidden">
-                <motion.img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-120 transition-transform duration-1000"
-                  whileHover={{ scale: 1.2 }}
-                />
-                
-                {/* Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t ${project.gradient} opacity-0 group-hover:opacity-60 transition-opacity duration-500`} />
-                
-                {/* Action Buttons */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileHover={{ opacity: 1, scale: 1 }}
-                  className="absolute inset-0 flex items-center justify-center space-x-4"
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.1, rotate: 2 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
-                  >
-                    <Eye size={24} />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1, rotate: -2 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
-                  >
-                    <Play size={24} />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1, rotate: 2 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/20 transition-all duration-200"
-                  >
-                    <Maximize size={24} />
-                  </motion.button>
-                </motion.div>
+              {/* Background image fills square */}
+              <motion.img
+                src={project.image}
+                alt={project.title}
+                className="absolute inset-0 w-full h-full object-cover"
+                whileHover={{ scale: 1.06 }}
+                transition={{ duration: 0.8 }}
+              />
 
-                {/* Title Reveal */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileHover={{ opacity: 1, y: 0 }}
-                  className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent"
-                >
-                  <h3 className="text-2xl font-bold font-lincolnmitre text-white mb-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-white/80 font-lincolnmitre text-sm leading-relaxed">
-                    {project.description}
-                  </p>
-                </motion.div>
+              {/* Soft gradient wash like Portfolio */}
+              <div className={`absolute inset-0 bg-gradient-to-t ${project.gradient} opacity-20 group-hover:opacity-35 transition-opacity duration-300`} />
+
+              {/* Top-right action icons (compact) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={inView ? { opacity: 1, scale: 1 } : {}}
+                className="absolute top-2 right-2 flex items-center gap-1 z-10"
+              >
+                <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
+                  <Eye size={12} />
+                </motion.button>
+                <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
+                  <Play size={12} />
+                </motion.button>
+                <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
+                  <Maximize size={12} />
+                </motion.button>
+              </motion.div>
+
+              {/* Bottom overlay band (Portfolio style) */}
+              <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/35 backdrop-blur-sm">
+                <h3 className="text-sm font-black font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
+                  {project.title}
+                </h3>
+                <p className="text-sm font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-2 leading-relaxed">
+                  {project.description}
+                </p>
               </div>
 
-              {/* Decorative Elements */}
+              {/* Decorative square (matches square style) */}
               <motion.div
-                animate={{ 
-                  rotate: [0, 360],
-                  scale: [1, 1.2, 1],
-                }}
-                transition={{ duration: 15, repeat: Infinity }}
-                className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-full opacity-60"
-              />
-              
-              <motion.div
-                animate={{ 
-                  scale: [1, 1.5, 1],
-                  opacity: [0.3, 0.7, 0.3],
-                }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute bottom-4 left-4 w-3 h-3 bg-primary rounded-full opacity-40"
+                animate={{ rotate: [0, 360], scale: [1, 1.1, 1] }}
+                transition={{ duration: 10, repeat: Infinity }}
+                className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-primary to-secondary rounded-none opacity-50"
               />
             </motion.div>
           ))}

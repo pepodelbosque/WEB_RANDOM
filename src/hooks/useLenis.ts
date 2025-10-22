@@ -1,6 +1,12 @@
 import { useEffect } from 'react';
 import Lenis from '@studio-freight/lenis';
 
+declare global {
+  interface Window {
+    lenis: Lenis;
+  }
+}
+
 export const useLenis = () => {
   useEffect(() => {
     const lenis = new Lenis({
@@ -12,6 +18,8 @@ export const useLenis = () => {
       wheelMultiplier: 1,
       touchMultiplier: 2,
     });
+
+    window.lenis = lenis;
 
     function raf(time: number) {
       lenis.raf(time);

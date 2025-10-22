@@ -15,6 +15,17 @@ const AboutSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const wasInViewRef = useRef(false);
 
+  // Tiny gallery images and duplicated track for seamless loop
+  const tinyGalleryImages = [
+    '/images/tuto01a.jpeg',
+    '/images/tuto02.jpg',
+    '/images/tuto04.jpeg',
+    '/images/tuto1.png',
+    '/images/logo-rndm.png',
+    '/images/logo-fntsm.png',
+  ];
+  const duplicatedTinyImages = [...tinyGalleryImages, ...tinyGalleryImages];
+
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     if (el) {
@@ -57,13 +68,6 @@ const AboutSection: React.FC = () => {
     };
   }, []);
 
-  const skills = [
-    { name: t(language, 'about.skills.creativeThinking'), icon: Brain, level: 95 },
-    { name: t(language, 'about.skills.problemSolving'), icon: Target, level: 90 },
-    { name: t(language, 'about.skills.userExperience'), icon: Heart, level: 88 },
-    { name: t(language, 'about.skills.innovation'), icon: Lightbulb, level: 92 },
-  ];
-
   return (
     <section id="about" ref={handleRef} className="min-h-screen py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,49 +107,8 @@ const AboutSection: React.FC = () => {
               </p>
             </motion.div>
 
-            {/* Skills */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1, delay: 0.6 }}
-              className="space-y-6"
-            >
-              <h3 className="text-2xl font-bold font-lincolnmitre text-primary">{t(language, 'about.coreStrengths')}</h3>
-              <div className="space-y-4">
-                {skills.map((skill, index) => (
-                  <motion.div
-                    key={skill.name}
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={inView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.8, delay: 0.8 + index * 0.1 }}
-                    className="flex items-center space-x-4"
-                  >
-                    <motion.div 
-                      className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800"
-                      whileHover={{ scale: 1.1, rotate: 2 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <skill.icon size={24} className="text-red-600" />
-                    </motion.div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-lincolnmitre text-orange-800 dark:text-gray-200">{skill.name}</span>
-                        <span className="font-lincolnmitre text-sm text-orange-600 dark:text-gray-400">{skill.level}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={inView ? { width: `${skill.level}%` } : {}}
-                          transition={{ duration: 1.5, delay: 1 + index * 0.1 }}
-                          className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full"
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+            {/* Replace tiny horizontal gallery with spacer */}
+            <div className="w-full sm:w-1/2 mx-auto h-16" aria-hidden="true" />
           </motion.div>
 
           {/* Visual Element was here */}
