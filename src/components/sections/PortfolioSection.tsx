@@ -13,8 +13,14 @@ const PortfolioSection: React.FC = () => {
     triggerOnce: true,
   });
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const [isPopupMinimal, setPopupMinimal] = useState(false);
+  const [popupTitle, setPopupTitle] = useState('VIDEOGAME');
 
-  const openPopup = () => setPopupVisible(true);
+  const openPopup = (minimal: boolean = false, title: string = 'VIDEOGAME') => {
+    setPopupMinimal(minimal);
+    setPopupTitle(title);
+    setPopupVisible(true);
+  };
   const closePopup = () => setPopupVisible(false);
 
   const projects = [
@@ -22,7 +28,7 @@ const PortfolioSection: React.FC = () => {
       id: 1,
       title: t(language, 'portfolio.projects.organicEcommerce.title'),
       description: t(language, 'portfolio.projects.organicEcommerce.description'),
-      image: 'https://images.pexels.com/photos/3584967/pexels-photo-3584967.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/cntrolito_pensador_muyBuena2.jpg',
       tech: ['React', 'Node.js', 'MongoDB'],
       gradient: 'from-primary to-secondary',
     },
@@ -30,7 +36,7 @@ const PortfolioSection: React.FC = () => {
       id: 2,
       title: t(language, 'portfolio.projects.motionStudio.title'),
       description: t(language, 'portfolio.projects.motionStudio.description'),
-      image: 'https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Instalacion_Buena.jpg',
       tech: ['Next.js', 'Framer Motion', 'GSAP'],
       gradient: 'from-secondary to-primary',
     },
@@ -38,7 +44,7 @@ const PortfolioSection: React.FC = () => {
       id: 3,
       title: t(language, 'portfolio.projects.forestDashboard.title'),
       description: t(language, 'portfolio.projects.forestDashboard.description'),
-      image: 'https://images.pexels.com/photos/853199/pexels-photo-853199.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/catalogo_1.jpg',
       tech: ['Vue.js', 'D3.js', 'Firebase'],
       gradient: 'from-primary via-secondary to-accent',
     },
@@ -46,7 +52,7 @@ const PortfolioSection: React.FC = () => {
       id: 4,
       title: t(language, 'portfolio.projects.naturePortfolio.title'),
       description: t(language, 'portfolio.projects.naturePortfolio.description'),
-      image: 'https://images.pexels.com/photos/1670187/pexels-photo-1670187.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/videos1b.jpg',
       tech: ['React', 'Three.js', 'GSAP'],
       gradient: 'from-secondary to-accent',
     },
@@ -72,7 +78,7 @@ const PortfolioSection: React.FC = () => {
           <h2 className="text-3xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4">
             {t(language, 'portfolio.title')}
           </h2>
-          <p className="text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed text-left">
             {t(language, 'portfolio.description')}
           </p>
         </motion.div>
@@ -87,7 +93,7 @@ const PortfolioSection: React.FC = () => {
               transition={{ duration: 1, delay: index * 0.2 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
               className="group relative aspect-square rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden cursor-pointer"
-              onClick={openPopup} // Open popup on click
+              onClick={() => openPopup(false, index === 1 ? 'VIDEO INSTALACIÓN' : 'VIDEOGAME')} // Open popup on click
             >
               {/* Project Image (fills square) */}
               <div className="absolute inset-0 overflow-hidden">
@@ -104,7 +110,10 @@ const PortfolioSection: React.FC = () => {
                   whileHover={{ opacity: 1 }}
                   className="absolute inset-0 flex items-center justify-center space-x-2 bg-black/30"
                 >
-                  <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
+                  <motion.button 
+                    className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200"
+                    onClick={(e) => { e.stopPropagation(); openPopup(true, index === 1 ? 'VIDEO INSTALACIÓN' : 'VIDEOGAME'); }}
+                  >
                     <Eye size={12} />
                   </motion.button>
                   <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
@@ -141,7 +150,7 @@ const PortfolioSection: React.FC = () => {
           ))}
         </div>
       </div>
-      <VideogamePopup isVisible={isPopupVisible} onClose={closePopup} />
+      <VideogamePopup isVisible={isPopupVisible} onClose={closePopup} minimal={isPopupMinimal} title={popupTitle} />
     </section>
   );
 }

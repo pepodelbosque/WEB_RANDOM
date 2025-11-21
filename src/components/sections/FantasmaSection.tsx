@@ -24,7 +24,7 @@ const FantasmaSection: React.FC = () => {
       id: 2,
       title: t(language, 'fantasma.projects.chaos.title'),
       description: t(language, 'fantasma.projects.chaos.description'),
-      image: 'https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/caos1.jpg',
       gradient: 'from-blue-600 via-purple-600 to-pink-600',
     },
   ];
@@ -60,7 +60,7 @@ const FantasmaSection: React.FC = () => {
           >
             {t(language, 'fantasma.title')}
           </motion.h2>
-          <p className="text-lg sm:text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
+          <p className="text-lg sm:text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto px-4 text-left">
             {t(language, 'fantasma.description')}
           </p>
         </motion.div>

@@ -61,68 +61,125 @@ const ServicesSection: React.FC = () => {
   // Crew data for biographic cards (uses images from /public/images)
   const crew = [
     {
-      name: "Alex Rivera",
-      role: "Director Creativo",
-      image: "/images/tuto02.jpg",
-      bio: "Explora narrativas visuales y experiencias inmersivas para RANDOM.",
-      skills: ["Arte", "Video", "Instalación"],
+      name: "BÁRBARA OETTINGER",
+      role: "Creadora y Directora",
+      image: "/images/brbr1.jpg",
+      bio: "Explorando las ciencias de lo humano, me encontré con los monstruos de verdad",
+      skills: ["Arte", "Video", "plan"],
     },
     {
-      name: "Morgan Lee",
-      role: "Diseñador",
-      image: "/images/tuto04.jpeg",
-      bio: "Diseño gráfico y UI centrados en identidad y ritmo visual.",
-      skills: ["UI", "Gráfica", "Tipografía"],
+      name: "PEPO SABATINI",
+      role: "Creador y Director.",
+      image: "/images/pepo1.jpg",
+      bio: "Desde el lugar menos seguro se cautiva al mirón.",
+      skills: ["CINE", "animacion", "guión"],
     },
     {
-      name: "Sam Ortiz",
-      role: "Productor",
-      image: "/images/tuto01a.jpeg",
-      bio: "Producción y coordinación de proyectos experimentales del colectivo.",
-      skills: ["Producción", "Gestión", "Calendario"],
+      name: "SEBASTIÁN VALENZUELA",
+      role: "Curador y Teórico",
+      image: "/images/seba1.jpg",
+      bio: "Traigo del recuerdo la memoria, por sobre la huella de la busqueda.",
+      skills: ["ESTUDIO", "Gestión", "CULTURA"],
+    },
+    {
+      name: "KATHERINE HOCH",
+      role: "Participante",
+      image: "/images/kate1.jpg",
+      bio: "Comparte sus experiencias oníricas para explorar lo real y lo imaginado.",
+      skills: ["Sueños", "Relato", "Poética"],
+    },
+    {
+      name: "EDUARDO PINO",
+      role: "Participante",
+      image: "/images/edu1.jpg",
+      bio: "Abre sus sueños al diálogo entre arte, tecnología y memoria.",
+      skills: ["Sueños", "Memoria", "Diálogo"],
+    },
+    {
+      name: "CAMILA ESTRELLA",
+      role: "Teórica y Participante",
+      image: "/images/cami1.jpg",
+      bio: "Aporta reflexión y comparte uno de los sueños que inspiró la obra.",
+      skills: ["Teoría", "estudio", "Sueños"],
+    },
+    {
+      name: "CHINI",
+      role: "Participante",
+      image: "/images/chini2.jpg",
+      bio: "Comparte experiencias oníricas que nutren la obra.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "YEIKOB",
+      role: "Participante",
+      image: "/images/yeikob1.jpg",
+      bio: "Participa compartiendo experiencias oníricas que inspiran la obra.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "NACHO",
+      role: "Participante",
+      image: "/images/nacho1.jpg",
+      bio: "Comparte experiencias oníricas que nutren el imaginario del proyecto.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "MARCO",
+      role: "Participante",
+      image: "/images/marco1.jpg",
+      bio: "Comparte experiencias oníricas que amplían el imaginario colectivo.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "CHICO",
+      role: "Participante",
+      image: "/images/chico1.jpg",
+      bio: "Aporta relatos de sueños al diálogo entre arte y tecnología.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "Diego Torres",
+      role: "Participante",
+      image: "/images/caos1.jpg",
+      bio: "Comparte experiencias oníricas que inspiran la obra.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "Luna Park",
+      role: "Participante",
+      image: "/images/caos1.jpg",
+      bio: "Aporta relatos de sueños al diálogo entre arte y tecnología.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "Raúl Méndez",
+      role: "Participante",
+      image: "/images/caos1.jpg",
+      bio: "Participa compartiendo experiencias oníricas que inspiran la obra.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "Nora Kim",
+      role: "Participante",
+      image: "/images/caos1.jpg",
+      bio: "Comparte experiencias oníricas que amplían el imaginario colectivo.",
+      skills: ["Sueños", "Relato", "Memoria"],
+    },
+    {
+      name: "Iker Silva",
+      role: "Participante",
+      image: "/images/caos1.jpg",
+      bio: "Aporta relatos de sueños al diálogo entre arte y tecnología.",
+      skills: ["Sueños", "Relato", "Memoria"],
     },
     {
       name: "Erika Gómez",
       role: "Curadora",
-      image: "/images/tuto1.png",
+      image: "/images/death1.jpg",
       bio: "Investiga y articula piezas con foco en contexto y discurso.",
       skills: ["Curaduría", "Investigación", "Arquitectura"],
     },
-    {
-      name: "Diego Torres",
-      role: "Fotógrafo",
-      image: "/images/tuto02.jpg",
-      bio: "Documenta procesos y obra con estética cruda y precisa.",
-      skills: ["Foto", "Color", "Post"],
-    },
-    {
-      name: "Luna Park",
-      role: "Editora de Video",
-      image: "/images/tuto04.jpeg",
-      bio: "Montaje y ritmo audiovisual para piezas e instalaciones.",
-      skills: ["Edición", "Narrativa", "Motion"],
-    },
-    {
-      name: "Raúl Méndez",
-      role: "Sonidista",
-      image: "/images/tuto01a.jpeg",
-      bio: "Diseño sonoro y ambiente para experiencias inmersivas.",
-      skills: ["Audio", "Foley", "Mezcla"],
-    },
-    {
-      name: "Nora Kim",
-      role: "Programadora",
-      image: "/images/tuto1.png",
-      bio: "Desarrolla herramientas interactivas y visuales generativas.",
-      skills: ["Web", "Interactive", "Livecoding"],
-    },
-    {
-      name: "Iker Silva",
-      role: "Investigador",
-      image: "/images/tuto02.jpg",
-      bio: "Analiza procesos y metodologías del colectivo para iterar.",
-      skills: ["Análisis", "Escritura", "Archivos"],
-    },
+    
   ];
 
   return (
@@ -138,7 +195,7 @@ const ServicesSection: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
             {t(language, 'services.title')}
           </h2>
-          <p className="text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto text-left">
             {t(language, 'services.description')}
           </p>
         </motion.div>
@@ -168,16 +225,16 @@ const ServicesSection: React.FC = () => {
   
               {/* Bottom overlay band (name, role, bio, skills) */}
               <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/35 backdrop-blur-sm">
-                <h3 className="text-sm font-black font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
+                <h3 className="text-sm font-black font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-1">
                   {member.name}
                 </h3>
-                <p className="text-xs font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1 leading-tight">
+                <p className="text-xs font-extrabold font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-1 leading-tight">
                   {member.role}
                 </p>
-                <p className="text-[11px] font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-2 leading-tight">
+                <p className="text-[11px] font-extrabold font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-2 leading-tight">
                   {member.bio}
                 </p>
-  
+
                 <div className="flex flex-wrap gap-1.5">
                   {member.skills.map((skill, skillIndex) => (
                     <motion.span
@@ -191,7 +248,7 @@ const ServicesSection: React.FC = () => {
                       transition={{
                         delay: index * 0.15 + skillIndex * 0.1 + 0.4,
                       }}
-                      className="px-2 py-[2px] bg-gradient-to-r from-primary/15 to-secondary/15 text-[10px] font-lincolnmitre rounded-none border border-primary/20 text-orange-400 dark:text-orange-300 font-extrabold"
+                      className="px-2 py-[2px] bg-gradient-to-r from-primary/15 to-secondary/15 text-[10px] font-lincolnmitre rounded-none border border-primary/20 text-orange-400/70 dark:text-orange-300/70 font-extrabold"
                     >
                       {skill}
                     </motion.span>

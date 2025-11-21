@@ -269,19 +269,19 @@ export const translations = {
       projects: {
         organicEcommerce: {
           title: 'E-commerce Orgánico',
-          description: 'Una plataforma de compras sostenible con animaciones fluidas y patrones de diseño natural.',
+          description: 'Toda la información necesaria para conocer sobre el video juego RANDOM 2.0 realizado durante el año 2025.',
         },
         motionStudio: {
           title: 'Motion Studio',
-          description: 'Sitio web de agencia creativa con efectos parallax avanzados y transiciones suaves.',
+          description: 'instalacion en museo MAC Forestal, toda la información al respecto y sus alcances culturales.',
         },
         forestDashboard: {
           title: 'Dashboard Forestal',
-          description: 'Panel de monitoreo ambiental con visualizaciones de datos orgánicas.',
+      description: 'Visualización y Descarga del catalalogo virtual. Información Backstage Adicional.',
         },
         naturePortfolio: {
           title: 'Portafolio Natural',
-          description: 'Portafolio de fotografía con experiencias de scroll inmersivas y diseños fluidos.',
+      description: 'Selección de imágenes y videos representativos del imaginario RANDOM durante los últimos años.',
         },
       },
     },
