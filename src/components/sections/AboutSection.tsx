@@ -4,6 +4,8 @@ import { useInView } from 'react-intersection-observer';
 import { Brain, Heart, Lightbulb, Target } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const AboutSection: React.FC = () => {
   const { language } = useLanguage();
@@ -14,6 +16,13 @@ const AboutSection: React.FC = () => {
   
   const sectionRef = useRef<HTMLElement>(null);
   const wasInViewRef = useRef(false);
+  const lineContainerRef = useRef<HTMLDivElement>(null);
+  const leftLineRef = useRef<HTMLDivElement>(null);
+  const rightLineRef = useRef<HTMLDivElement>(null);
+  const topAccentLeftRef = useRef<HTMLDivElement>(null);
+  const topAccentRightRef = useRef<HTMLDivElement>(null);
+  const bottomAccentLeftRef = useRef<HTMLDivElement>(null);
+  const bottomAccentRightRef = useRef<HTMLDivElement>(null);
 
   // Tiny gallery images and duplicated track for seamless loop
   const tinyGalleryImages = [
@@ -35,6 +44,8 @@ const AboutSection: React.FC = () => {
 
   // Detect scroll up from AboutSection
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
     const section = sectionRef.current;
     if (!section) return;
 
@@ -68,6 +79,95 @@ const AboutSection: React.FC = () => {
     };
   }, []);
 
+  // GSAP split-line animation tied to scroll
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    // Espera a que las fuentes estén listas para obtener saltos de línea reales
+    const ready = (document as any).fonts?.ready || Promise.resolve();
+
+    Promise.resolve(ready).then(() => {
+      const containers = gsap.utils.toArray<HTMLElement>(
+        section.querySelectorAll('.split-container')
+      );
+
+      containers.forEach((container) => {
+        const text = container.querySelector('.split') as HTMLElement | null;
+        if (!text) return;
+
+        // Evitar dividir dos veces
+        if (text.getAttribute('data-split-initialized') === 'true') return;
+        text.setAttribute('data-split-initialized', 'true');
+
+        // Convertir el contenido en spans por palabra
+        const original = text.textContent || '';
+        const words = original.split(/(\s+)/); // mantiene los espacios como tokens
+        text.textContent = '';
+        words.forEach((token) => {
+          const span = document.createElement('span');
+          span.className = 'split-word';
+          span.textContent = token;
+          text.appendChild(span);
+        });
+
+        const wordSpans = Array.from(text.querySelectorAll('.split-word')) as HTMLSpanElement[];
+        // Agrupar por líneas según offsetTop
+        const lines: HTMLSpanElement[][] = [];
+        let currentLineTop: number | null = null;
+        let currentLine: HTMLSpanElement[] = [];
+
+        wordSpans.forEach((w) => {
+          const top = w.offsetTop;
+          if (currentLineTop === null) {
+            currentLineTop = top;
+          }
+          if (Math.abs(top - currentLineTop) <= 2) {
+            currentLine.push(w);
+          } else {
+            lines.push(currentLine);
+            currentLine = [w];
+            currentLineTop = top;
+          }
+        });
+        if (currentLine.length) lines.push(currentLine);
+
+        // Envolver cada línea en un contenedor bloque con overflow oculto
+        const lineWrappers: HTMLElement[] = [];
+        lines.forEach((lineWords) => {
+          const wrapper = document.createElement('span');
+          wrapper.className = 'split-line';
+          wrapper.style.display = 'block';
+          wrapper.style.overflow = 'hidden';
+          // Insertar wrapper antes del primer elemento de la línea y mover palabras dentro
+          text.insertBefore(wrapper, lineWords[0]);
+          lineWords.forEach((word) => wrapper.appendChild(word));
+          lineWrappers.push(wrapper);
+        });
+
+        // Animación por líneas con ScrollTrigger (sin markers)
+        gsap.from(lineWrappers, {
+          yPercent: 120,
+          stagger: 0.1,
+          ease: 'sine.out',
+          scrollTrigger: {
+            trigger: container,
+            start: 'clamp(top center)',
+            end: 'clamp(bottom center)',
+            scrub: true,
+            markers: false,
+          },
+        });
+      });
+    });
+
+    return () => {
+      // Eliminar cualquier ScrollTrigger creado por estas animaciones
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    };
+  }, []);
+
+
   return (
     <section id="about" ref={handleRef} className="min-h-screen py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,21 +194,26 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 1, delay: 0.4 }}
               className="space-y-6 text-base md:text-lg font-lincolnmitre text-red-600 dark:text-white max-w-2xl mx-auto leading-normal"
             >
-              <p>
-                {t(language, 'about.description1')}
-              </p>
-              
-              <p>
-                {t(language, 'about.description2')}
-              </p>
+              <div className="split-container">
+                <p className="split">
+                 {t(language, 'about.description1')}
+                </p>
+              </div>
 
-              <p>
+              <div className="split-container">
+                <p className="split">
+                {t(language, 'about.description2')}
+                </p>
+              </div>
+
+              <div className="split-container">
+                <p className="split">
                 {t(language, 'about.description3')}
-              </p>
+                </p>
+              </div>
             </motion.div>
 
-            {/* Replace tiny horizontal gallery with spacer */}
-            <div className="w-full sm:w-1/2 mx-auto h-16" aria-hidden="true" />
+            {/* Operational line removida para evitar marcas visibles */}
           </motion.div>
 
           {/* Visual Element was here */}

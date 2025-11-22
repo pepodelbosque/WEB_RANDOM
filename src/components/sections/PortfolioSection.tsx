@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { ExternalLink, Github, Eye } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import VideogamePopup from './VideogamePopup'; // Import the new component
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const PortfolioSection: React.FC = () => {
   const { language } = useLanguage();
@@ -12,6 +14,11 @@ const PortfolioSection: React.FC = () => {
     threshold: 0.2,
     triggerOnce: true,
   });
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const handleRef = (el: HTMLElement | null) => {
+    ref(el);
+    sectionRef.current = el;
+  };
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [isPopupMinimal, setPopupMinimal] = useState(false);
   const [popupTitle, setPopupTitle] = useState('VIDEOGAME');
@@ -65,22 +72,98 @@ const PortfolioSection: React.FC = () => {
     'VIDEOS RANDOM',
   ];
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ready = (document as any).fonts?.ready || Promise.resolve();
+    Promise.resolve(ready).then(() => {
+      const containers = gsap.utils.toArray<HTMLElement>(
+        section.querySelectorAll('.split-container')
+      );
+      containers.forEach((container) => {
+        const text = container.querySelector('.split') as HTMLElement | null;
+        if (!text) return;
+        if (text.getAttribute('data-split-initialized') === 'true') return;
+        text.setAttribute('data-split-initialized', 'true');
+
+        const original = text.textContent || '';
+        const tokens = original.split(/(\s+)/);
+        text.textContent = '';
+        tokens.forEach((tk) => {
+          const span = document.createElement('span');
+          span.className = 'split-word';
+          span.textContent = tk;
+          text.appendChild(span);
+        });
+
+        const wordSpans = Array.from(text.querySelectorAll('.split-word')) as HTMLSpanElement[];
+        const lines: HTMLSpanElement[][] = [];
+        let currentTop: number | null = null;
+        let line: HTMLSpanElement[] = [];
+        wordSpans.forEach((w) => {
+          const top = w.offsetTop;
+          if (currentTop === null || Math.abs(top - currentTop) <= 2) {
+            currentTop = currentTop ?? top;
+            line.push(w);
+          } else {
+            lines.push(line);
+            line = [w];
+            currentTop = top;
+          }
+        });
+        if (line.length) lines.push(line);
+
+        const wrappers: HTMLElement[] = [];
+        lines.forEach((lineWords) => {
+          const wrapper = document.createElement('span');
+          wrapper.className = 'split-line';
+          wrapper.style.display = 'block';
+          wrapper.style.overflow = 'hidden';
+          text.insertBefore(wrapper, lineWords[0]);
+          lineWords.forEach((w) => wrapper.appendChild(w));
+          wrappers.push(wrapper);
+        });
+
+        gsap.from(wrappers, {
+          yPercent: 120,
+          stagger: 0.12,
+          ease: 'sine.out',
+          scrollTrigger: {
+            trigger: container,
+            start: 'clamp(top center)',
+            end: 'clamp(bottom center)',
+            scrub: true,
+            markers: false,
+          },
+        });
+      });
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    };
+  }, []);
+
   return (
-    <section id="portfolio" ref={ref} className="min-h-[50vh] py-6 relative">
+    <section id="portfolio" ref={handleRef} className="min-h-[50vh] py-6 relative">
       <div className="max-w-3xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 100 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1 }}
-          className="text-center mb-10"
+          className="text-left mb-10"
         >
-          <h2 className="text-3xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4">
+          <h2 className="text-4xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4 max-w-2xl">
             {t(language, 'portfolio.title')}
           </h2>
-          <p className="text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed text-left">
-            {t(language, 'portfolio.description')}
-          </p>
+          <div className="split-container">
+            <p className="split text-base md:text-lg font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl leading-relaxed text-left">
+              {t(language, 'portfolio.description')}
+            </p>
+          </div>
         </motion.div>
 
         {/* Projects Grid */}

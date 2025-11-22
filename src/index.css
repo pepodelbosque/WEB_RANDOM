@@ -90,3 +90,28 @@ body {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* Oculta por completo los markers de GSAP, incluso si alguien los habilita */
+.gsap-marker-start,
+.gsap-marker-end,
+.gsap-marker {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Utilidades para animación de división en líneas */
+.split-line {
+  display: block;
+  overflow: hidden;
+}
+.split-word {
+  display: inline-block;
+  white-space: pre; /* conserva espacios como tokens visibles */
+}
+
+/* Spans por carácter usados en el efecto de scramble */
+.char {
+  display: inline-block;
+  white-space: pre; /* preserva espacios */
+}
