@@ -61,87 +61,87 @@ const ServicesSection: React.FC = () => {
   // Crew data for biographic cards (uses images from /public/images)
   const crew = [
     {
-      name: "BÁRBARA OETTINGER",
-      role: "Creadora y Directora",
+      nameKey: "services.crew.barbara.name",
+      roleKey: "services.crew.barbara.role",
       image: "/images/brbr1.jpg",
-      bio: "Desarrollo estructural Creativo, incorporando las Artes visuales como lenguaje central.",
+      bioKey: "services.crew.barbara.bio",
       skills: ["Arte", "Video", "plan"],
     },
     {
-      name: "PEPO SABATINI",
-      role: "Creador y Director.",
+      nameKey: "services.crew.pepo.name",
+      roleKey: "services.crew.pepo.role",
       image: "/images/pepo1.jpg",
-      bio: "Desde el mundo del cine al video juego y también al revés.",
+      bioKey: "services.crew.pepo.bio",
       skills: ["CINE", "animacion", "guión"],
     },
     {
-      name: "SEBASTIAN VIDAL",
-      role: "curador y teorico",
+      nameKey: "services.crew.sebastian.name",
+      roleKey: "services.crew.sebastian.role",
       image: "/images/seba1.jpg",
-      bio: "El ensamblaje de memoria y recuerdo, evocados por la huella y su busqueda.",
+      bioKey: "services.crew.sebastian.bio",
       skills: ["ESTUDIO", "Gestión", "CULTURA"],
     },
     {
-      name: "KATHERINE HOCH",
-      role: "Participante",
+      nameKey: "services.crew.katherine.name",
+      roleKey: "services.crew.katherine.role",
       image: "/images/kate1.jpg",
-      bio: "Comparte sus experiencias oníricas para explorar lo real y lo imaginado.",
+      bioKey: "services.crew.katherine.bio",
       skills: ["Sueños", "Relato", "Poética"],
     },
     {
-      name: "EDUARDO PINO",
-      role: "Participante",
+      nameKey: "services.crew.eduardo.name",
+      roleKey: "services.crew.eduardo.role",
       image: "/images/edu1.jpg",
-      bio: "Abre sus sueños al diálogo entre arte, tecnología y memoria.",
+      bioKey: "services.crew.eduardo.bio",
       skills: ["Sueños", "Memoria", "Diálogo"],
     },
     {
-      name: "CAMILA ESTRELLA",
-      role: "Teórica y Participante",
+      nameKey: "services.crew.camila.name",
+      roleKey: "services.crew.camila.role",
       image: "/images/cami1.jpg",
-      bio: "Aporta reflexión y comparte uno de los sueños que inspiró la obra.",
+      bioKey: "services.crew.camila.bio",
       skills: ["Teoría", "estudio", "Sueños"],
     },
     {
-      name: "CHINI",
-      role: "Participante",
+      nameKey: "services.crew.chini.name",
+      roleKey: "services.crew.chini.role",
       image: "/images/chini2.jpg",
-      bio: "Comparte experiencias oníricas que nutren la obra.",
+      bioKey: "services.crew.chini.bio",
       skills: ["Sueños", "Relato", "Memoria"],
     },
     {
-      name: "YEIKOB",
-      role: "Participante",
+      nameKey: "services.crew.yeikob.name",
+      roleKey: "services.crew.yeikob.role",
       image: "/images/yeikob1.jpg",
-      bio: "Participa compartiendo experiencias oníricas que inspiran la obra.",
+      bioKey: "services.crew.yeikob.bio",
       skills: ["Sueños", "Relato", "Memoria"],
     },
     {
-      name: "NACHO",
-      role: "Participante",
+      nameKey: "services.crew.nacho.name",
+      roleKey: "services.crew.nacho.role",
       image: "/images/nacho1.jpg",
-      bio: "Comparte experiencias oníricas que nutren el imaginario del proyecto.",
+      bioKey: "services.crew.nacho.bio",
       skills: ["Sueños", "Relato", "Memoria"],
     },
     {
-      name: "MARCO",
-      role: "Participante",
+      nameKey: "services.crew.marco.name",
+      roleKey: "services.crew.marco.role",
       image: "/images/marco1.jpg",
-      bio: "Comparte experiencias oníricas que amplían el imaginario colectivo.",
+      bioKey: "services.crew.marco.bio",
       skills: ["Sueños", "Relato", "Memoria"],
     },
     {
-      name: "CHICO",
-      role: "Participante",
+      nameKey: "services.crew.chico.name",
+      roleKey: "services.crew.chico.role",
       image: "/images/chico1.jpg",
-      bio: "Aporta relatos de sueños al diálogo entre arte y tecnología.",
+      bioKey: "services.crew.chico.bio",
       skills: ["Sueños", "Relato", "Memoria"],
     },
     {
-      name: "Erika Gómez",
-      role: "Curadora",
+      nameKey: "services.crew.erika.name",
+      roleKey: "services.crew.erika.role",
       image: "/images/death1.jpg",
-      bio: "Investiga y articula piezas con foco en contexto y discurso.",
+      bioKey: "services.crew.erika.bio",
       skills: ["Curaduría", "Investigación", "Arquitectura"],
     },
     
@@ -169,7 +169,7 @@ const ServicesSection: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {crew.map((member, index) => (
             <motion.div
-              key={member.name}
+              key={member.nameKey}
               initial={{ opacity: 0, y: 100, rotateY: -15 }}
               animate={
                 inView
@@ -178,12 +178,12 @@ const ServicesSection: React.FC = () => {
               }
               transition={{ duration: 1, delay: index * 0.15 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
-              className="group relative aspect-square rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden"
+              className="group relative aspect-square max-w-xs w-full rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden"
             >
               {/* Background photo fills the square (crew portrait) */}
               <img
                 src={member.image}
-                alt={member.name}
+                alt={t(language, member.nameKey)}
                 className="absolute inset-0 w-full h-full object-cover opacity-70"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
@@ -191,13 +191,13 @@ const ServicesSection: React.FC = () => {
               {/* Bottom overlay band (name, role, bio, skills) */}
               <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/35 backdrop-blur-sm">
                 <h3 className="text-sm font-black font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-1">
-                  {member.name}
+                  {t(language, member.nameKey)}
                 </h3>
                 <p className="text-xs font-extrabold font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-1 leading-tight">
-                  {member.role}
+                  {t(language, member.roleKey)}
                 </p>
                 <p className="text-[11px] font-extrabold font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-2 leading-tight">
-                  {member.bio}
+                  {t(language, member.bioKey)}
                 </p>
 
                 <div className="flex flex-wrap gap-1.5">
@@ -215,7 +215,7 @@ const ServicesSection: React.FC = () => {
                       }}
                       className="px-2 py-[2px] bg-gradient-to-r from-primary/15 to-secondary/15 text-[10px] font-lincolnmitre rounded-none border border-primary/20 text-orange-400/70 dark:text-orange-300/70 font-extrabold"
                     >
-                      {skill}
+                      {t(language, skill)}
                     </motion.span>
                   ))}
                 </div>
