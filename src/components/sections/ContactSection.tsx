@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const ContactSection: React.FC = () => {
   const { language } = useLanguage();
@@ -11,6 +13,11 @@ const ContactSection: React.FC = () => {
     threshold: 0.2,
     triggerOnce: true,
   });
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const handleRef = (el: HTMLElement | null) => {
+    ref(el);
+    sectionRef.current = el;
+  };
 
   const [formData, setFormData] = useState({
     name: '',
@@ -67,8 +74,129 @@ const ContactSection: React.FC = () => {
     { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
   ];
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ready = (document as any).fonts?.ready || Promise.resolve();
+    Promise.resolve(ready).then(() => {
+      const containers = gsap.utils.toArray<HTMLElement>(
+        section.querySelectorAll('.split-container')
+      );
+
+      containers.forEach((container) => {
+        const text = container.querySelector('.split') as HTMLElement | null;
+        if (!text) return;
+        if (text.getAttribute('data-split-initialized') === 'true') return;
+        text.setAttribute('data-split-initialized', 'true');
+
+        const original = text.textContent || '';
+        const tokens = original.split(/(\s+)/);
+        text.textContent = '';
+        tokens.forEach((tk) => {
+          const span = document.createElement('span');
+          span.className = 'split-word';
+          span.textContent = tk;
+          text.appendChild(span);
+        });
+
+        const wordSpans = Array.from(text.querySelectorAll('.split-word')) as HTMLSpanElement[];
+        const lines: HTMLSpanElement[][] = [];
+        let currentTop: number | null = null;
+        let line: HTMLSpanElement[] = [];
+        wordSpans.forEach((w) => {
+          const top = w.offsetTop;
+          if (currentTop === null || Math.abs(top - currentTop) <= 2) {
+            currentTop = currentTop ?? top;
+            line.push(w);
+          } else {
+            lines.push(line);
+            line = [w];
+            currentTop = top;
+          }
+        });
+        if (line.length) lines.push(line);
+
+        const wrappers: HTMLElement[] = [];
+        lines.forEach((lineWords) => {
+          const wrapper = document.createElement('span');
+          wrapper.className = 'split-line';
+          wrapper.style.display = 'block';
+          wrapper.style.overflow = 'hidden';
+          wrapper.style.textAlign = 'justify';
+          (wrapper.style as any)['textAlignLast'] = 'justify';
+          wrapper.style.hyphens = 'auto';
+          text.insertBefore(wrapper, lineWords[0]);
+          lineWords.forEach((w) => wrapper.appendChild(w));
+          wrappers.push(wrapper);
+        });
+
+        const justifyLines = () => {
+          wrappers.forEach((wrapper, idx) => {
+            const isLast = idx === wrappers.length - 1;
+            (wrapper.style as any)['textAlignLast'] = isLast ? 'left' : 'justify';
+            if (isLast) {
+              wrapper.style.wordSpacing = '';
+              return;
+            }
+            const children = Array.from(wrapper.children) as HTMLElement[];
+            const spaceCount = children.reduce((acc, el) => {
+              const txt = el.textContent || '';
+              return acc + (/^\s+$/.test(txt) ? 1 : 0);
+            }, 0);
+            if (spaceCount <= 0) {
+              wrapper.style.wordSpacing = '';
+              return;
+            }
+            const wrapperWidth = wrapper.getBoundingClientRect().width;
+            const contentWidth = children.reduce((acc, el) => acc + el.getBoundingClientRect().width, 0);
+            const leftover = wrapperWidth - contentWidth;
+            const perSpace = leftover / spaceCount;
+            wrapper.style.wordSpacing = perSpace > 0 ? `${perSpace}px` : '';
+          });
+        };
+
+        justifyLines();
+        window.addEventListener('resize', justifyLines);
+
+        gsap.from(wrappers, {
+          yPercent: 120,
+          stagger: 0.12,
+          ease: 'sine.out',
+          scrollTrigger: {
+            trigger: container,
+            start: 'clamp(top center)',
+            end: 'clamp(bottom center)',
+            scrub: true,
+            markers: false,
+          },
+        });
+
+        ScrollTrigger.addEventListener('refresh', justifyLines);
+        const cleanup = () => {
+          window.removeEventListener('resize', justifyLines);
+          ScrollTrigger.removeEventListener('refresh', justifyLines);
+        };
+        (container as any).__justifyCleanup = cleanup;
+      });
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+      const section = sectionRef.current;
+      if (section) {
+        const containers = Array.from(section.querySelectorAll('.split-container')) as HTMLElement[];
+        containers.forEach((c) => {
+          const fn = (c as any).__justifyCleanup;
+          if (typeof fn === 'function') fn();
+        });
+      }
+    };
+  }, []);
+
   return (
-    <section id="contact" ref={ref} className="min-h-screen py-20 relative">
+    <section id="contact" ref={handleRef} className="min-h-screen py-20 relative mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -80,9 +208,11 @@ const ContactSection: React.FC = () => {
           <h2 className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
            {t(language, 'contact.title')}
           </h2>
-          <p className="text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto">
-           {t(language, 'contact.description')}
-          </p>
+          <div className="split-container">
+            <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-justify">
+             {t(language, 'contact.description')}
+            </p>
+          </div>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-16">

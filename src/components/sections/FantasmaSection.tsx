@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Eye, Play, Maximize } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const FantasmaSection: React.FC = () => {
   const { language } = useLanguage();
@@ -11,6 +13,11 @@ const FantasmaSection: React.FC = () => {
     threshold: 0.2,
     triggerOnce: true,
   });
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const handleRef = (el: HTMLElement | null) => {
+    ref(el);
+    sectionRef.current = el;
+  };
 
   const projects = [
     {
@@ -29,15 +36,136 @@ const FantasmaSection: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ready = (document as any).fonts?.ready || Promise.resolve();
+    Promise.resolve(ready).then(() => {
+      const containers = gsap.utils.toArray<HTMLElement>(
+        section.querySelectorAll('.split-container')
+      );
+
+      containers.forEach((container) => {
+        const text = container.querySelector('.split') as HTMLElement | null;
+        if (!text) return;
+        if (text.getAttribute('data-split-initialized') === 'true') return;
+        text.setAttribute('data-split-initialized', 'true');
+
+        const original = text.textContent || '';
+        const tokens = original.split(/(\s+)/);
+        text.textContent = '';
+        tokens.forEach((tk) => {
+          const span = document.createElement('span');
+          span.className = 'split-word';
+          span.textContent = tk;
+          text.appendChild(span);
+        });
+
+        const wordSpans = Array.from(text.querySelectorAll('.split-word')) as HTMLSpanElement[];
+        const lines: HTMLSpanElement[][] = [];
+        let currentTop: number | null = null;
+        let line: HTMLSpanElement[] = [];
+        wordSpans.forEach((w) => {
+          const top = w.offsetTop;
+          if (currentTop === null || Math.abs(top - currentTop) <= 2) {
+            currentTop = currentTop ?? top;
+            line.push(w);
+          } else {
+            lines.push(line);
+            line = [w];
+            currentTop = top;
+          }
+        });
+        if (line.length) lines.push(line);
+
+        const wrappers: HTMLElement[] = [];
+        lines.forEach((lineWords) => {
+          const wrapper = document.createElement('span');
+          wrapper.className = 'split-line';
+          wrapper.style.display = 'block';
+          wrapper.style.overflow = 'hidden';
+          wrapper.style.textAlign = 'justify';
+          (wrapper.style as any)['textAlignLast'] = 'justify';
+          wrapper.style.hyphens = 'auto';
+          text.insertBefore(wrapper, lineWords[0]);
+          lineWords.forEach((w) => wrapper.appendChild(w));
+          wrappers.push(wrapper);
+        });
+
+        const justifyLines = () => {
+          wrappers.forEach((wrapper, idx) => {
+            const isLast = idx === wrappers.length - 1;
+            (wrapper.style as any)['textAlignLast'] = isLast ? 'left' : 'justify';
+            if (isLast) {
+              wrapper.style.wordSpacing = '';
+              return;
+            }
+            const children = Array.from(wrapper.children) as HTMLElement[];
+            const spaceCount = children.reduce((acc, el) => {
+              const txt = el.textContent || '';
+              return acc + (/^\s+$/.test(txt) ? 1 : 0);
+            }, 0);
+            if (spaceCount <= 0) {
+              wrapper.style.wordSpacing = '';
+              return;
+            }
+            const wrapperWidth = wrapper.getBoundingClientRect().width;
+            const contentWidth = children.reduce((acc, el) => acc + el.getBoundingClientRect().width, 0);
+            const leftover = wrapperWidth - contentWidth;
+            const perSpace = leftover / spaceCount;
+            wrapper.style.wordSpacing = perSpace > 0 ? `${perSpace}px` : '';
+          });
+        };
+
+        justifyLines();
+        window.addEventListener('resize', justifyLines);
+
+        gsap.from(wrappers, {
+          yPercent: 120,
+          stagger: 0.12,
+          ease: 'sine.out',
+          scrollTrigger: {
+            trigger: container,
+            start: 'clamp(top center)',
+            end: 'clamp(bottom center)',
+            scrub: true,
+            markers: false,
+          },
+        });
+
+        ScrollTrigger.addEventListener('refresh', justifyLines);
+        const cleanup = () => {
+          window.removeEventListener('resize', justifyLines);
+          ScrollTrigger.removeEventListener('refresh', justifyLines);
+        };
+        (container as any).__justifyCleanup = cleanup;
+      });
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+      const section = sectionRef.current;
+      if (section) {
+        const containers = Array.from(section.querySelectorAll('.split-container')) as HTMLElement[];
+        containers.forEach((c) => {
+          const fn = (c as any).__justifyCleanup;
+          if (typeof fn === 'function') fn();
+        });
+      }
+    };
+  }, []);
+
   return (
-    <section id="fantasma" ref={ref} className="min-h-screen py-20 relative overflow-hidden">
+    <section id="fantasma" ref={handleRef} className="min-h-screen py-20 relative overflow-hidden mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 100 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1 }}
-          className="text-center mb-20"
+          className="text-center mb-4"
         >
           <motion.div 
             initial={{ opacity: 0, scale: 0.5 }}
@@ -48,25 +176,23 @@ const FantasmaSection: React.FC = () => {
             <img 
               src="/images/logo-fntsm.png" 
               alt="FNTSM Logo"
-              className="h-18 sm:h-18 md:h-24 lg:h-24 xl:h-30 w-auto object-contain"
+              className="h-18 sm:h-18 md:h-24 lg:h-24 xl:h-30 w-auto object-contain logo-fntsm"
             />
           </motion.div>
           <motion.h2 
             initial={{ opacity: 0, scale: 0.5 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-sm sm:text-sm md:text-base lg:text-base xl:text-lg font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-6 px-4 max-w-full overflow-hidden opacity-50"
+            className="text-[0.5rem] sm:text-[0.55rem] md:text-[0.6rem] lg:text-[0.6rem] xl:text-[0.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-0 px-4 max-w-full overflow-hidden opacity-50"
             style={{ fontVariant: 'small-caps', wordBreak: 'break-word' }}
           >
-            {t(language, 'fantasma.title')}
+            FANTASMA = PEPO SABATINI & BARBARA OETTINGER
           </motion.h2>
-          <p className="text-lg sm:text-xl font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto px-4 text-left">
-            {t(language, 'fantasma.description')}
-          </p>
+          {/* Description removed per request */}
         </motion.div>
 
-        {/* Gallery Grid */}
-        <div className="mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-3xl">
+        {/* Gallery Grid: centered responsive */}
+        <div className="fantasma-grid">
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
@@ -74,7 +200,7 @@ const FantasmaSection: React.FC = () => {
               animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
               transition={{ duration: 1, delay: index * 0.3 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
-              className="group relative aspect-square rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden"
+              className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
             >
               {/* Background image fills square */}
               <motion.img
@@ -106,11 +232,11 @@ const FantasmaSection: React.FC = () => {
               </motion.div>
 
               {/* Bottom overlay band (Portfolio style) */}
-              <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/35 backdrop-blur-sm">
-                <h3 className="text-sm font-black font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
+              <div className="fantasma-overlay absolute bottom-0 left-0 right-0 bg-black/35 backdrop-blur-sm">
+                <h3 className="font-black font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
                   {project.title}
                 </h3>
-                <p className="text-sm font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-2 leading-relaxed">
+                <p className="font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
                   {project.description}
                 </p>
               </div>

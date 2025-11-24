@@ -116,7 +116,8 @@ const HeroSection: React.FC = () => {
         {/* Main Content */}
         <motion.div
           initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 1 }}
           className="space-y-8"
         >
@@ -124,7 +125,8 @@ const HeroSection: React.FC = () => {
           <div className="relative">
             <motion.h1 
               initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 1, delay: 0.2 }}
               className="text-6xl md:text-8xl font-bold font-dirtyline uppercase tracking-wider text-center -mb-2"
               style={{ fontVariant: 'small-caps' }}
@@ -141,7 +143,8 @@ const HeroSection: React.FC = () => {
           <div className="scramble-container">
           <motion.p 
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 1, delay: 0.4 }}
             className="scramble-paragraph text-xs md:text-sm font-lincolnmitre text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4"
             style={{ 
@@ -155,7 +158,8 @@ const HeroSection: React.FC = () => {
           {/* CTA Buttons */}
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 1, delay: 0.6 }}
             className="flex flex-row justify-center items-center mt-12 gap-1"
           >
@@ -203,7 +207,8 @@ const HeroSection: React.FC = () => {
           {/* CTA Link */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 1, delay: 0.8 }}
             className="mt-8"
           >

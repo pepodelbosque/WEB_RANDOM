@@ -15,7 +15,7 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Main Content */}
         <motion.div
@@ -48,7 +48,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="text-xs md:text-sm font-lincolnmitre text-red-600 dark:text-white max-w-lg mx-auto leading-tight -mt-4 hover:text-red-400 dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer"
+            className="text-[0.9em] md:text-[0.95em] font-lincolnmitre text-red-600 dark:text-white max-w-lg mx-auto leading-[1.05] -mt-4 hover:text-red-400 dark:hover:text-gray-200 transition-colors duration-300 cursor-pointer"
             style={{ 
               letterSpacing: '-0.5px'
             }}
