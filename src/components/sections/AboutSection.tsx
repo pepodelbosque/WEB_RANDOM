@@ -15,6 +15,7 @@ const AboutSection: React.FC = () => {
   
   const sectionRef = useRef<HTMLElement>(null);
   const wasInViewRef = useRef(false);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   
 
   
@@ -71,11 +72,13 @@ const AboutSection: React.FC = () => {
     // Espera a que las fuentes estén listas para obtener saltos de línea reales
     const ready = (document as any).fonts?.ready || Promise.resolve();
 
+    // Recopila los ScrollTriggers locales para cleanup sin afectar otros triggers
+    const localTriggers: ScrollTrigger[] = [];
+
     Promise.resolve(ready).then(() => {
       const containers = gsap.utils.toArray<HTMLElement>(
         section.querySelectorAll('.split-container')
       );
-
       containers.forEach((container) => {
         const text = container.querySelector('.split') as HTMLElement | null;
         if (!text) return;
@@ -166,7 +169,7 @@ const AboutSection: React.FC = () => {
         window.addEventListener('resize', justifyLines);
 
         // Animación por líneas con ScrollTrigger (sin markers)
-        gsap.from(lineWrappers, {
+        const anim = gsap.from(lineWrappers, {
           yPercent: 120,
           stagger: 0.1,
           ease: 'sine.out',
@@ -178,6 +181,8 @@ const AboutSection: React.FC = () => {
             markers: false,
           },
         });
+        const st = (anim as any)?.scrollTrigger as ScrollTrigger | undefined;
+        if (st) localTriggers.push(st);
 
         // Cleanup del listener de resize específico de este contenedor
         ScrollTrigger.addEventListener('refresh', justifyLines);
@@ -191,10 +196,7 @@ const AboutSection: React.FC = () => {
     });
 
     return () => {
-      // Eliminar cualquier ScrollTrigger creado por estas animaciones
-      // Eliminar cualquier ScrollTrigger creado por estas animaciones
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-      // Ejecutar cleanups de justificado
+      // Eliminar solo los ScrollTriggers creados por la animación de líneas
       const section = sectionRef.current;
       if (section) {
         const containers = Array.from(section.querySelectorAll('.split-container')) as HTMLElement[];
@@ -203,8 +205,134 @@ const AboutSection: React.FC = () => {
           if (typeof fn === 'function') fn();
         });
       }
+      // Local triggers se crean por cada contenedor
+      // Nota: si se vuelve a montar, GSAP registrará nuevos triggers
+      // Evitamos matar triggers ajenos (como el del título)
+      // localTriggers acumulados en esta ejecución
+      // Si por alguna razón está vacío, no hacemos nada
+      // (esto previene impactos fuera de este efecto)
+      // Aun así, por seguridad, chequeamos existencia antes de kill
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      (function killLocal() { localTriggers.forEach((st: ScrollTrigger) => st?.kill()); })();
     };
   }, []);
+
+  // GSAP Secret Scramble Reveal para el título
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const el = titleRef.current;
+    if (!el) return;
+
+    const finalText = t(language, 'about.title');
+    el.textContent = finalText; // asegura texto final como base
+
+    // Scramble en toda la frase con revelado uniforme (no solo izquierda→derecha)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    // Orden de revelado más homogéneo (tipo "blue noise") usando la razón áurea
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const setScrambledText = (progress: number) => {
+      const threshold = progress * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (c === ' ') return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    // Orquestación en tres fases: entrada, asentamiento y salida
+    const config = {
+      appearPreRoll: 0.45,
+      appearMove: 1.4,
+      settle: 3.0,
+      disappear: 1.6,
+      ease: 'power3.inOut',
+    } as const;
+
+    const scrambleState = { p: 0 };
+
+    // ENTRADA + ASENTAMIENTO
+    const introTL = gsap.timeline({ paused: true });
+    gsap.set(el, { opacity: 1, y: 40 });
+    // 1) Iniciar efecto ANTES del deslizamiento
+    introTL.to(scrambleState, {
+      p: 0.35,
+      duration: config.appearPreRoll,
+      ease: config.ease,
+      onUpdate: () => setScrambledText(scrambleState.p),
+    });
+    // 1) Deslizamiento hacia posición final con efecto activo
+    introTL.fromTo(
+      el,
+      { opacity: 1, y: 40 },
+      { opacity: 1, y: 0, duration: config.appearMove, ease: config.ease }
+    );
+    introTL.to(scrambleState, {
+      p: 0.75,
+      duration: config.appearMove,
+      ease: config.ease,
+      onUpdate: () => setScrambledText(scrambleState.p),
+    }, '<');
+    // 2) Transformación gradual hasta forma definitiva
+    introTL.to(scrambleState, {
+      p: 1,
+      duration: config.settle,
+      ease: config.ease,
+      onUpdate: () => setScrambledText(scrambleState.p),
+    });
+    introTL.add(() => { el.textContent = finalText; });
+
+    // SALIDA: reactivar efecto y mantener hasta desaparecer
+    const outroTL = gsap.timeline({ paused: true });
+    outroTL.to(scrambleState, {
+      p: 0.4,
+      duration: 0.3,
+      ease: config.ease,
+      onUpdate: () => setScrambledText(scrambleState.p),
+    });
+    outroTL.to(el, {
+      opacity: 0,
+      y: -40,
+      duration: config.disappear,
+      ease: config.ease,
+    }, '<');
+    outroTL.to(scrambleState, {
+      p: 1,
+      duration: config.disappear,
+      ease: config.ease,
+      onUpdate: () => setScrambledText(scrambleState.p),
+    }, '<');
+    outroTL.add(() => { el.textContent = finalText; });
+
+    // ScrollTrigger para sincronizar fases con entrada/salida de la sección
+    const st = ScrollTrigger.create({
+      trigger: el,
+      start: 'top 95%',
+      end: 'bottom 5%',
+      onEnter: () => introTL.restart(),
+      onEnterBack: () => introTL.restart(),
+      // La salida inicia cuando el título ya está posicionado (y=0)
+      onLeave: () => outroTL.restart(),
+      onLeaveBack: () => outroTL.restart(),
+    });
+
+    return () => {
+      introTL.kill();
+      outroTL.kill();
+      st.kill();
+    };
+  }, [language]);
 
 
   return (
@@ -220,11 +348,8 @@ const AboutSection: React.FC = () => {
             className="space-y-8"
           >
             <motion.h2 
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary max-w-2xl mx-auto"
+              className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary max-w-2xl mx-auto"
+              ref={titleRef}
             >
               {t(language, 'about.title')}
             </motion.h2>

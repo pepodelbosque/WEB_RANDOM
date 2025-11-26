@@ -14,6 +14,7 @@ const ExperienceSection: React.FC = () => {
     triggerOnce: false,
   });
   const sectionRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -128,7 +129,6 @@ const ExperienceSection: React.FC = () => {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
       const section = sectionRef.current;
       if (section) {
         const containers = Array.from(section.querySelectorAll('.split-container')) as HTMLElement[];
@@ -139,6 +139,65 @@ const ExperienceSection: React.FC = () => {
       }
     };
   }, []);
+
+  // Scramble Reveal del título (homogéneo, sincronizado con ScrollTrigger)
+  useEffect(() => {
+    const el = titleRef.current;
+    const section = sectionRef.current;
+    if (!el || !section) return;
+
+    const finalText = 'EXPERIENCIA';
+    el.textContent = finalText;
+
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const setScrambledText = (progress: number) => {
+      const threshold = progress * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (c === ' ') return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    const config = { appearPreRoll: 0.45, appearMove: 1.4, settle: 3.0, disappear: 1.6, ease: 'power3.inOut' } as const;
+    const scrambleState = { p: 0 };
+
+    const introTL = gsap.timeline({ paused: true });
+    gsap.set(el, { opacity: 1, y: 40 });
+    introTL
+      .to(scrambleState, { p: 0.35, duration: config.appearPreRoll, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) })
+      .to(scrambleState, { p: 0.92, duration: config.appearMove, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) }, 0)
+      .to(el, { y: 0, duration: config.appearMove, ease: config.ease }, 0)
+      .to(scrambleState, { p: 1, duration: config.settle, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) });
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top 75%',
+      end: 'bottom 25%',
+      onEnter: () => introTL.play(0),
+      onEnterBack: () => {
+        gsap.set(el, { opacity: 1, y: 0 });
+        setScrambledText(1);
+      },
+    });
+
+    return () => {
+      st.kill();
+      introTL.kill();
+    };
+  }, [language]);
 
   const experiences = [
     {
@@ -186,27 +245,21 @@ const ExperienceSection: React.FC = () => {
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, x: -100 }}
-          animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 1 }}
           className="mb-20"
         >
-          <motion.h2 
-            initial={{ opacity: 0, x: -100 }}
-            animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
-            transition={{ duration: 1, delay: 0.1 }}
-            className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to secondary mb-6 text-left max-w-3xl mx-auto"
+          <motion.h2
+            className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6 text-left max-w-3xl mx-auto"
+            ref={titleRef}
           >
             EXPERIENCIA
           </motion.h2>
           <div className="split-container">
             <p className="split text-[1.1em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-justify">
-              Aquí te presentamos a quienes dieron vida a este proyecto, desde las voces creativas hasta quienes compartieron sus sueños para transformarlos en obra.
-              Katherine Hoch y Eduardo Pino abren generosamente sus experiencias oníricas, invitándonos a explorar con sus sueños las fronteras entre lo real y lo imaginado.
-              Camila Estrella, teórica y participante, aporta desde la reflexión y también comparte uno de los sueños que inspiró la obra.
-              Sebastián Valenzuela, curador y teórico, acompaña guiando la visión general y el diálogo entre arte y tecnología.
-              Barbara Oettinger, artista visual y realizadora, y Pepo Sabatini, cineasta y animador 3D, crearon conjuntamente el imaginario y la concepción estética del proyecto, fusionando visión creativa y técnica.
-              Barbara aporta una mirada sensible y poética que atraviesa la propuesta, mientras que Pepo aporta su visión y expertice dentro del universo 3D.
-              Cada uno, desde su lugar, construye un entramado colectivo que atraviesa el arte, la tecnología y los sueños.
+              Jugar no es cosa de niños: es un método de investigación, una ética de la experimentación, una manera de mantener viva la curiosidad ante el mundo.
+              El videojuego —con su lógica interactiva y su invitación explícita a participar— nos devolvió a ese estado primero.
+              Nos recordó que la imagen no tiene por qué ser solo espejo o ventana: puede ser también terreno de juego, espacio que se recorre, se toca, se altera.
             </p>
           </div>
         </motion.div>

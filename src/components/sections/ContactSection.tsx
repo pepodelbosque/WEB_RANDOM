@@ -14,6 +14,7 @@ const ContactSection: React.FC = () => {
     triggerOnce: true,
   });
   const sectionRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -183,7 +184,6 @@ const ContactSection: React.FC = () => {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
       const section = sectionRef.current;
       if (section) {
         const containers = Array.from(section.querySelectorAll('.split-container')) as HTMLElement[];
@@ -195,6 +195,65 @@ const ContactSection: React.FC = () => {
     };
   }, []);
 
+  // Scramble Reveal del título (homogéneo, sincronizado con ScrollTrigger)
+  useEffect(() => {
+    const el = titleRef.current;
+    const section = sectionRef.current;
+    if (!el || !section) return;
+
+    const finalText = t(language, 'contact.title');
+    el.textContent = finalText;
+
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const setScrambledText = (progress: number) => {
+      const threshold = progress * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (c === ' ') return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    const config = { appearPreRoll: 0.45, appearMove: 1.4, settle: 3.0, disappear: 1.6, ease: 'power3.inOut' } as const;
+    const scrambleState = { p: 0 };
+
+    const introTL = gsap.timeline({ paused: true });
+    gsap.set(el, { opacity: 1, y: 40 });
+    introTL
+      .to(scrambleState, { p: 0.35, duration: config.appearPreRoll, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) })
+      .to(scrambleState, { p: 0.92, duration: config.appearMove, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) }, 0)
+      .to(el, { y: 0, duration: config.appearMove, ease: config.ease }, 0)
+      .to(scrambleState, { p: 1, duration: config.settle, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) });
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top 75%',
+      end: 'bottom 25%',
+      onEnter: () => introTL.play(0),
+      onEnterBack: () => {
+        gsap.set(el, { opacity: 1, y: 0 });
+        setScrambledText(1);
+      },
+    });
+
+    return () => {
+      st.kill();
+      introTL.kill();
+    };
+  }, [language]);
+
   return (
     <section id="contact" ref={handleRef} className="min-h-screen py-20 relative mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -205,8 +264,11 @@ const ContactSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="text-center mb-20"
         >
-          <h2 className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
-           {t(language, 'contact.title')}
+          <h2
+            className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6"
+            ref={titleRef}
+          >
+            {t(language, 'contact.title')}
           </h2>
           <div className="split-container">
             <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-justify">

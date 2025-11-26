@@ -14,6 +14,7 @@ const ServicesSection: React.FC = () => {
     fallbackInView: true
   });
   const sectionRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -132,7 +133,6 @@ const ServicesSection: React.FC = () => {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
       const section = sectionRef.current;
       if (section) {
         const containers = Array.from(section.querySelectorAll('.split-container')) as HTMLElement[];
@@ -143,6 +143,65 @@ const ServicesSection: React.FC = () => {
       }
     };
   }, []);
+
+  // Scramble Reveal del título (homogéneo, sincronizado con ScrollTrigger)
+  useEffect(() => {
+    const el = titleRef.current;
+    const section = sectionRef.current;
+    if (!el || !section) return;
+
+    const finalText = 'TRIPULACIÓN';
+    el.textContent = finalText;
+
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const setScrambledText = (progress: number) => {
+      const threshold = progress * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (c === ' ') return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    const config = { appearPreRoll: 0.45, appearMove: 1.4, settle: 3.0, disappear: 1.6, ease: 'power3.inOut' } as const;
+    const scrambleState = { p: 0 };
+
+    const introTL = gsap.timeline({ paused: true });
+    gsap.set(el, { opacity: 1, y: 40 });
+    introTL
+      .to(scrambleState, { p: 0.35, duration: config.appearPreRoll, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) })
+      .to(scrambleState, { p: 0.92, duration: config.appearMove, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) }, 0)
+      .to(el, { y: 0, duration: config.appearMove, ease: config.ease }, 0)
+      .to(scrambleState, { p: 1, duration: config.settle, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) });
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top 75%',
+      end: 'bottom 25%',
+      onEnter: () => introTL.play(0),
+      onEnterBack: () => {
+        gsap.set(el, { opacity: 1, y: 0 });
+        setScrambledText(1);
+      },
+    });
+
+    return () => {
+      st.kill();
+      introTL.kill();
+    };
+  }, [language]);
 
   // Crew data for biographic cards (uses images from /public/images)
   const crew = [
@@ -244,12 +303,9 @@ const ServicesSection: React.FC = () => {
           transition={{ duration: 1 }}
           className="text-left mb-24 md:mb-28"
         >
-          <motion.h2 
-            initial={{ opacity: 0, x: -100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0 }}
-            transition={{ duration: 1, delay: 0.1 }}
-            className="text-5xl font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4 max-w-2xl"
+          <motion.h2
+            className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4 max-w-2xl"
+            ref={titleRef}
           >
             TRIPULACIÓN
           </motion.h2>
