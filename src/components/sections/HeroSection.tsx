@@ -87,21 +87,18 @@ const HeroSection: React.FC = () => {
       // Detener el refresco periódico cuando se inicia la revelación
       stopScrambleTick();
       revealTL.play(0);
-      el.removeEventListener('click', startReveal);
-      el.removeEventListener('touchstart', startReveal);
+      el.removeEventListener('dblclick', startReveal);
     };
-    el.addEventListener('click', startReveal, { passive: true });
-    el.addEventListener('touchstart', startReveal, { passive: true });
+    // Solo accionar con doble clic
+    el.addEventListener('dblclick', startReveal, { passive: true });
 
     const resetToPreScramble = () => {
       revealTL.pause(0);
       revealState.p = 0;
       setScrambledProgress(0);
       // Reasegurar listeners para que se pueda revelar nuevamente al re-entrar
-      el.removeEventListener('click', startReveal);
-      el.removeEventListener('touchstart', startReveal);
-      el.addEventListener('click', startReveal, { passive: true });
-      el.addEventListener('touchstart', startReveal, { passive: true });
+      el.removeEventListener('dblclick', startReveal);
+      el.addEventListener('dblclick', startReveal, { passive: true });
       // Reanudar el refresco cada 3s al volver al estado pre-scramble
       startScrambleTick();
     };
@@ -121,8 +118,7 @@ const HeroSection: React.FC = () => {
     }
 
     return () => {
-      el.removeEventListener('click', startReveal);
-      el.removeEventListener('touchstart', startReveal);
+      el.removeEventListener('dblclick', startReveal);
       revealTL.kill();
       if (st) st.kill();
       stopScrambleTick();
