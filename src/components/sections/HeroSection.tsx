@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
-import GradientText from '../GradientText';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const HeroSection: React.FC = () => {
   const { language } = useLanguage();
+  const subtitleRef = useRef<HTMLParagraphElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const tickRef = useRef<number | null>(null);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -14,8 +18,119 @@ const HeroSection: React.FC = () => {
     }
   };
 
+  // Scramble reveal para el subtítulo del Hero: se mantiene secreto hasta interacción (click/touch)
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const el = subtitleRef.current;
+    if (!el) return;
+
+    const finalText = t(language, 'hero.subtitle') as string;
+
+    const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText)
+      .map((c, i) => (/^\s$/.test(c) ? -1 : i))
+      .filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const setScrambledProgress = (p: number) => {
+      const threshold = p * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (/^\s$/.test(c)) return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    // Estado inicial: completamente scrambled
+    setScrambledProgress(0);
+
+    const revealState = { p: 0 };
+    const revealTL = gsap.timeline({ paused: true });
+    revealTL.to(revealState, {
+      p: 1,
+      duration: 2.6,
+      ease: 'power3.out',
+      onUpdate: () => setScrambledProgress(revealState.p),
+    });
+
+    const stopScrambleTick = () => {
+      if (tickRef.current !== null) {
+        clearInterval(tickRef.current);
+        tickRef.current = null;
+      }
+    };
+
+    const startScrambleTick = () => {
+      stopScrambleTick();
+      tickRef.current = window.setInterval(() => {
+        // Solo refrescar el scramble si aún no se ha revelado
+        if (!revealTL.isActive() && revealState.p === 0) {
+          setScrambledProgress(0);
+        }
+      }, 5000);
+    };
+
+    // Comenzar el refresco cada 3 segundos en pre-scramble
+    startScrambleTick();
+
+    const startReveal = () => {
+      if (revealTL.isActive() || revealState.p >= 1) return;
+      // Detener el refresco periódico cuando se inicia la revelación
+      stopScrambleTick();
+      revealTL.play(0);
+      el.removeEventListener('click', startReveal);
+      el.removeEventListener('touchstart', startReveal);
+    };
+    el.addEventListener('click', startReveal, { passive: true });
+    el.addEventListener('touchstart', startReveal, { passive: true });
+
+    const resetToPreScramble = () => {
+      revealTL.pause(0);
+      revealState.p = 0;
+      setScrambledProgress(0);
+      // Reasegurar listeners para que se pueda revelar nuevamente al re-entrar
+      el.removeEventListener('click', startReveal);
+      el.removeEventListener('touchstart', startReveal);
+      el.addEventListener('click', startReveal, { passive: true });
+      el.addEventListener('touchstart', startReveal, { passive: true });
+      // Reanudar el refresco cada 3s al volver al estado pre-scramble
+      startScrambleTick();
+    };
+
+    // Activar/restablecer pre-scramble cada vez que se entra/sale de la sección
+    let st: ScrollTrigger | null = null;
+    if (sectionRef.current) {
+      st = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top center',
+        end: 'bottom top',
+        onEnter: () => resetToPreScramble(),
+        onEnterBack: () => resetToPreScramble(),
+        onLeave: () => resetToPreScramble(),
+        onLeaveBack: () => resetToPreScramble(),
+      });
+    }
+
+    return () => {
+      el.removeEventListener('click', startReveal);
+      el.removeEventListener('touchstart', startReveal);
+      revealTL.kill();
+      if (st) st.kill();
+      stopScrambleTick();
+    };
+  }, [language]);
+
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden mb-24 md:mb-32">
+    <section ref={sectionRef} id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Main Content */}
         <motion.div
@@ -52,6 +167,7 @@ const HeroSection: React.FC = () => {
             style={{ 
               letterSpacing: '-0.5px'
             }}
+            ref={subtitleRef}
           >
             {t(language, 'hero.subtitle')}
           </motion.p>

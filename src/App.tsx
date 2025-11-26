@@ -104,16 +104,16 @@ function App() {
             
             {/* Footer */}
             <motion.footer 
-              className="relative z-10 bg-black/90 backdrop-blur-lg text-white py-4 overflow-x-hidden"
+              className="relative z-10 bg-black/90 backdrop-blur-lg text-white py-6 safe-area-bottom overflow-x-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1 }}
             >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
-                <p className="font-lincolnmitre text-xs opacity-80">
+                <p className="font-lincolnmitre text-[10px] opacity-80">
                   {t(language, 'footer.copyright')}
                 </p>
-                <p className="font-lincolnmitre text-[10px] opacity-60 leading-tight max-w-4xl mx-auto">
+                <p className="font-lincolnmitre text-[8px] opacity-60 leading-tight max-w-4xl mx-auto">
                   {t(language, 'This artwork was created for artistic purposes and does not necessarily reflect objective information nor endorse any specific viewpoint. The content is for creative purposes and should not be interpreted as a representation of reality')}
                 </p>
               </div>

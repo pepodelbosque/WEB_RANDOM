@@ -9,6 +9,16 @@ body {
   padding: 0;
 }
 
+/* Safe area padding for mobile portrait to ensure footer is readable */
+.safe-area-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+@supports (padding: constant(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: max(1rem, constant(safe-area-inset-bottom));
+  }
+}
+
 @font-face {
   font-family: 'Dirtyline';
   src: url('/public/fonts/Dirtyline 36daysoftype 2022.otf') format('opentype');
@@ -100,6 +110,72 @@ body {
   opacity: 0 !important;
 }
 
+/* Carrusel automático (marquee continuo, configurable por data-*) */
+.auto-carousel {
+  position: relative;
+  overflow: hidden;
+}
+.auto-carousel-track {
+  will-change: transform;
+  animation-duration: var(--carousel-duration, 24s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.auto-carousel.paused .auto-carousel-track {
+  animation-play-state: paused;
+}
+.auto-carousel[data-direction="horizontal"] .auto-carousel-track {
+  display: flex;
+  flex-direction: row;
+  animation-name: marqueeX;
+}
+.auto-carousel[data-direction="horizontal"][data-reverse="true"] .auto-carousel-track {
+  animation-name: marqueeXReverse;
+}
+.auto-carousel[data-direction="vertical"] .auto-carousel-track {
+  display: flex;
+  flex-direction: column;
+  animation-name: marqueeY;
+}
+.auto-carousel[data-direction="vertical"][data-reverse="true"] .auto-carousel-track {
+  animation-name: marqueeYReverse;
+}
+
+@keyframes marqueeX {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes marqueeXReverse {
+  from { transform: translateX(0); }
+  to   { transform: translateX(50%); }
+}
+@keyframes marqueeY {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+@keyframes marqueeYReverse {
+  from { transform: translateY(0); }
+  to   { transform: translateY(50%); }
+}
+
+.auto-carousel-indicators {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+.auto-carousel-indicators .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.35);
+}
+.auto-carousel-indicators .dot.active {
+  background: #ed254e;
+}
+
 /* Utilidades para animación de división en líneas */
 .split-line {
   display: block;
@@ -170,7 +246,7 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr)); /* igual que Galería de Medios */
     justify-items: center; /* centrado por columna */
     min-height: clamp(320px, 50vh, 640px);
-    column-gap: 0.25ch; /* casi pegadas horizontalmente en dos columnas */
+    column-gap: 2ch; /* separación horizontal equivalente a 2 espacios */
   }
 }
 
@@ -222,4 +298,40 @@ body {
 .fantasma-overlay .chip {
   font-size: clamp(0.6rem, 1.2vw, 0.8rem);
   padding: clamp(2px, 0.4vw, 4px) clamp(6px, 0.6vw, 8px);
+}
+/* TV de-sintonización overlay for contact buttons */
+.noise-tv {
+  mix-blend-mode: screen;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(255,0,0,0.06) 0px, rgba(0,0,0,0.03) 2px, transparent 3px);
+  animation: tv-static-move 800ms steps(8) infinite;
+  filter: contrast(1.2) brightness(1.05) saturate(1.1);
+}
+
+@keyframes tv-static-move {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  25% {
+    background-position: 0 -12px, -12px 0;
+  }
+  50% {
+    background-position: 0 -24px, -24px 0;
+  }
+  75% {
+    background-position: 0 -36px, -36px 0;
+  }
+  100% {
+    background-position: 0 -48px, -48px 0;
+  }
+}
+
+/* Oculta la barra de scroll en contenedores con overflow */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari y Opera */
 }

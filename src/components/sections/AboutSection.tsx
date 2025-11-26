@@ -348,7 +348,7 @@ const AboutSection: React.FC = () => {
             className="space-y-8"
           >
             <motion.h2 
-              className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary max-w-2xl mx-auto"
+            className="text-[2.7rem] leading-[1.05] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary max-w-2xl mx-auto"
               ref={titleRef}
             >
               {t(language, 'about.title')}

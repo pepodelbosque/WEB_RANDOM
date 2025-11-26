@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { ExternalLink, Github, Eye } from 'lucide-react';
+// Removed overlay icon buttons
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import VideogamePopup from './VideogamePopup'; // Import the new component
@@ -16,6 +16,7 @@ const PortfolioSection: React.FC = () => {
   });
   const sectionRef = useRef<HTMLElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -254,6 +255,28 @@ const PortfolioSection: React.FC = () => {
     };
   }, [language]);
 
+  // Limitar tamaño superior de las tarjetas del grid al tamaño actual
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const lockMaxUpperSize = () => {
+      const cards = Array.from(grid.querySelectorAll('[data-card="project"]')) as HTMLElement[];
+      cards.forEach((card) => {
+        const w = card.offsetWidth;
+        const h = card.offsetHeight;
+        card.style.maxWidth = `${w}px`;
+        card.style.maxHeight = `${h}px`;
+        card.setAttribute('data-max-upper-locked', 'true');
+      });
+    };
+
+    const fontsReady = (document as any).fonts?.ready || Promise.resolve();
+    Promise.resolve(fontsReady).then(() => {
+      requestAnimationFrame(lockMaxUpperSize);
+    });
+  }, [language]);
+
   return (
     <section id="portfolio" ref={handleRef} className="min-h-[50vh] py-6 relative mb-40 md:mb-56">
       <div className="max-w-3xl mx-auto px-3 sm:px-4 lg:px-6">
@@ -265,7 +288,7 @@ const PortfolioSection: React.FC = () => {
           className="text-left mb-16 md:mb-20"
         >
           <motion.h2
-            className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4 max-w-2xl"
+            className="text-[2.7rem] leading-[1.05] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4 max-w-2xl"
             ref={titleRef}
           >
             {t(language, 'portfolio.title')}
@@ -283,10 +306,12 @@ const PortfolioSection: React.FC = () => {
           animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
           transition={{ duration: 1, delay: 0.1 }}
           className="grid md:grid-cols-2 gap-x-4 gap-y-4 justify-items-center"
+          ref={gridRef}
         >
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
+              data-card="project"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.6 }}
@@ -303,25 +328,7 @@ const PortfolioSection: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t ${project.gradient} opacity-15 group-hover:opacity-30 transition-opacity duration-200`} />
-                {/* Overlay Actions */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  className="absolute inset-0 flex items-center justify-center space-x-2 bg-black/30"
-                >
-                  <motion.button 
-                    className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200"
-                    onClick={(e) => { e.stopPropagation(); openPopup(true, index === 1 ? 'VIDEO INSTALACIÓN' : 'VIDEOGAME'); }}
-                  >
-                    <Eye size={10} />
-                  </motion.button>
-                  <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
-                    <Github size={10} />
-                  </motion.button>
-                  <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
-                    <ExternalLink size={10} />
-                  </motion.button>
-                </motion.div>
+                {/* Overlay Actions removed per request */}
               </div>
               {/* Project Content (bottom band inside square) */}
               <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/35 backdrop-blur-sm">

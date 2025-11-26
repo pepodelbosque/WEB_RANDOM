@@ -14,6 +14,7 @@ const FantasmaSection: React.FC = () => {
     triggerOnce: true,
   });
   const sectionRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -157,6 +158,65 @@ const FantasmaSection: React.FC = () => {
     };
   }, []);
 
+  // Scramble reveal para el título: permanece secreto hasta interacción (click/touch)
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+
+    const finalText = 'FANTASMA = PEPO SABATINI & BARBARA OETTINGER';
+
+    const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText)
+      .map((c, i) => (/^\s$/.test(c) ? -1 : i))
+      .filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const setScrambledProgress = (p: number) => {
+      const threshold = p * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (/^\s$/.test(c)) return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    // Estado inicial: completamente scrambled
+    setScrambledProgress(0);
+
+    const revealState = { p: 0 };
+    const revealTL = gsap.timeline({ paused: true });
+    revealTL.to(revealState, {
+      p: 1,
+      duration: 2.6,
+      ease: 'power3.out',
+      onUpdate: () => setScrambledProgress(revealState.p),
+    });
+
+    const startReveal = () => {
+      if (revealTL.isActive() || revealState.p >= 1) return;
+      revealTL.play(0);
+      el.removeEventListener('click', startReveal);
+      el.removeEventListener('touchstart', startReveal);
+    };
+    el.addEventListener('click', startReveal, { passive: true });
+    el.addEventListener('touchstart', startReveal, { passive: true });
+
+    return () => {
+      el.removeEventListener('click', startReveal);
+      el.removeEventListener('touchstart', startReveal);
+      revealTL.kill();
+    };
+  }, []);
+
   return (
     <section id="fantasma" ref={handleRef} className="min-h-screen py-20 relative overflow-hidden mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -183,8 +243,9 @@ const FantasmaSection: React.FC = () => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-[0.5rem] sm:text-[0.55rem] md:text-[0.6rem] lg:text-[0.6rem] xl:text-[0.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-0 px-4 max-w-full overflow-hidden opacity-50"
+            className="text-[0.5rem] sm:text-[0.55rem] md:text-[0.6rem] lg:text-[0.6rem] xl:text-[0.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary uppercase tracking-wider mb-0 px-4 max-w-full overflow-hidden opacity-50 cursor-pointer"
             style={{ fontVariant: 'small-caps', wordBreak: 'break-word' }}
+            ref={titleRef}
           >
             FANTASMA = PEPO SABATINI & BARBARA OETTINGER
           </motion.h2>
@@ -200,7 +261,7 @@ const FantasmaSection: React.FC = () => {
               animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
               transition={{ duration: 1, delay: index * 0.3 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
-              className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
+              className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 mt-2 md:mt-3 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
             >
               {/* Background image fills square */}
               <motion.img

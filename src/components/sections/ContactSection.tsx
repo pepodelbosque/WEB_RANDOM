@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter } from 'lucide-react';
+import { Mail, MessageCircle, Instagram, Youtube } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
@@ -15,65 +15,17 @@ const ContactSection: React.FC = () => {
   });
   const sectionRef = useRef<HTMLElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const introRef = useRef<HTMLParagraphElement | null>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
   };
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
+  // Formulario eliminado; se reemplaza por botoneras de contacto directas
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Contact info cells removed per request (Correo, Teléfono, Ubicación)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Form submitted:', formData);
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setIsSubmitting(false);
-  };
-
-  const contactInfo = [
-    {
-      icon: Mail,
-      label: t(language, 'contact.contactInfo.email'),
-      value: 'hello@random.dev',
-      href: 'mailto:hello@random.dev',
-    },
-    {
-      icon: Phone,
-      label: t(language, 'contact.contactInfo.phone'),
-      value: '+1 (555) 123-4567',
-      href: 'tel:+15551234567',
-    },
-    {
-      icon: MapPin,
-      label: t(language, 'contact.contactInfo.location'),
-      value: 'San Francisco, CA',
-      href: '#',
-    },
-  ];
-
-  const socialLinks = [
-    { icon: Github, href: 'https://github.com', label: 'GitHub' },
-    { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  ];
+  // Social icons will be rendered directly in the CTAs block
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -125,8 +77,8 @@ const ContactSection: React.FC = () => {
           wrapper.className = 'split-line';
           wrapper.style.display = 'block';
           wrapper.style.overflow = 'hidden';
-          wrapper.style.textAlign = 'justify';
-          (wrapper.style as any)['textAlignLast'] = 'justify';
+          wrapper.style.textAlign = 'center';
+          (wrapper.style as any)['textAlignLast'] = 'center';
           wrapper.style.hyphens = 'auto';
           text.insertBefore(wrapper, lineWords[0]);
           lineWords.forEach((w) => wrapper.appendChild(w));
@@ -134,27 +86,10 @@ const ContactSection: React.FC = () => {
         });
 
         const justifyLines = () => {
-          wrappers.forEach((wrapper, idx) => {
-            const isLast = idx === wrappers.length - 1;
-            (wrapper.style as any)['textAlignLast'] = isLast ? 'left' : 'justify';
-            if (isLast) {
-              wrapper.style.wordSpacing = '';
-              return;
-            }
-            const children = Array.from(wrapper.children) as HTMLElement[];
-            const spaceCount = children.reduce((acc, el) => {
-              const txt = el.textContent || '';
-              return acc + (/^\s+$/.test(txt) ? 1 : 0);
-            }, 0);
-            if (spaceCount <= 0) {
-              wrapper.style.wordSpacing = '';
-              return;
-            }
-            const wrapperWidth = wrapper.getBoundingClientRect().width;
-            const contentWidth = children.reduce((acc, el) => acc + el.getBoundingClientRect().width, 0);
-            const leftover = wrapperWidth - contentWidth;
-            const perSpace = leftover / spaceCount;
-            wrapper.style.wordSpacing = perSpace > 0 ? `${perSpace}px` : '';
+          wrappers.forEach((wrapper) => {
+            wrapper.style.textAlign = 'center';
+            (wrapper.style as any)['textAlignLast'] = 'center';
+            wrapper.style.wordSpacing = '';
           });
         };
 
@@ -226,7 +161,7 @@ const ContactSection: React.FC = () => {
       el.textContent = out;
     };
 
-    const config = { appearPreRoll: 0.45, appearMove: 1.4, settle: 3.0, disappear: 1.6, ease: 'power3.inOut' } as const;
+    const config = { appearPreRoll: 1.6, appearMove: 3.8, settle: 5.2, disappear: 1.6, ease: 'power3.inOut' } as const;
     const scrambleState = { p: 0 };
 
     const introTL = gsap.timeline({ paused: true });
@@ -254,224 +189,217 @@ const ContactSection: React.FC = () => {
     };
   }, [language]);
 
+  // Scramble reveal en el párrafo de "Conectemos" reactivo al clic
+  const handleIntroClick = () => {
+    const el = introRef.current;
+    if (!el) return;
+
+    const finalText = t(language, 'contact.intro');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+
+    // Determinar orden de revelado (pseudo-aleatorio estable por índice)
+    const indices = Array.from(finalText)
+      .map((c, i) => (/\s/.test(c) ? -1 : i))
+      .filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const state = { p: 0 };
+    const setScrambledText = (progress: number) => {
+      const threshold = progress * revealOrder.length;
+      const out = finalText
+        .split('')
+        .map((c, i) => {
+          if (/\s/.test(c)) return c; // conservar espacios
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      el.textContent = out;
+    };
+
+    // Animar revelado
+    gsap.to(state, {
+      p: 1,
+      duration: 1.2,
+      ease: 'power2.out',
+      onUpdate: () => setScrambledText(state.p),
+      onComplete: () => {
+        el.textContent = finalText;
+      },
+    });
+  };
+
+  // Mantener siempre en estado pre-scramble fijo (sin bucle) hasta que se haga clic
+  useEffect(() => {
+    const el = introRef.current;
+    if (!el) return;
+    const finalText = t(language, 'contact.intro');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+
+    const scrambleOnce = () => {
+      const out = finalText
+        .split('')
+        .map((c) => (/\s/.test(c) ? c : chars[Math.floor(Math.random() * chars.length)]))
+        .join('');
+      el.textContent = out;
+    };
+
+    // Establecer una única vez el pre-scramble y mantenerlo fijo
+    scrambleOnce();
+
+    return () => {};
+  }, [language]);
+
+  // Al salir de la sección, volver al estado inicial (pre-scramble)
+  useEffect(() => {
+    const section = sectionRef.current;
+    const el = introRef.current;
+    if (!section || !el) return;
+    const finalText = t(language, 'contact.intro');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+
+    const scrambleOnce = () => {
+      const out = finalText
+        .split('')
+        .map((c) => (/\s/.test(c) ? c : chars[Math.floor(Math.random() * chars.length)]))
+        .join('');
+      el.textContent = out;
+    };
+
+    const restartPreScramble = () => {
+      // Volver al pre-scramble fijo (sin bucle)
+      scrambleOnce();
+    };
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top center',
+      end: 'bottom center',
+      onToggle: (self) => {
+        if (!self.isActive) {
+          // fuera de la sección -> estado inicial
+          restartPreScramble();
+        }
+      },
+    });
+
+    return () => {
+      st.kill();
+    };
+  }, [language]);
+
   return (
-    <section id="contact" ref={handleRef} className="min-h-screen py-20 relative mb-24 md:mb-32">
+  <section id="contact" ref={handleRef} className="pt-0 pb-20 relative mb-24 md:mb-32 -mt-12 md:-mt-16 scroll-mt-24 md:scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 100 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1 }}
-          className="text-center mb-20"
+          className="text-center mb-10"
         >
           <h2
-            className="text-[2.7rem] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6"
+            className="text-[2.7rem] leading-[1.05] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6"
             ref={titleRef}
           >
             {t(language, 'contact.title')}
           </h2>
           <div className="split-container">
-            <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-justify">
+            <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-center">
              {t(language, 'contact.description')}
             </p>
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, x: -100 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="space-y-8"
-          >
-            <div>
-              <h3 className="text-3xl font-bold font-lincolnmitre text-orange-800 dark:text-white mb-6">
-                {t(language, 'contact.getInTouch')}
-              </h3>
-              <p className="text-orange-600 dark:text-gray-300 font-lincolnmitre leading-relaxed mb-8">
-                {t(language, 'contact.intro')}
-              </p>
-            </div>
-
-            {/* Contact Details */}
-            <div className="space-y-6">
-              {contactInfo.map((info, index) => (
-                <motion.a
-                  key={info.label}
-                  href={info.href}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={inView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
-                  whileHover={{ scale: 1.02, x: 10 }}
-                  className="flex items-center space-x-4 p-4 bg-white/10 dark:bg-black/20 backdrop-blur-lg rounded-2xl border border-white/20 hover:border-primary/50 transition-all duration-300"
-                >
-                  <motion.div 
-                    className="p-2 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800"
-                    whileHover={{ scale: 1.1, rotate: 2 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <info.icon size={24} className="text-red-600" />
-                  </motion.div>
-                  <div>
-                    <div className="text-sm font-lincolnmitre text-gray-600 dark:text-gray-400">
-                      {info.label}
-                    </div>
-                    <div className="font-lincolnmitre text-gray-800 dark:text-white">
-                      {info.value}
-                    </div>
-                  </div>
-                </motion.a>
-              ))}
-            </div>
-
-            {/* Social Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
+        {/* Iconos centrados alineados con el título */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="mb-6"
+        >
+          <div className="flex flex-wrap items-center justify-center gap-4 max-w-3xl mx-auto">
+            <motion.a
+              href="mailto:hello@random.dev"
+              initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1, delay: 0.8 }}
-              className="pt-8"
+              transition={{ duration: 0.5, delay: 0.4 }}
+              whileHover={{ scale: 1.2, rotate: 10 }}
+              whileTap={{ scale: 0.95 }}
+            className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
+              aria-label="Correo"
             >
-              <h4 className="text-xl font-bold font-lincolnmitre text-gray-800 dark:text-white mb-6">
-                {t(language, 'contact.followMe')}
-              </h4>
-              <div className="flex space-x-4">
-                {socialLinks.map((social, index) => (
-                  <motion.a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={inView ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
-                    whileHover={{ scale: 1.2, rotate: 10 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-3 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 hover:bg-gradient-to-r hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 hover:text-white hover:shadow-lg transition-all duration-300"
-                  >
-                    <social.icon size={24} />
-                  </motion.a>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, delay: 0.3 }}
+              <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
+              <Mail size={24} />
+            </motion.a>
+            <motion.a
+              href="https://wa.me/15551234567"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              whileHover={{ scale: 1.2, rotate: 10 }}
+              whileTap={{ scale: 0.95 }}
+            className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+            >
+              <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
+              <MessageCircle size={24} />
+            </motion.a>
+            <motion.a
+              href="#"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              whileHover={{ scale: 1.2, rotate: 10 }}
+              whileTap={{ scale: 0.95 }}
+            className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
+              <Instagram size={24} />
+            </motion.a>
+            <motion.a
+              href="https://youtube.com"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              whileHover={{ scale: 1.2, rotate: 10 }}
+              whileTap={{ scale: 0.95 }}
+            className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+            >
+              <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
+              <Youtube size={24} />
+            </motion.a>
+          </div>
+        </motion.div>
+        {/* Párrafo centrado debajo del bloque de iconos */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-10 max-w-2xl mx-auto text-center"
+        >
+          <p
+            ref={introRef}
+            onClick={handleIntroClick}
+            className="text-orange-600 dark:text-gray-300 font-lincolnmitre leading-[1.1] cursor-pointer"
           >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: 0.5 }}
-                >
-                  <label htmlFor="name" className="block text-sm font-lincolnmitre text-orange-700 dark:text-gray-300 mb-2">
-                   {t(language, 'contact.form.name')}
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-white/10 dark:bg-black/20 backdrop-blur-lg border border-white/20 rounded-2xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-lincolnmitre text-orange-800 dark:text-white placeholder-orange-500 dark:placeholder-gray-500"
-                   placeholder={t(language, 'contact.form.namePlaceholder')}
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: 0.6 }}
-                >
-                  <label htmlFor="email" className="block text-sm font-lincolnmitre text-orange-700 dark:text-gray-300 mb-2">
-                   {t(language, 'contact.form.email')}
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-white/10 dark:bg-black/20 backdrop-blur-lg border border-white/20 rounded-2xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-lincolnmitre text-orange-800 dark:text-white placeholder-orange-500 dark:placeholder-gray-500"
-                   placeholder={t(language, 'contact.form.emailPlaceholder')}
-                  />
-                </motion.div>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.7 }}
-              >
-                <label htmlFor="subject" className="block text-sm font-lincolnmitre text-orange-700 dark:text-gray-300 mb-2">
-                 {t(language, 'contact.form.subject')}
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/10 dark:bg-black/20 backdrop-blur-lg border border-white/20 rounded-2xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-lincolnmitre text-orange-800 dark:text-white placeholder-orange-500 dark:placeholder-gray-500"
-                 placeholder={t(language, 'contact.form.subjectPlaceholder')}
-                />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              >
-                <label htmlFor="message" className="block text-sm font-lincolnmitre text-orange-700 dark:text-gray-300 mb-2">
-                 {t(language, 'contact.form.message')}
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={6}
-                  className="w-full px-4 py-3 bg-white/10 dark:bg-black/20 backdrop-blur-lg border border-white/20 rounded-2xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-lincolnmitre text-orange-800 dark:text-white placeholder-orange-500 dark:placeholder-gray-500 resize-none"
-                 placeholder={t(language, 'contact.form.messagePlaceholder')}
-                />
-              </motion.div>
-
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
-                initial={{ opacity: 0, y: 50 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.9 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-8 py-4 rounded-none bg-red-600/20 backdrop-blur-sm border border-orange-800 text-red-600 font-lincolnmitre hover:bg-gradient-to-r hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 hover:text-white hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                {isSubmitting ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full"
-                  />
-                ) : (
-                  <>
-                    <span>{t(language, 'contact.form.sendMessage')}</span>
-                    <Send size={20} />
-                  </>
-                )}
-              </motion.button>
-            </form>
-          </motion.div>
-        </div>
+            {t(language, 'contact.intro')}
+          </p>
+        </motion.div>
+        {/* Bloque de "Visítanos" con íconos eliminado; los íconos se subieron arriba */}
       </div>
     </section>
   );

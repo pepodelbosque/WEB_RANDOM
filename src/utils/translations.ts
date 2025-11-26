@@ -79,7 +79,7 @@ export const translations = {
     // Services Section
     services: {
       title: 'CREW',
-      description: 'Here we present those who brought this project to life, from the creative voices to those who shared their dreams to transform them into artwork. Katherine Hoch and Eduardo Pino generously open their dreamlike experiences, inviting us to explore with their dreams the boundaries between the real and the imagined. Camila Estrella, theorist and participant, contributes from reflection and also shares one of the dreams that inspired the work. Sebastián Valenzuela, curator and theorist, accompanies guiding the general vision and dialogue between art and technology. Barbara Oettinger, visual artist and filmmaker, and Pepo Sabatini, filmmaker and 3D animator, jointly created the imagery and aesthetic conception of the project, fusing creative vision and technique. Barbara brings a sensitive and poetic perspective that permeates the proposal, while Pepo contributes his vision and expertise within the 3D universe. Each one, from their place, builds a collective framework that crosses art, technology and dreams.',
+    description: 'Here we present those who brought this project to life, from the creative voices to those who shared their dreams to transform them into artwork. Katherine Hoch and Eduardo Pino generously open their dreamlike experiences, inviting us to explore with their dreams the boundaries between the real and the imagined. Camila Estrella, theorist and participant, contributes from reflection and also shares one of the dreams that inspired the work. Sebastián Vidal, curator and theorist, accompanies guiding the general vision and dialogue between art and technology. Barbara Oettinger, visual artist and filmmaker, and Pepo Sabatini, filmmaker and 3D animator, jointly created the imagery and aesthetic conception of the project, fusing creative vision and technique. Barbara brings a sensitive and poetic perspective that permeates the proposal, while Pepo contributes his vision and expertise within the 3D universe. Each one, from their place, builds a collective framework that crosses art, technology and dreams.',
       webDevelopment: {
         title: 'Web Development',
         description: 'Custom websites and applications built with modern technologies and organic design principles.',
@@ -346,7 +346,7 @@ export const translations = {
     // Portfolio Section
     portfolio: {
       title: 'Galería de Medios', // ✅ MAINTAINED as requested
-      description: 'Este espacio es para que explores de manera visual y directa. Aquí encontrarás imágenes seleccionadas que muestran momentos clave del proyecto, junto con la opción de descargar la experiencia interactiva del videojuego. La galería te invita a sumergirte en el universo onírico que creamos, donde el arte, los sueños y la tecnología se encuentran para ofrecer una experiencia interactiva y sensorial. Es una oportunidad para vivir la obra desde dentro, jugando, explorando y conectando con los sueños que han sido transformados en arquitecturas y paisajes digitales.',
+      description: 'imágenes seleccionadas que muestran momentos clave del proyecto, junto con la opción de descargar la experiencia interactiva del videojuego. La galería te invita a sumergirte en el universo onírico que creamos, donde el arte, los sueños y la tecnología se encuentran para ofrecer una experiencia interactiva y sensorial. Es una oportunidad para vivir la obra desde dentro, jugando, explorando y conectando con los sueños que han sido transformados en arquitecturas y paisajes digitales.',
       projects: {
         organicEcommerce: {
           title: 'E-commerce Orgánico',
@@ -369,7 +369,7 @@ export const translations = {
     // Services Section
     services: {
       title: 'Tripulación',
-      description: 'Aquí te presentamos a quienes dieron vida a este proyecto, desde las voces creativas hasta quienes compartieron sus sueños para transformarlos en obra. Katherine Hoch y Eduardo Pino abren generosamente sus experiencias oníricas, invitándonos a explorar con sus sueños las fronteras entre lo real y lo imaginado. Camila Estrella, teórica y participante, aporta desde la reflexión y también comparte uno de los sueños que inspiró la obra. Sebastián Valenzuela, curador y teórico, acompaña guiando la visión general y el diálogo entre arte y tecnología. Barbara Oettinger, artista visual y realizadora, y Pepo Sabatini, cineasta y animador 3D, crearon conjuntamente el imaginario y la concepción estética del proyecto, fusionando visión creativa y técnica. Barbara aporta una mirada sensible y poética que atraviesa la propuesta, mientras que Pepo aporta su visión y expertice dentro del universo 3D. Cada uno, desde su lugar, construye un entramado colectivo que atraviesa el arte, la tecnología y los sueños.',
+    description: 'Katherine Hoch y Eduardo Pino abren generosamente sus experiencias oníricas, invitándonos a explorar con sus sueños las fronteras entre lo real y lo imaginado. Camila Estrella, teórica y participante, aporta desde la reflexión y también comparte uno de los sueños que inspiró la obra. Sebastián Vidal, curador y teórico, acompaña guiando la visión general y el diálogo entre arte y tecnología. Barbara Oettinger, artista visual y realizadora, y Pepo Sabatini, cineasta y animador 3D, crearon conjuntamente el imaginario y la concepción estética del proyecto, fusionando visión creativa y técnica. Barbara aporta una mirada sensible y poética que atraviesa la propuesta, mientras que Pepo aporta su visión y expertice dentro del universo 3D. Cada uno, desde su lugar, construye un entramado colectivo que atraviesa el arte, la tecnología y los sueños.',
       webDevelopment: {
         title: 'PERONAS',
         description: 'Sitios web y aplicaciones personalizadas construidas con tecnologías modernas y principios de diseño orgánico.',
@@ -556,7 +556,7 @@ export const translations = {
       title: 'Conectemos',
       description: '¿Listo para dar vida a tus ideas? Creemos algo increíble juntos.',
       getInTouch: 'Ponte en Contacto',
-      intro: 'Siempre estoy emocionado de discutir nuevos proyectos y oportunidades. Ya sea que tengas una idea específica en mente o necesites orientación en tu viaje digital, estoy aquí para ayudar.',
+    intro: 'Siempre estamos emocionados de discutir nuevos proyectos y oportunidades. Si tienes una idea específica en mente o necesitas orientación en tu viaje digital, estamos aquí para ayudar.',
       contactInfo: {
         email: 'Correo',
         phone: 'Teléfono',
