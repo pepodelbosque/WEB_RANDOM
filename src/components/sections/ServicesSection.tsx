@@ -5,6 +5,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import TripulacionPopUp from './TripulacionPopUp';
 
 const ServicesSection: React.FC = () => {
   const { language } = useLanguage();
@@ -20,6 +21,10 @@ const ServicesSection: React.FC = () => {
   const leftBtnRef = useRef<HTMLButtonElement | null>(null);
   const rightBtnRef = useRef<HTMLButtonElement | null>(null);
   const heartControls = useAnimationControls();
+  const [isCrewPopupVisible, setCrewPopupVisible] = useState(false);
+  const [crewPopupTitle, setCrewPopupTitle] = useState('TRIPULACIÓN');
+  const [selectedMember, setSelectedMember] = useState<{ nameKey: string; roleKey: string; bioKey: string; image: string; skills: string[] } | null>(null);
+  const [crewPopupDescription, setCrewPopupDescription] = useState<string | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState(0);
   const stepRef = useRef(0);
@@ -34,6 +39,15 @@ const ServicesSection: React.FC = () => {
     ref(el);
     sectionRef.current = el;
   };
+
+  const openCrewPopup = (member?: { nameKey: string; roleKey: string; bioKey: string; image: string; skills: string[] } | null, title?: string, description?: string) => {
+    setSelectedMember(member ?? null);
+    setCrewPopupDescription(description);
+    setCrewPopupTitle(title || (member ? t(language, member.nameKey) : 'TRIPULACIÓN'));
+    setCrewPopupVisible(true);
+  };
+
+  const closeCrewPopup = () => setCrewPopupVisible(false);
 
   // Mantener ref sincronizada
   useEffect(() => {
@@ -518,8 +532,10 @@ const ServicesSection: React.FC = () => {
             <motion.div
               key={`${member.nameKey}-${index}`}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
-              className="group relative aspect-square max-w-xs w-[52%] md:w-[14.3rem] flex-shrink-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden"
+              onClick={() => openCrewPopup(member)}
+              className="group relative aspect-square max-w-xs w-[52%] md:w-[15rem] flex-shrink-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden"
               role="listitem"
+              aria-label={`Abrir Tripulación: ${t(language, member.nameKey)}`}
             >
               {/* Background photo fills the square (crew portrait) */}
               <img
@@ -574,6 +590,10 @@ const ServicesSection: React.FC = () => {
             <span
               aria-hidden="true"
               className="inline-flex items-center justify-center w-9 h-6 sm:w-10 sm:h-7 rounded-none border border-red-500/30 bg-red-500/10 dark:bg-red-500/10 text-red-500/80 dark:text-red-400/80 select-none"
+              role="button"
+              tabIndex={0}
+              onClick={() => openCrewPopup(null, 'TRIPULACIÓN', t(language, 'services.description'))}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCrewPopup(null, 'TRIPULACIÓN', t(language, 'services.description')); } }}
             >
               <motion.svg
                 initial={{ scale: 1 }}
@@ -617,6 +637,14 @@ const ServicesSection: React.FC = () => {
           </div>
           */}
         </motion.div>
+        <TripulacionPopUp 
+          isVisible={isCrewPopupVisible}
+          onClose={closeCrewPopup}
+          title={crewPopupTitle}
+          selectedMember={selectedMember ?? undefined}
+          description={crewPopupDescription}
+          sequenceMembers={crew}
+        />
       </div>
     </section>
   );

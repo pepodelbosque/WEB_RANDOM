@@ -165,7 +165,8 @@ const ContactSection: React.FC = () => {
     const scrambleState = { p: 0 };
 
     const introTL = gsap.timeline({ paused: true });
-    gsap.set(el, { opacity: 1, y: 40 });
+    // Entrada desde arriba: posición inicial negativa
+    gsap.set(el, { opacity: 1, y: -40 });
     introTL
       .to(scrambleState, { p: 0.35, duration: config.appearPreRoll, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) })
       .to(scrambleState, { p: 0.92, duration: config.appearMove, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) }, 0)
@@ -298,7 +299,7 @@ const ContactSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 100 }}
+          initial={{ opacity: 0, y: -100 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1 }}
           className="text-center mb-10"
@@ -323,7 +324,7 @@ const ContactSection: React.FC = () => {
           transition={{ duration: 1, delay: 0.3 }}
           className="mb-6"
         >
-          <div className="flex flex-wrap items-center justify-center gap-4 max-w-3xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-4 max-w-3xl mx-auto dotted-icons">
             <motion.a
               href="mailto:hello@random.dev"
               initial={{ opacity: 0, y: 30 }}

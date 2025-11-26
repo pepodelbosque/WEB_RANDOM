@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Eye, Play, Maximize } from 'lucide-react';
+
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
@@ -275,23 +275,6 @@ const FantasmaSection: React.FC = () => {
               {/* Soft gradient wash like Portfolio */}
               <div className={`absolute inset-0 bg-gradient-to-t ${project.gradient} opacity-20 group-hover:opacity-35 transition-opacity duration-300`} />
 
-              {/* Top-right action icons (compact) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={inView ? { opacity: 1, scale: 1 } : {}}
-                className="absolute top-2 right-2 flex items-center gap-1 z-10"
-              >
-                <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
-                  <Eye size={12} />
-                </motion.button>
-                <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
-                  <Play size={12} />
-                </motion.button>
-                <motion.button className="p-1 rounded-none bg-red-600/15 backdrop-blur-sm border border-orange-800 text-red-600 hover:text-orange-500 hover:bg-orange-500/15 transition-all duration-200">
-                  <Maximize size={12} />
-                </motion.button>
-              </motion.div>
-
               {/* Bottom overlay band (Portfolio style) */}
               <div className="fantasma-overlay absolute bottom-0 left-0 right-0 bg-black/35 backdrop-blur-sm">
                 <h3 className="font-black font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
@@ -301,13 +284,6 @@ const FantasmaSection: React.FC = () => {
                   {project.description}
                 </p>
               </div>
-
-              {/* Decorative square (matches square style) */}
-              <motion.div
-                animate={{ rotate: [0, 360], scale: [1, 1.1, 1] }}
-                transition={{ duration: 10, repeat: Infinity }}
-                className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-primary to-secondary rounded-none opacity-50"
-              />
             </motion.div>
           ))}
         </div>

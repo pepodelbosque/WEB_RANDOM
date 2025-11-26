@@ -327,6 +327,17 @@ body {
   }
 }
 
+/* Dotted stroke style for contact icons (scoped) */
+.dotted-icons .lucide path,
+.dotted-icons .lucide rect,
+.dotted-icons .lucide circle,
+.dotted-icons .lucide line,
+.dotted-icons .lucide polyline,
+.dotted-icons .lucide polygon {
+  /* Puntos más pequeños y más juntos */
+  stroke-dasharray: 0.9 1.6;
+}
+
 /* Oculta la barra de scroll en contenedores con overflow */
 .no-scrollbar {
   -ms-overflow-style: none; /* IE y Edge */

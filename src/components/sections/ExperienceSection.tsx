@@ -304,7 +304,7 @@ const ExperienceSection: React.FC = () => {
   ];
 
   return (
-    <section id="experience" ref={handleRef} className="min-h-screen py-20 relative mb-24 md:mb-32">
+    <section id="experience" ref={handleRef} className="min-h-screen py-20 relative mt-12 md:mt-16 mb-24 md:mb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
