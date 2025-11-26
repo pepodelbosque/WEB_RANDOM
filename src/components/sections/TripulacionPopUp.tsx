@@ -218,34 +218,80 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
               className="w-full h-[35vh] md:h-[40vh] overflow-y-auto mt-2 md:mt-4 no-scrollbar"
             >
               <div className="max-w-[85vw] md:max-w-2xl mx-auto text-center px-2 md:px-4">
-                {description && (
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35] mb-3 md:mb-4">
-                    {description}
-                  </p>
-                )}
-                {sequenceMembers.map((m, i) => (
-                  <div key={`txt-block-${m.nameKey}-${i}`} ref={(el) => (textRefs.current[i] = el)} className="mb-3 md:mb-4">
-                    <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">
-                      {t(language, m.nameKey)}
-                    </h3>
-                    <p className="text-[11px] md:text-sm font-extrabold font-lincolnmitre text-orange-300/80 mb-1 md:mb-2">
-                      {t(language, m.roleKey)}
-                    </p>
-                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35] mb-1 md:mb-2">
-                      {t(language, m.bioKey)}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 md:gap-2 justify-center">
-                      {m.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="px-2 py-[2px] bg-gradient-to-r from-primary/15 to-secondary/15 text-[10px] md:text-[11px] font-lincolnmitre rounded-none border border-primary/30 text-orange-200/80 font-extrabold"
-                        >
-                          {t(language, skill)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                {/* Contenido fijo proporcionado por el usuario */}
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo principal - random 2.0 videojuego</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección del videojuego: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección conceptual: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción ejecutiva: Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Curatorial global y asesoría artística: Sebastián Vidal</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de juego: Pepo Sabatini – Javier Rojas</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Programación: Javier Rojas – Ignacio Concha – Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Director de arte: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Director de fotografía y cámaras: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Arte 3D y entornos: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Arte 2D y UI (interfaz de usuario): Javier Rojas – Ignacio Concha</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Animación y rigging: Pepo Sabatini – Fernanda Aguirre</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Composición musical: Marco Portilla – Lost Tropicales</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sonido (SFX): Sebastián Lagos Ossa</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Guion y narrativa: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Control de calidad (QA): Daniel Cruz, Sebastián Vidal</p>
+                </div>
+
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo entrevistas - random 2.0 videojuego</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección y montaje: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistadora y asistencia en terreno: Fernanda Aguirre</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Digitalización y creación de personajes: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistados y soñadores: Camila Estrella – Eduardo Vega – Kate Hosh</p>
+                </div>
+
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo principal - random 1.0 (machinima)</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Concepto y dirección creativa: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección de machinima: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Edición: Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Asesoría artística: Sebastián Vidal</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de intervención y mecánicas: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Desarrollo de mods y scripting: Pepo Sabatini + TuchinoFeo</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección de arte y curaduría visual: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección de fotografía y cámara virtual: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sets y exploración de locaciones: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Puesta en escena y animación de avatares: Pepo Sabatini</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Música original: Chris Manhey</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sonido y post-producción de audio: Omnilab</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Guion y narrativa: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción ejecutiva: Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Pepo Sabatini y Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Montaje exhibición y programación: Nicolás Briceño</p>
+                </div>
+
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">mundo de producción y herramientas</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Construido dentro del mundo de: Grand Theft Auto V</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Desarrolladores originales del mundo: Rockstar Games & Rockstar North</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Plataforma de modificación: FiveM, OpenIV, Menyoo, Rockstar Editor.</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Mods adicionales de la comunidad: [Si usaron mods de autos, ropa, etc., creados por otros, es vital listarlos aquí]</p>
+                </div>
+
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">catálogo</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Textos catálogo: Bárbara Oettinger, Sebastián Vidal Valenzuela, Camila Estrella & Pepo Sabatini.</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño y edición del catálogo: Bárbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Fotografía y registro audiovisual exhibición: Pepo Sabatini</p>
+                </div>
+
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">web</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño y programación: Pepo Sabatini</p>
+                </div>
+
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">agradecimientos</h3>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Instituciones, apoyos, colaboradores</p>
+                </div>
               </div>
             </div>
 
