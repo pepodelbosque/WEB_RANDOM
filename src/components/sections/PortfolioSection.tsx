@@ -277,6 +277,136 @@ const PortfolioSection: React.FC = () => {
     });
   }, [language]);
 
+  // Pre-scramble escalonado por párrafo con ciclo suave y cooldown
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const paras = Array.from(grid.querySelectorAll('[data-card="project"] p')) as HTMLElement[];
+    if (!paras.length) return;
+
+    // Guardar texto final canónico para evitar acumulación entre ciclos
+    paras.forEach((el) => {
+      const final = el.textContent || '';
+      el.setAttribute('data-final-text', final);
+    });
+
+    // Bloquear dimensiones para que el pre-scramble no haga crecer las frases
+    const lockParagraphDimensions = () => {
+      paras.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const height = rect.height;
+        el.style.height = `${height}px`;
+        el.style.maxHeight = `${height}px`;
+        el.style.overflow = 'hidden';
+      });
+    };
+
+    const unlockParagraphDimensions = () => {
+      paras.forEach((el) => {
+        el.style.height = '';
+        el.style.maxHeight = '';
+        el.style.overflow = '';
+      });
+    };
+
+    let tickId: number | null = null;
+    let cooldownId: number | null = null;
+
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const scrambleOnce = (el: HTMLElement) => {
+      const final = el.getAttribute('data-final-text') || '';
+      const out = final
+        .split('')
+        .map((c) => (/\s/.test(c) ? c : letters[Math.floor(Math.random() * letters.length)]))
+        .join('');
+      el.textContent = out;
+    };
+
+    const setNormalTextFor = (el: HTMLElement) => {
+      const final = el.getAttribute('data-final-text') || '';
+      el.textContent = final;
+    };
+
+    // Duraciones escalonadas: p0 base, p1 +1s, p2 +2s, p3 +3s
+    const baseMsInitial = 4000;
+    const baseMsRepeat = 2000; // ciclo suave
+    const offsetsMs = paras.map((_, i) => Math.min(i * 1000, 3000));
+    const startTick = (baseMsArg: number) => {
+      stopTick();
+      const endTimes = new Map<HTMLElement, number>();
+      const done = new Set<HTMLElement>();
+      const now = Date.now();
+      paras.forEach((el, i) => {
+        endTimes.set(el, now + baseMsArg + (offsetsMs[i] || 0));
+      });
+      tickId = window.setInterval(() => {
+        const t = Date.now();
+        paras.forEach((el) => {
+          if (done.has(el)) return;
+          const end = endTimes.get(el) || 0;
+          if (t < end) {
+            scrambleOnce(el);
+          } else {
+            setNormalTextFor(el);
+            done.add(el);
+          }
+        });
+        // Cuando todos terminaron, fijar altura, detener y programar próximo ciclo suave
+        if (done.size >= paras.length) {
+          lockParagraphDimensions();
+          stopTick();
+          scheduleNextCycle();
+        }
+      }, 140);
+    };
+
+    const stopTick = () => {
+      if (tickId !== null) {
+        clearInterval(tickId);
+        tickId = null;
+      }
+    };
+
+    const stopCooldown = () => {
+      if (cooldownId !== null) {
+        clearTimeout(cooldownId);
+        cooldownId = null;
+      }
+    };
+
+    const scheduleNextCycle = () => {
+      // No programar si no está en vista
+      if (!inView) return;
+      stopCooldown();
+      const cooldownMs = 12000; // 12s de reposo antes de otro scramble suave
+      cooldownId = window.setTimeout(() => {
+        // Asegurar texto final y altura bloqueada antes del nuevo ciclo
+        paras.forEach(setNormalTextFor);
+        lockParagraphDimensions();
+        startTick(baseMsRepeat);
+      }, cooldownMs);
+    };
+
+    if (inView) {
+      // Al iniciar, fijar texto final y bloquear altura antes del scramble
+      paras.forEach(setNormalTextFor);
+      lockParagraphDimensions();
+      startTick(baseMsInitial);
+    } else {
+      stopTick();
+      stopCooldown();
+      paras.forEach(setNormalTextFor);
+    }
+
+    return () => {
+      stopTick();
+      stopCooldown();
+      paras.forEach(setNormalTextFor);
+      unlockParagraphDimensions();
+    };
+  }, [inView, language]);
+
   return (
     <section id="portfolio" ref={handleRef} className="min-h-[50vh] py-6 relative mb-40 md:mb-56">
       <div className="max-w-3xl mx-auto px-3 sm:px-4 lg:px-6">

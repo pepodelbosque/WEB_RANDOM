@@ -15,6 +15,8 @@ const FantasmaSection: React.FC = () => {
   });
   const sectionRef = useRef<HTMLElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const revealTLRef = useRef<gsap.core.Timeline | null>(null);
+  const revealStateRef = useRef<{ p: number }>({ p: 0 });
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -192,14 +194,17 @@ const FantasmaSection: React.FC = () => {
     // Estado inicial: completamente scrambled
     setScrambledProgress(0);
 
-    const revealState = { p: 0 };
-    const revealTL = gsap.timeline({ paused: true });
+    // Estado compartido para permitir triggers externos (inView + timeout)
+    const revealState = revealStateRef.current = { p: 0 };
+    const revealTL = gsap.timeline({ paused: true, repeat: -1, yoyo: true, repeatDelay: 4 });
     revealTL.to(revealState, {
       p: 1,
       duration: 2.6,
       ease: 'power3.out',
       onUpdate: () => setScrambledProgress(revealState.p),
+      delay: 0,
     });
+    revealTLRef.current = revealTL;
 
     const startReveal = () => {
       if (revealTL.isActive() || revealState.p >= 1) return;
@@ -214,6 +219,73 @@ const FantasmaSection: React.FC = () => {
       el.removeEventListener('click', startReveal);
       el.removeEventListener('touchstart', startReveal);
       revealTL.kill();
+      revealTLRef.current = null;
+    };
+  }, []);
+
+  // Al entrar en la sección (inView), revelar automáticamente el h2 tras 4s
+  useEffect(() => {
+    const tl = revealTLRef.current;
+    if (!tl) return;
+    if (inView) {
+      const timeoutId = window.setTimeout(() => {
+        if (!tl.isActive()) {
+          tl.play(0);
+        }
+      }, 4000);
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    } else {
+      tl.pause();
+    }
+  }, [inView]);
+
+  // Bloquear tamaños mínimos al 120% del tamaño visible inicial para elementos clave
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const lockMinSizes = () => {
+      const elements: HTMLElement[] = [];
+      const logo = section.querySelector('.logo-fntsm') as HTMLElement | null;
+      if (logo) elements.push(logo);
+      const cards = Array.from(section.querySelectorAll('.fantasma-grid .group')) as HTMLElement[];
+      elements.push(...cards);
+
+      elements.forEach((el) => {
+        const baseWAttr = el.getAttribute('data-min-base-w');
+        const baseHAttr = el.getAttribute('data-min-base-h');
+        const baseW = baseWAttr ? parseFloat(baseWAttr) : el.offsetWidth;
+        const baseH = baseHAttr ? parseFloat(baseHAttr) : el.offsetHeight;
+        if (!baseWAttr) el.setAttribute('data-min-base-w', String(baseW));
+        if (!baseHAttr) el.setAttribute('data-min-base-h', String(baseH));
+
+        const minW = Math.round(baseW * 1.2);
+        el.style.minWidth = `${minW}px`;
+
+        // Para el logo, también fijar altura mínima para evitar reducción en layouts pequeños
+        if (el.classList.contains('logo-fntsm')) {
+          const minH = Math.round(baseH * 1.2);
+          el.style.minHeight = `${minH}px`;
+        }
+
+        el.setAttribute('data-min-locked', 'true');
+      });
+    };
+
+    const ready = (document as any).fonts?.ready || Promise.resolve();
+    Promise.resolve(ready).then(() => {
+      requestAnimationFrame(lockMinSizes);
+    });
+
+    const onResize = () => {
+      // Mantener mínimos basados en la medida base (no compone)
+      requestAnimationFrame(lockMinSizes);
+    };
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -261,7 +333,7 @@ const FantasmaSection: React.FC = () => {
               animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
               transition={{ duration: 1, delay: index * 0.3 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
-              className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 mt-2 md:mt-3 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
+              className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 mt-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
             >
               {/* Background image fills square */}
               <motion.img

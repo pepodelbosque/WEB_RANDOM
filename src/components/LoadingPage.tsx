@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../hooks/useLanguage';
+import MirloStrip from './MirloStrip';
 
 interface LoadingPageProps {
   onLoadingComplete: () => void;
@@ -132,8 +133,12 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
                 duration: isFadingOut ? 0.6 : 0.8, 
                 delay: isFadingOut ? 0 : 0.3 
               }}
-              className="space-y-4"
+              className="space-y-[10px]"
             >
+              {/* Mirlo reactivo al progreso, arriba de la barra */}
+              <div className="mx-auto w-48 h-24 flex justify-center items-center">
+                <MirloStrip progress={progress} scale={1} progressSpeed={3} disableWheel width={96} height={96} />
+              </div>
               {/* Smaller fixed size progress bar */}
               <div className="relative">
                 <div className="w-48 h-0.5 bg-gray-800 rounded-full overflow-hidden mx-auto">

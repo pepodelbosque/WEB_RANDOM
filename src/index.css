@@ -238,7 +238,8 @@ body {
   column-gap: 2ch; /* separación horizontal equivalente a 2 espacios */
   row-gap: clamp(12px, 2.4vw, 20px);
   min-height: clamp(280px, 45vh, 520px);
-  margin-top: -6rem; /* default desktop spacing as currently configured */
+  /* restar 10 espacios: fijar separación en 0 espacios (mt-0) */
+  margin-top: 0; /* mt-0 */
 }
 
 @media (min-width: 768px) {
@@ -275,7 +276,9 @@ body {
 /* Portrait mobile: lower the grid to avoid overlap with header images */
 @media (orientation: portrait) and (max-width: 768px) {
   .fantasma-grid {
-    margin-top: 1.5rem; /* mt-6: baja las tarjetas 6 espacios */
+    margin-top: 0; /* mt-0: 0 espacios en móvil */
+    /* Reducir separación vertical entre tarjetas en móvil */
+    row-gap: clamp(6px, 1.6vw, 12px);
   }
 }
 @media (orientation: landscape) and (min-width: 768px) {

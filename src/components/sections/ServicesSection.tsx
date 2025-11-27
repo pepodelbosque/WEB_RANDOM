@@ -288,23 +288,35 @@ const ServicesSection: React.FC = () => {
       setCurrentIndex((prev) => Math.min(prev, newMax));
     };
 
-    // Bloquear tamaño máximo de tarjetas al tamaño actual
+    // Bloquear tamaño fijo de tarjetas al tamaño actualmente observado (no reactivo)
     const relockCards = () => {
       const cards = Array.from(track.querySelectorAll('[role="listitem"]')) as HTMLElement[];
+      // Limpiar estilos previos para medir tamaño natural según layout actual
       cards.forEach((card) => {
-        // Quitar bloqueos para medir tamaño natural
         card.style.width = '';
         card.style.minWidth = '';
         card.style.maxWidth = '';
+        card.style.height = '';
+        card.style.minHeight = '';
+        card.style.maxHeight = '';
       });
-      // Forzar reflow y medir
+      // Forzar reflow para obtener medidas actualizadas
       void track.offsetWidth;
+      // Fijar width/height y min/max al tamaño base observado (bloqueo fijo)
       cards.forEach((card) => {
-        const w = card.offsetWidth;
-        // Bloquear que crezca o se achique: fijar ancho, min y max
-        card.style.width = `${w}px`;
-        card.style.minWidth = `${w}px`;
-        card.style.maxWidth = `${w}px`;
+        const baseAttr = card.getAttribute('data-fixed-w') || card.getAttribute('data-min-base-w') || card.getAttribute('data-max-base-w');
+        const baseW = baseAttr ? parseFloat(baseAttr) : card.offsetWidth;
+        const fixed = Math.round(baseW);
+        card.style.width = `${fixed}px`;
+        card.style.minWidth = `${fixed}px`;
+        card.style.maxWidth = `${fixed}px`;
+        card.style.height = `${fixed}px`;
+        card.style.minHeight = `${fixed}px`;
+        card.style.maxHeight = `${fixed}px`;
+        card.style.flexShrink = '0';
+        card.setAttribute('data-fixed-w', String(fixed));
+        // Marcas
+        card.setAttribute('data-min-locked', 'true');
         card.setAttribute('data-max-locked', 'true');
       });
     };
@@ -340,14 +352,36 @@ const ServicesSection: React.FC = () => {
     rightBtn?.addEventListener('click', onRightClick);
     rightBtn?.addEventListener('keydown', onRightKey);
 
+    // Pausar auto-movimiento cuando el puntero/tacto esté sobre cualquier tarjeta
+    const onCardEnter = () => {
+      // Pausar indefinidamente mientras esté encima
+      autoPausedUntilRef.current = Infinity;
+      carouselRef.current?.classList.add('paused');
+    };
+    const onCardLeave = () => {
+      // Reanudar inmediatamente al salir
+      autoPausedUntilRef.current = Date.now();
+      carouselRef.current?.classList.remove('paused');
+    };
+    const cardEls = Array.from(track.querySelectorAll('[role="listitem"]')) as HTMLElement[];
+    cardEls.forEach((card) => {
+      card.addEventListener('mouseenter', onCardEnter);
+      card.addEventListener('mouseleave', onCardLeave);
+      card.addEventListener('touchstart', onCardEnter, { passive: true } as any);
+      card.addEventListener('touchend', onCardLeave);
+    });
+
     // Recalcular en resize
-    const onResize = () => computeMetrics();
+    const onResize = () => {
+      // No re-bloquear tamaños: mantener fijo; solo recomputar métricas de carrusel
+      computeMetrics();
+    };
     window.addEventListener('resize', onResize);
 
     // Rebloquear tras carga de fuentes
     const fontsReady = (document as any).fonts?.ready || Promise.resolve();
     Promise.resolve(fontsReady).then(() => {
-      // Esperar al layout final y then relock
+      // Bloquear una sola vez tras el layout final
       requestAnimationFrame(() => {
         relockCards();
         computeMetrics();
@@ -356,9 +390,8 @@ const ServicesSection: React.FC = () => {
 
     // Observar cambios de contenido y re-bloquear
     const mo = new MutationObserver(() => {
-      // Schedule para evitar múltiples triggers
+      // No cambiar tamaños; solo recalcular métricas si el contenido cambia
       requestAnimationFrame(() => {
-        relockCards();
         computeMetrics();
       });
     });
@@ -370,6 +403,13 @@ const ServicesSection: React.FC = () => {
       rightBtn?.removeEventListener('click', onRightClick);
       rightBtn?.removeEventListener('keydown', onRightKey);
       window.removeEventListener('resize', onResize);
+      // Limpieza de listeners en tarjetas
+      cardEls.forEach((card) => {
+        card.removeEventListener('mouseenter', onCardEnter);
+        card.removeEventListener('mouseleave', onCardLeave);
+        card.removeEventListener('touchstart', onCardEnter as any);
+        card.removeEventListener('touchend', onCardLeave);
+      });
       mo.disconnect();
     };
   }, [language]);

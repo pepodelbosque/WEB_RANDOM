@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Mail, MessageCircle, Instagram, Youtube } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import MirloStrip from '../MirloStrip';
 
 const ContactSection: React.FC = () => {
   const { language } = useLanguage();
@@ -13,13 +14,33 @@ const ContactSection: React.FC = () => {
     threshold: 0.2,
     triggerOnce: true,
   });
+  const [introObserveRef, introIsInView] = useInView({
+    threshold: 0.3,
+    triggerOnce: false,
+  });
   const sectionRef = useRef<HTMLElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
+  const [birdProgress, setBirdProgress] = useState(0);
+  const [birdAutoPlay, setBirdAutoPlay] = useState(false);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
   };
+
+  // Variants para entrada sutil con zoom + fade en iconos
+  const iconContainerVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 0.15 },
+    },
+  } as const;
+
+  const iconItemVariants = {
+    initial: { opacity: 0, scale: 0.92 },
+    animate: { opacity: 1, scale: 1, transition: { duration: 0.45, ease: 'easeOut' } },
+  } as const;
 
   // Formulario eliminado; se reemplaza por botoneras de contacto directas
 
@@ -129,6 +150,30 @@ const ContactSection: React.FC = () => {
       }
     };
   }, []);
+
+  // Progreso de scroll para animar el pájaro (0–100 dentro de la sección)
+  useEffect(() => {
+    const onScroll = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const top = el.offsetTop;
+      const height = Math.max(el.offsetHeight, 1);
+      const y = window.scrollY;
+      const p = Math.min(Math.max((y - top) / height, 0), 1);
+      setBirdProgress(Math.round(p * 100));
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Auto-play del mirlo: 15s al entrar específicamente al bloque "Conectemos"
+  useEffect(() => {
+    if (!introIsInView) return;
+    setBirdAutoPlay(true);
+    const t = setTimeout(() => setBirdAutoPlay(false), 15000);
+    return () => clearTimeout(t);
+  }, [introIsInView]);
 
   // Scramble Reveal del título (homogéneo, sincronizado con ScrollTrigger)
   useEffect(() => {
@@ -295,7 +340,7 @@ const ContactSection: React.FC = () => {
   }, [language]);
 
   return (
-  <section id="contact" ref={handleRef} className="pt-0 pb-20 relative mb-24 md:mb-32 -mt-12 md:-mt-16 scroll-mt-24 md:scroll-mt-28">
+  <section id="contact" ref={handleRef} className="pt-0 pb-0 relative mb-0 -mt-12 md:-mt-16 scroll-mt-24 md:scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -319,17 +364,15 @@ const ContactSection: React.FC = () => {
 
         {/* Iconos centrados alineados con el título */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1, delay: 0.3 }}
+          variants={iconContainerVariants}
+          initial="initial"
+          animate={inView ? 'animate' : 'initial'}
           className="mb-6"
         >
           <div className="flex flex-wrap items-center justify-center gap-4 max-w-3xl mx-auto dotted-icons">
             <motion.a
               href="mailto:hello@random.dev"
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
             className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
@@ -340,9 +383,7 @@ const ContactSection: React.FC = () => {
             </motion.a>
             <motion.a
               href="https://wa.me/15551234567"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={inView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
             className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
@@ -355,9 +396,7 @@ const ContactSection: React.FC = () => {
             </motion.a>
             <motion.a
               href="#"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={inView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
             className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
@@ -370,9 +409,7 @@ const ContactSection: React.FC = () => {
             </motion.a>
             <motion.a
               href="https://youtube.com"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={inView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.7 }}
+              variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
             className="group relative overflow-hidden p-3 rounded-none bg-transparent backdrop-blur-md border border-primary/40 text-primary shadow-[0_0_0_1px_rgba(255,0,0,0.12)] hover:border-primary hover:text-amber-300 hover:shadow-[0_0_18px_rgba(255,0,0,0.35)] transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/10 before:to-transparent before:opacity-0 hover:before:opacity-100 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition before:duration-700"
@@ -393,13 +430,25 @@ const ContactSection: React.FC = () => {
           className="mt-10 max-w-2xl mx-auto text-center"
         >
           <p
-            ref={introRef}
+            ref={(node) => {
+              introRef.current = node;
+              introObserveRef(node);
+            }}
             onClick={handleIntroClick}
             className="text-orange-600 dark:text-gray-300 font-lincolnmitre leading-[1.1] cursor-pointer"
           >
             {t(language, 'contact.intro')}
           </p>
         </motion.div>
+        {/* Secuencia 2D del mirlo: auto-play 5s al entrar, luego reactivo al mouse */}
+        <div
+          className="-mt-[3.75rem] mb-[3rem] flex justify-center cursor-pointer"
+          onClick={handleIntroClick}
+          role="button"
+          aria-label="Activar conversión de texto en Conectemos"
+        >
+          <MirloStrip progress={birdProgress} autoPlay={birdAutoPlay} />
+        </div>
         {/* Bloque de "Visítanos" con íconos eliminado; los íconos se subieron arriba */}
       </div>
     </section>
