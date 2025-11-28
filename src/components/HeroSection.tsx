@@ -11,7 +11,19 @@ const HeroSection: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const lenis = (window as any).lenis;
+      if (lenis && typeof lenis.scrollTo === 'function') {
+        const header = document.querySelector('nav');
+        const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
+        const dynamicOffset = sectionId === '#contact' ? -Math.round(window.innerHeight * 0.2) : sectionId === '#portfolio' ? headerH + 90 : 0;
+        lenis.scrollTo(element, {
+          offset: dynamicOffset,
+          duration: 1.1,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      } else {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 

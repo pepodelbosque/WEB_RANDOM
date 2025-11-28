@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Mail, MessageCircle, Instagram, Youtube } from 'lucide-react';
+import { Mail, MessageCircle, Instagram, Youtube, Phone, Send, Paperclip, Camera, Share, Link as LinkIcon, Globe, Wifi, Radio, Activity, Bell, Skull, Banana, Gem, Apple, Cherry, Cake, Candy, CandyCane, Carrot, Cat, Bird, Bone, Bomb, Beer, Bike, Anchor, Rocket, Umbrella, Cloud, Sun, Moon, Star, Flame, Heart, Music, Car, Coffee, Crown, Leaf, Flower, Fish, Aperture, Award, Gift, Ghost } from 'lucide-react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
@@ -206,26 +206,32 @@ const ContactSection: React.FC = () => {
       el.textContent = out;
     };
 
-    const config = { appearPreRoll: 1.6, appearMove: 3.8, settle: 5.2, disappear: 1.6, ease: 'power3.inOut' } as const;
+    const config = { appearPreRoll: 1.2, appearMove: 1.4, settle: 5.2, disappear: 1.6, ease: 'power3.inOut' } as const;
     const scrambleState = { p: 0 };
 
     const introTL = gsap.timeline({ paused: true });
-    // Entrada desde arriba: posición inicial negativa
-    gsap.set(el, { opacity: 1, y: -40 });
+    gsap.set(el, { opacity: 0, y: -40 });
     introTL
       .to(scrambleState, { p: 0.35, duration: config.appearPreRoll, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) })
       .to(scrambleState, { p: 0.92, duration: config.appearMove, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) }, 0)
-      .to(el, { y: 0, duration: config.appearMove, ease: config.ease }, 0)
+      .to(el, { opacity: 1, y: 0, duration: config.appearMove, ease: config.ease }, 0)
       .to(scrambleState, { p: 1, duration: config.settle, ease: config.ease, onUpdate: () => setScrambledText(scrambleState.p) });
 
     const st = ScrollTrigger.create({
       trigger: section,
       start: 'top 75%',
       end: 'bottom 25%',
-      onEnter: () => introTL.play(0),
+      onEnter: () => {
+        gsap.set(el, { opacity: 0, y: -40 });
+        scrambleState.p = 0;
+        setScrambledText(0);
+        introTL.play(0);
+      },
       onEnterBack: () => {
-        gsap.set(el, { opacity: 1, y: 0 });
-        setScrambledText(1);
+        gsap.set(el, { opacity: 0, y: -40 });
+        scrambleState.p = 0;
+        setScrambledText(0);
+        introTL.play(0);
       },
     });
 
@@ -379,7 +385,7 @@ const ContactSection: React.FC = () => {
               aria-label="Correo"
             >
               <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
-              <Mail size={24} />
+              <ScrambleIcon Original={Heart} HoverIcon={Mail} size={24} exclude={[MessageCircle, Instagram, Youtube]} startDelay={0} />
             </motion.a>
             <motion.a
               href="https://wa.me/15551234567"
@@ -392,7 +398,7 @@ const ContactSection: React.FC = () => {
               aria-label="WhatsApp"
             >
               <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
-              <MessageCircle size={24} />
+              <ScrambleIcon Original={Bird} HoverIcon={MessageCircle} size={24} exclude={[Mail, Instagram, Youtube]} startDelay={800} />
             </motion.a>
             <motion.a
               href="#"
@@ -405,7 +411,7 @@ const ContactSection: React.FC = () => {
               aria-label="Instagram"
             >
               <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
-              <Instagram size={24} />
+              <ScrambleIcon Original={Skull} HoverIcon={Instagram} size={24} exclude={[Mail, MessageCircle, Youtube]} startDelay={1600} />
             </motion.a>
             <motion.a
               href="https://youtube.com"
@@ -418,7 +424,7 @@ const ContactSection: React.FC = () => {
               aria-label="YouTube"
             >
               <span aria-hidden className="noise-tv absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-60" />
-              <Youtube size={24} />
+              <ScrambleIcon Original={Ghost} HoverIcon={Youtube} size={24} exclude={[Mail, MessageCircle, Instagram]} startDelay={2400} />
             </motion.a>
           </div>
         </motion.div>
@@ -456,3 +462,97 @@ const ContactSection: React.FC = () => {
 };
 
 export default ContactSection;
+  const ScrambleIcon: React.FC<{ Original: any; HoverIcon?: any; size?: number; exclude?: any[]; startDelay?: number } > = ({ Original, HoverIcon, size = 24, exclude = [], startDelay = 0 }) => {
+    const [useMotionReduced] = useState(() => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const [mode, setMode] = useState<'scramble' | 'original'>('scramble');
+    const [IconComp, setIconComp] = useState<any>(Original);
+    const pool = [
+      Phone, Send, Paperclip, Camera, Share, LinkIcon, Globe, Wifi, Radio, Activity, Bell,
+      Skull, Banana, Gem, Apple, Cherry, Cake, Candy, CandyCane, Carrot, Cat, Bird, Bone, Bomb, Beer, Bike,
+      Anchor, Rocket, Umbrella, Cloud, Sun, Moon, Star, Flame, Heart, Music, Car, Coffee, Crown, Leaf, Flower,
+      Fish, Aperture, Award, Gift, Ghost
+    ].filter((ic) => {
+      return ic !== Original && !exclude.includes(ic);
+    });
+    const tickRef = useRef<number | null>(null);
+    const phaseRef = useRef<'scramble' | 'original'>('scramble');
+    const idxRef = useRef<number>(-1);
+
+    useEffect(() => {
+      if (useMotionReduced) {
+        setMode('original');
+        setIconComp(Original);
+        return;
+      }
+
+      const SCRAMBLE_MS = 3000;
+      const ORIGINAL_MS = 4000;
+      const STEP_MS = Math.max(Math.floor(SCRAMBLE_MS / 50), 50);
+
+      const pickNext = () => {
+        if (!pool.length) {
+          setIconComp(Original);
+          return;
+        }
+        let next = Math.floor(Math.random() * pool.length);
+        if (next === idxRef.current) {
+          next = (next + 1) % pool.length;
+        }
+        idxRef.current = next;
+        setIconComp(pool[next]);
+      };
+
+      const startScramble = () => {
+        phaseRef.current = 'scramble';
+        setMode('scramble');
+        pickNext();
+        const endAt = Date.now() + SCRAMBLE_MS;
+        const step = () => {
+          if (Date.now() < endAt) {
+            pickNext();
+            tickRef.current = window.setTimeout(step, STEP_MS);
+          } else {
+            startOriginal();
+          }
+        };
+        tickRef.current = window.setTimeout(step, STEP_MS);
+      };
+
+      const startOriginal = () => {
+        phaseRef.current = 'original';
+        setMode('original');
+        setIconComp(Original);
+        tickRef.current = window.setTimeout(() => {
+          startScramble();
+        }, ORIGINAL_MS);
+      };
+
+      const delay = Math.max(0, startDelay);
+      tickRef.current = window.setTimeout(() => {
+        startScramble();
+      }, delay);
+      return () => {
+        if (tickRef.current !== null) {
+          clearTimeout(tickRef.current);
+          tickRef.current = null;
+        }
+      };
+    }, [Original, useMotionReduced]);
+
+    const Current = IconComp;
+    return (
+      <span className="relative inline-grid" style={{ placeItems: 'center' }}>
+        <span className={`transition-opacity duration-200 ${mode === 'scramble' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-0`}>
+          <Current size={size} />
+        </span>
+        <span className={`absolute inset-0 transition-opacity duration-200 ${mode === 'original' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-0`} style={{ display: 'grid', placeItems: 'center' }}>
+          <Original size={size} />
+        </span>
+        {HoverIcon ? (
+          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ display: 'grid', placeItems: 'center' }}>
+            <HoverIcon size={size} />
+          </span>
+        ) : null}
+      </span>
+    );
+  };

@@ -1,0 +1,165 @@
+/* Marco envolvente 4:3 para el popup de tripulación */
+.overlay {
+  will-change: transform, opacity;
+  -webkit-will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  position: relative; /* para el pseudo-elemento de fondo */
+}
+
+.overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9); /* fondo negro al 90% */
+  opacity: 0; /* inicia transparente */
+  transition: opacity 300ms ease-in-out; /* transición suave */
+  will-change: opacity;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.overlayVisible::before {
+  opacity: 1; /* alcanza 90% del fondo por el alpha */
+}
+
+.frame {
+  /* Relación de aspecto estricta */
+  aspect-ratio: 4 / 3;
+
+  /* Dimensiones: 60% del viewport, con límites por altura */
+  width: min(60vw, calc(85vh * (4 / 3)));
+  max-width: 95vw;
+  max-height: 95vh;
+
+  /* Sombra suave para profundidad */
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+
+  /* Fondo: preservar opacidad actual del overlay (no tocar) */
+  background-color: transparent;
+
+  /* Centrado interno y distribución vertical */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+
+  /* Encerrar completamente el contenido */
+  overflow: hidden;
+
+  /* Posicionamiento para stroke overlay */
+  position: relative;
+
+  /* Rendimiento */
+  will-change: transform, opacity;
+  -webkit-will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Marco rojo animado: se expande de 0% a 100% */
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 0, 0, 0.5);
+  transform: scale(0);
+  -webkit-transform: scale(0);
+  transform-origin: center;
+  -webkit-transform-origin: center;
+  /* Animación más orgánica: duración 400ms, easing Material cubic-bezier(0.4, 0, 0.2, 1), 100ms de delay */
+  animation: frameExpand 400ms cubic-bezier(0.4, 0, 0.2, 1) 100ms forwards,
+             popupBorderBlink var(--popup-border-blink-duration, 1.5s) ease-in-out 0s infinite;
+  -webkit-animation: frameExpand 400ms cubic-bezier(0.4, 0, 0.2, 1) 100ms forwards,
+                     popupBorderBlink var(--popup-border-blink-duration, 1.5s) ease-in-out 0s infinite;
+  will-change: transform;
+  pointer-events: none;
+  /* Asegura superposición por encima del contenido y las imágenes */
+  z-index: 20;
+}
+
+@keyframes frameExpand {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Overlay de ruido/grano en el borde rojo, restringido al ring del borde */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: var(--popup-border-width, 2px);
+  pointer-events: none;
+  opacity: var(--popup-noise-opacity, 0.35);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,0,0,0.18) 0 1px, rgba(255,0,0,0) 1px 2px),
+    repeating-linear-gradient(90deg, rgba(255,0,0,0.16) 0 1px, rgba(255,0,0,0) 1px 3px),
+    radial-gradient(rgba(255,0,0,0.12) 0.5px, transparent 0.8px);
+  background-blend-mode: screen;
+  /* Solo mostrar el ring del borde */
+  -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  will-change: background-position, opacity;
+  z-index: 21;
+  animation: popupGrainShift var(--popup-grain-interval, 1.5s) steps(2, end) infinite;
+}
+
+@-webkit-keyframes frameExpand {
+  0% { -webkit-transform: scale(0); opacity: 1; }
+  100% { -webkit-transform: scale(1); opacity: 1; }
+}
+
+.content {
+  opacity: 0; /* inicia invisible */
+  /* Fade sincronizado: 500ms ease-out, inicia tras completar el marco (100ms delay + 400ms duración = 500ms) */
+  animation: contentFade 500ms ease-out 500ms forwards;
+  -webkit-animation: contentFade 500ms ease-out 500ms forwards;
+  will-change: opacity;
+  position: relative;
+  /* Mantener el contenido debajo del marco pero encima del fondo */
+  z-index: 1;
+}
+
+@keyframes contentFade {
+  0% { opacity: 0; }
+  100% { opacity: 0.9; }
+}
+
+@-webkit-keyframes contentFade {
+  0% { opacity: 0; }
+  100% { opacity: 0.9; }
+}
+
+/* Responsivo en pantallas pequeñas */
+@media (max-width: 640px) {
+  .frame {
+    /* En móviles, usar relación 1:1 y ocupar como máximo el 95% del ancho/alto */
+    aspect-ratio: 1 / 1;
+    width: min(95vw, 95vh);
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+}
+
+/* Alturas reducidas en pantallas muy bajas (apaisado móvil) */
+@media (max-height: 480px) {
+  .frame {
+    width: min(95vw, calc(90vh * (4 / 3)));
+    max-height: 90vh;
+  }
+}
+
+/* Formato más vertical: preferir 3:4 en orientación retrato */
+@media (orientation: portrait) {
+  .frame {
+    aspect-ratio: 3 / 4;
+    width: min(95vw, calc(95vh * (3 / 4)));
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+}

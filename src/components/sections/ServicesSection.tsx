@@ -326,10 +326,6 @@ const ServicesSection: React.FC = () => {
     
     computeMetrics();
 
-    const applyTransform = (idx: number) => {
-      const dx = -idx * (stepRef.current || 0);
-      track.style.transform = `translateX(${dx}px)`;
-    };
     // Handlers
     const onLeftClick = () => {
       const prev = currentIndexRef.current;
@@ -551,7 +547,7 @@ const ServicesSection: React.FC = () => {
             TRIPULACIÓN
           </motion.h2>
           <div className="split-container">
-            <p className="split text-[0.9em] md:text-[1.02em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto text-justify leading-[1.3]">
+            <p className="split text-[0.9em] md:text-[1.02em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto text-justify leading-[1.3]">
               {t(language, 'services.description')}
             </p>
           </div>

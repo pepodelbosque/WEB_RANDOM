@@ -211,56 +211,7 @@ export const translations = {
         },
       },
     },
-    // Experience Section
-    experience: {
-      title: 'Experience',
-      description: 'A journey through creative development and digital innovation',
-      stats: {
-        projectsCompleted: 'Projects Completed',
-        yearsExperience: 'Years Experience',
-        happyClients: 'Happy Clients',
-        clientSatisfaction: 'Client Satisfaction',
-      },
-      jobs: {
-        seniorCreativeDeveloper: {
-          title: 'Senior Creative Developer',
-          company: 'Digital Organic Studio',
-          location: 'Remote',
-          period: '2022 - Present',
-          description: 'Leading the development of innovative web experiences with focus on organic design and smooth animations.',
-          achievements: [
-            'Increased client satisfaction by 40% through improved UX',
-            'Reduced page load times by 60% across all projects',
-            'Mentored 5 junior developers',
-          ],
-        },
-        fullStackDeveloper: {
-          title: 'Full-Stack Developer',
-          company: 'Nature Tech Solutions',
-          location: 'San Francisco, CA',
-          period: '2020 - 2022',
-          description: 'Developed scalable web applications with emphasis on environmental monitoring and data visualization.',
-          achievements: [
-            'Built real-time dashboard serving 10k+ users',
-            'Implemented ML algorithms for predictive analytics',
-            'Led migration to microservices architecture',
-          ],
-        },
-        frontendDeveloper: {
-          title: 'Frontend Developer',
-          company: 'Creative Labs',
-          location: 'New York, NY',
-          period: '2018 - 2020',
-          description: 'Specialized in creating responsive, accessible websites with modern JavaScript frameworks.',
-          achievements: [
-            'Improved accessibility scores by 85%',
-            'Reduced development time by 30% with reusable components',
-            'Collaborated with design team on 50+ projects',
-          ],
-        },
-      },
-      keyAchievements: 'Key Achievements:',
-    },
+    
     // Contact Section
     contact: {
       title: "Let's Connect",
@@ -501,56 +452,7 @@ export const translations = {
         },
       },
     },
-    // Experience Section
-    experience: {
-      title: 'Experiencia',
-      description: 'Un viaje a través del desarrollo creativo y la innovación digital',
-      stats: {
-        projectsCompleted: 'Proyectos Completados',
-        yearsExperience: 'Años de Experiencia',
-        happyClients: 'Clientes Satisfechos',
-        clientSatisfaction: 'Satisfacción del Cliente',
-      },
-      jobs: {
-        seniorCreativeDeveloper: {
-          title: 'Desarrollador Creativo Senior',
-          company: 'Digital Organic Studio',
-          location: 'Remoto',
-          period: '2022 - Presente',
-          description: 'Liderando el desarrollo de experiencias web innovadoras con enfoque en diseño orgánico y animaciones suaves.',
-          achievements: [
-            'Aumenté la satisfacción del cliente en un 40% a través de UX mejorada',
-            'Reduje los tiempos de carga de página en un 60% en todos los proyectos',
-            'Mentoré a 5 desarrolladores junior',
-          ],
-        },
-        fullStackDeveloper: {
-          title: 'Desarrollador Full-Stack',
-          company: 'Nature Tech Solutions',
-          location: 'San Francisco, CA',
-          period: '2020 - 2022',
-          description: 'Desarrollé aplicaciones web escalables con énfasis en monitoreo ambiental y visualización de datos.',
-          achievements: [
-            'Construí un dashboard en tiempo real sirviendo a más de 10k usuarios',
-            'Implementé algoritmos de ML para análisis predictivo',
-            'Lideré la migración a arquitectura de microservicios',
-          ],
-        },
-        frontendDeveloper: {
-          title: 'Desarrollador Frontend',
-          company: 'Creative Labs',
-          location: 'Nueva York, NY',
-          period: '2018 - 2020',
-          description: 'Me especialicé en crear sitios web responsivos y accesibles con frameworks modernos de JavaScript.',
-          achievements: [
-            'Mejoré las puntuaciones de accesibilidad en un 85%',
-            'Reduje el tiempo de desarrollo en un 30% con componentes reutilizables',
-            'Colaboré con el equipo de diseño en más de 50 proyectos',
-          ],
-        },
-      },
-      keyAchievements: 'Logros Clave:',
-    },
+    
     // Contact Section
     contact: {
       title: 'Conectemos',

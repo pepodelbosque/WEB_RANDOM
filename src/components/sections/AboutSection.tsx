@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import styles from './TripulacionPopUp.module.css';
 
 const AboutSection: React.FC = () => {
   const { language } = useLanguage();
@@ -12,10 +13,74 @@ const AboutSection: React.FC = () => {
     threshold: 0.3,
     triggerOnce: false,
   });
-  
+  const overlayHeaderRef = useRef<HTMLDivElement | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const wasInViewRef = useRef(false);
-  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const [overlayOpen, setOverlayOpen] = useState(false);
+  const [overlayPage, setOverlayPage] = useState(0);
+  const dirRef = useRef(1);
+  const touchStartYRef = useRef<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  const navigateOnCloseRef = useRef(false);
+  const overlayImages = useMemo(() => {
+    const pool = [
+      '/images/brbr1.jpg',
+      '/images/pepo1.jpg',
+      '/images/seba1.jpg',
+      '/images/kate1.jpg',
+      '/images/edu1.jpg',
+      '/images/cami1.jpg',
+      '/images/chini2.jpg',
+    ];
+    const picks: string[] = [];
+    const used = new Set<number>();
+    while (picks.length < 6 && used.size < pool.length) {
+      const idx = Math.floor(Math.random() * pool.length);
+      if (used.has(idx)) continue;
+      used.add(idx);
+      picks.push(pool[idx]);
+    }
+    while (picks.length < 6) picks.push(pool[picks.length % pool.length]);
+    return picks;
+  }, []);
+  const desc1 = useMemo(() => t(language, 'about.description1'), [language]);
+  const desc2 = useMemo(() => t(language, 'about.description2'), [language]);
+  const desc3 = useMemo(() => t(language, 'about.description3'), [language]);
+  const allWords = useMemo(() => {
+    const text = [desc1, desc2, desc3].filter(Boolean).join(' ');
+    return text.split(/(\s+)/).filter((w) => w.length > 0);
+  }, [desc1, desc2, desc3]);
+  const [partA, partB, partC] = useMemo(() => {
+    const total = allWords.length;
+    const aEnd = Math.floor(total / 3);
+    const bEnd = Math.floor((2 * total) / 3);
+    return [allWords.slice(0, aEnd), allWords.slice(aEnd, bEnd), allWords.slice(bEnd)];
+  }, [allWords]);
+  const RenderTokens: React.FC<{ tokens: string[]; images: string[] }> = ({ tokens, images }) => {
+    const elems: React.ReactNode[] = [];
+    let imgIdx = 0;
+    let count = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      const tk = tokens[i];
+      elems.push(<span key={`w-${i}`}>{tk}</span>);
+      count++;
+      if (count % 32 === 0 && imgIdx < images.length) {
+        const sideRight = imgIdx % 2 === 1;
+        elems.push(
+          <img
+            key={`im-${i}`}
+            src={images[imgIdx++]}
+            alt={`overlay-${imgIdx}`}
+            className={(sideRight ? 'float-right ml-2' : 'float-left mr-2') + ' w-[30%] max-w-[40%] h-auto object-cover rounded-none border border-red-500/30 box-border mb-2'}
+            style={{ breakInside: 'avoid-column', shapeOutside: 'inset(0)' }}
+          />
+        );
+      }
+    }
+    return <>{elems}</>;
+  };
   
 
   
@@ -63,6 +128,151 @@ const AboutSection: React.FC = () => {
       observer.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top center',
+      onEnter: () => {
+        const w = window as any;
+        const last = w.__recentScrollAt || 0;
+        const mode = w.__accessMode || 'scroll';
+        const isRecent = Date.now() - last < 1800;
+        if (isRecent && mode !== 'nav' && mode !== 'external' && mode !== 'up') {
+          setOverlayOpen(true);
+          try { (window as any).lenis?.stop(); } catch (e) { void e; }
+        }
+      },
+      onEnterBack: () => {
+        const w = window as any;
+        w.__accessMode = 'up';
+        try {
+          const lenis = (window as any).lenis;
+          const hero = document.querySelector('#home');
+          if (hero && lenis && typeof lenis.scrollTo === 'function') {
+            const header = document.querySelector('nav');
+            const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
+            lenis.scrollTo(hero, { offset: 0 - headerH, duration: 1.1, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+          } else {
+            (hero as any)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+          }
+        } catch (e) { void e; }
+      },
+    });
+    return () => { st.kill(); };
+  }, []);
+
+  useEffect(() => {
+    const w = window as any;
+    const setNatural = () => { w.__accessMode = 'scroll'; w.__recentScrollAt = Date.now(); };
+    window.addEventListener('wheel', setNatural, { passive: true } as any);
+    window.addEventListener('touchmove', setNatural, { passive: true } as any);
+    if (window.location.hash) { w.__accessMode = 'external'; }
+    return () => {
+      window.removeEventListener('wheel', setNatural as any);
+      window.removeEventListener('touchmove', setNatural as any);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!overlayOpen) return;
+    const el = overlayHeaderRef.current;
+    if (!el) return;
+    const finalText = t(language, 'about.title');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+    const setScrambledText = (p: number) => {
+      const threshold = Math.floor(p * revealOrder.length);
+      el.textContent = finalText
+        .split('')
+        .map((c, i) => {
+          if (c === ' ') return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+    };
+    setScrambledText(0);
+    const state = { p: 0 };
+    const tl = gsap.to(state, {
+      p: 1,
+      duration: 1.2,
+      ease: 'power3.inOut',
+      onUpdate: () => setScrambledText(state.p),
+      onComplete: () => { el.textContent = finalText; },
+    });
+    return () => { tl.kill(); };
+  }, [overlayOpen, language]);
+
+  useEffect(() => {
+    if (overlayOpen) {
+      setOverlayPage(0);
+      navigateOnCloseRef.current = false;
+      dirRef.current = 1;
+    }
+  }, [overlayOpen]);
+
+  useEffect(() => {
+    const onInfo = () => {
+      setOverlayOpen(true);
+      try { (window as any).lenis?.stop(); } catch (e) { void e; }
+    };
+    const onMedia = (ev: any) => {
+      const src = ev?.detail?.src as string | undefined;
+      (window as any).__accessMode = 'media';
+      setSelectedImage(src || null);
+      setOverlayOpen(true);
+      try { (window as any).lenis?.stop(); } catch (e) { void e; }
+    };
+    window.addEventListener('openAboutInfoPopup', onInfo as any);
+    window.addEventListener('openAboutImagePopup', onMedia as any);
+    return () => { window.removeEventListener('openAboutInfoPopup', onInfo as any); };
+  }, []);
+
+  useEffect(() => {
+    if (!overlayOpen) return;
+    const el = overlayHeaderRef.current;
+    if (!el) return;
+    const finalText = t(language, 'about.title');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+    const setScrambledText = (p: number) => {
+      const threshold = Math.floor(p * revealOrder.length);
+      el.textContent = finalText
+        .split('')
+        .map((c, i) => {
+          if (c === ' ') return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+    };
+    setScrambledText(0);
+    const state = { p: 0 };
+    const tl = gsap.to(state, {
+      p: 1,
+      duration: 2,
+      ease: 'power2.inOut',
+      onUpdate: () => setScrambledText(state.p),
+      onComplete: () => { el.textContent = finalText; },
+    });
+    return () => { tl.kill(); };
+  }, [overlayOpen, language]);
+
 
   // GSAP split-line animation tied to scroll
   useEffect(() => {
@@ -217,122 +427,6 @@ const AboutSection: React.FC = () => {
     };
   }, []);
 
-  // GSAP Secret Scramble Reveal para el título
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const el = titleRef.current;
-    if (!el) return;
-
-    const finalText = t(language, 'about.title');
-    el.textContent = finalText; // asegura texto final como base
-
-    // Scramble en toda la frase con revelado uniforme (no solo izquierda→derecha)
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
-    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
-    // Orden de revelado más homogéneo (tipo "blue noise") usando la razón áurea
-    const phi = 0.6180339887498948;
-    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
-    weights.sort((a, b) => a.w - b.w);
-    const revealOrder = weights.map((w) => w.idx);
-    const rankMap = new Map<number, number>();
-    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
-
-    const setScrambledText = (progress: number) => {
-      const threshold = progress * revealOrder.length;
-      const out = finalText
-        .split('')
-        .map((c, i) => {
-          if (c === ' ') return c;
-          const rank = rankMap.get(i) ?? 0;
-          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
-        })
-        .join('');
-      el.textContent = out;
-    };
-
-    // Orquestación en tres fases: entrada, asentamiento y salida
-    const config = {
-      appearPreRoll: 0.45,
-      appearMove: 1.4,
-      settle: 3.0,
-      disappear: 1.6,
-      ease: 'power3.inOut',
-    } as const;
-
-    const scrambleState = { p: 0 };
-
-    // ENTRADA + ASENTAMIENTO
-    const introTL = gsap.timeline({ paused: true });
-    gsap.set(el, { opacity: 1, y: 40 });
-    // 1) Iniciar efecto ANTES del deslizamiento
-    introTL.to(scrambleState, {
-      p: 0.35,
-      duration: config.appearPreRoll,
-      ease: config.ease,
-      onUpdate: () => setScrambledText(scrambleState.p),
-    });
-    // 1) Deslizamiento hacia posición final con efecto activo
-    introTL.fromTo(
-      el,
-      { opacity: 1, y: 40 },
-      { opacity: 1, y: 0, duration: config.appearMove, ease: config.ease }
-    );
-    introTL.to(scrambleState, {
-      p: 0.75,
-      duration: config.appearMove,
-      ease: config.ease,
-      onUpdate: () => setScrambledText(scrambleState.p),
-    }, '<');
-    // 2) Transformación gradual hasta forma definitiva
-    introTL.to(scrambleState, {
-      p: 1,
-      duration: config.settle,
-      ease: config.ease,
-      onUpdate: () => setScrambledText(scrambleState.p),
-    });
-    introTL.add(() => { el.textContent = finalText; });
-
-    // SALIDA: reactivar efecto y mantener hasta desaparecer
-    const outroTL = gsap.timeline({ paused: true });
-    outroTL.to(scrambleState, {
-      p: 0.4,
-      duration: 0.3,
-      ease: config.ease,
-      onUpdate: () => setScrambledText(scrambleState.p),
-    });
-    outroTL.to(el, {
-      opacity: 0,
-      y: -40,
-      duration: config.disappear,
-      ease: config.ease,
-    }, '<');
-    outroTL.to(scrambleState, {
-      p: 1,
-      duration: config.disappear,
-      ease: config.ease,
-      onUpdate: () => setScrambledText(scrambleState.p),
-    }, '<');
-    outroTL.add(() => { el.textContent = finalText; });
-
-    // ScrollTrigger para sincronizar fases con entrada/salida de la sección
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: 'top 95%',
-      end: 'bottom 5%',
-      onEnter: () => introTL.restart(),
-      onEnterBack: () => introTL.restart(),
-      // La salida inicia cuando el título ya está posicionado (y=0)
-      onLeave: () => outroTL.restart(),
-      onLeaveBack: () => outroTL.restart(),
-    });
-
-    return () => {
-      introTL.kill();
-      outroTL.kill();
-      st.kill();
-    };
-  }, [language]);
 
 
   return (
@@ -347,45 +441,141 @@ const AboutSection: React.FC = () => {
             transition={{ duration: 1 }}
             className="space-y-8"
           >
-            <motion.h2 
-            className="text-[2.7rem] leading-[1.05] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary max-w-2xl mx-auto"
-              ref={titleRef}
-            >
-              {t(language, 'about.title')}
-            </motion.h2>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 1, delay: 0.4 }}
-              className="space-y-5 text-[0.9em] md:text-[1.02em] font-lincolnmitre text-red-600 dark:text-white max-w-2xl mx-auto leading-[1.3]"
-            >
-              <div className="split-container">
-                <p className="split">
-                  {t(language, 'about.description1')}
-                </p>
-              </div>
-
-              <div className="split-container">
-                <p className="split">
-                {t(language, 'about.description2')}
-                </p>
-              </div>
-
-              <div className="split-container">
-                <p className="split">
-                {t(language, 'about.description3')}
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Operational line removida para evitar marcas visibles */}
+            <div className="max-w-2xl mx-auto w-full h-[60vh] md:h-[65vh]" />
           </motion.div>
 
           {/* Visual Element was here */}
         </div>
       </div>
+      <AnimatePresence onExitComplete={() => {
+        try {
+          const lenis = (window as any).lenis;
+          lenis?.start();
+          const target = document.getElementById('portfolio');
+          if (target) {
+            const header = document.querySelector('nav');
+            const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
+            if (lenis && typeof lenis.scrollTo === 'function') {
+              lenis.scrollTo(target, { offset: headerH + 20, duration: 1.05, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            } else {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        } catch (e) { void e; }
+        navigateOnCloseRef.current = false;
+        setSelectedImage(null);
+      }}>
+      {overlayOpen && (
+        <motion.div
+          ref={overlayRef}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          className={`${styles.overlay} ${styles.overlayVisible} fixed inset-0 z-50 flex flex-col items-center justify-center`}
+          onWheel={(e) => {
+            e.preventDefault();
+            const dy = e.deltaY || 0;
+            if (dy === 0) return;
+            dirRef.current = dy > 0 ? 1 : -1;
+            if (dy > 0) {
+              if (overlayPage < 2) {
+                setOverlayPage((p) => Math.min(2, p + 1));
+              } else {
+                navigateOnCloseRef.current = false;
+                setOverlayOpen(false);
+                setOverlayPage(0);
+              }
+            } else {
+              if (overlayPage > 0) {
+                setOverlayPage((p) => Math.max(0, p - 1));
+              } else {
+                navigateOnCloseRef.current = false;
+                setOverlayOpen(false);
+                setOverlayPage(0);
+              }
+            }
+          }}
+          onTouchStart={(e) => {
+            touchStartYRef.current = e.touches?.[0]?.clientY ?? null;
+          }}
+          onTouchMove={(e) => {
+            const y = e.touches?.[0]?.clientY ?? null;
+            if (y == null || touchStartYRef.current == null) return;
+            const dy = touchStartYRef.current - y;
+            if (Math.abs(dy) < 10) return;
+            e.preventDefault();
+            dirRef.current = dy > 0 ? 1 : -1;
+            if (dy > 0) {
+              if (overlayPage < 2) {
+                setOverlayPage((p) => Math.min(2, p + 1));
+              } else {
+                navigateOnCloseRef.current = false;
+                setOverlayOpen(false);
+                setOverlayPage(0);
+              }
+            } else {
+              if (overlayPage > 0) {
+                setOverlayPage((p) => Math.max(0, p - 1));
+              } else {
+                navigateOnCloseRef.current = false;
+                setOverlayOpen(false);
+                setOverlayPage(0);
+              }
+            }
+            touchStartYRef.current = y;
+          }}
+        >
+          <div ref={overlayHeaderRef} className="pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3">{t(language, 'about.title')}</div>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            className={styles.frame}
+            style={{ width: '75vw', maxHeight: '75vh' }}
+          >
+            <div className={styles.content} style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
+              <motion.div
+                key={overlayPage}
+                initial={{ x: dirRef.current > 0 ? 120 : -120, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -120, opacity: 0 }}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                className="w-full h-full px-10 pt-14 pb-12 md:px-12 md:pt-16 md:pb-14 box-border overflow-hidden"
+              >
+                {selectedImage && overlayPage === 0 && (
+                  <div className="w-full mb-3 flex items-center justify-center">
+                    <img src={selectedImage} alt="selección" className="max-h-[32vh] w-auto object-contain border border-red-600/40" />
+                  </div>
+                )}
+                {overlayPage === 0 && (
+                  <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
+                    <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                      <RenderTokens tokens={partA} images={[overlayImages[0], overlayImages[1], overlayImages[2]]} />
+                    </div>
+                  </div>
+                )}
+                {overlayPage === 1 && (
+                  <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
+                    <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                      <RenderTokens tokens={partB} images={[overlayImages[3], overlayImages[4], overlayImages[5]]} />
+                    </div>
+                  </div>
+                )}
+                {overlayPage === 2 && (
+                  <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
+                    <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                      <RenderTokens tokens={partC} images={[overlayImages[1], overlayImages[2], overlayImages[0]]} />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+      </AnimatePresence>
     </section>
   );
 };

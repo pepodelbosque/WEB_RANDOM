@@ -11,7 +11,7 @@ const FantasmaSection: React.FC = () => {
   const { language } = useLanguage();
   const [ref, inView] = useInView({
     threshold: 0.2,
-    triggerOnce: true,
+    triggerOnce: false,
   });
   const sectionRef = useRef<HTMLElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -97,6 +97,67 @@ const FantasmaSection: React.FC = () => {
           wrappers.push(wrapper);
         });
 
+        // Pre-scramble idéntico a Experiencia: texto "secreto" hasta click/touch
+        const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+        type SpanData = {
+          el: HTMLSpanElement;
+          final: string;
+          revealOrder: number[];
+          rankMap: Map<number, number>;
+          length: number;
+        };
+        const spanData: SpanData[] = [];
+        (Array.from(text.querySelectorAll('.split-word')) as HTMLSpanElement[]).forEach((el) => {
+          const final = el.textContent || '';
+          const indices = Array.from(final)
+            .map((c, i) => (/^\s$/.test(c) ? -1 : i))
+            .filter((i) => i >= 0);
+          const phi = 0.6180339887498948;
+          const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+          weights.sort((a, b) => a.w - b.w);
+          const revealOrder = weights.map((w) => w.idx);
+          const rankMap = new Map<number, number>();
+          revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+          spanData.push({ el, final, revealOrder, rankMap, length: revealOrder.length });
+        });
+
+        const setScrambledProgress = (p: number) => {
+          spanData.forEach(({ el, final, rankMap, length }) => {
+            const threshold = p * length;
+            const out = final
+              .split('')
+              .map((c, i) => {
+                if (/^\s$/.test(c)) return c;
+                const rank = rankMap.get(i) ?? 0;
+                return rank < threshold ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+              })
+              .join('');
+            el.textContent = out;
+          });
+        };
+
+        // Inicial: completamente "secreto" (scrambled)
+        setScrambledProgress(0);
+
+        // Timeline que revela solo tras interacción explícita
+        const revealState = { p: 0 };
+        const revealTL = gsap.timeline({ paused: true });
+        revealTL.to(revealState, {
+          p: 1,
+          duration: 2.6,
+          ease: 'power3.out',
+          onUpdate: () => setScrambledProgress(revealState.p),
+        });
+
+        const startReveal = () => {
+          if ((revealTL as any).isActive?.() || revealState.p >= 1) return;
+          revealTL.play(0);
+          text.removeEventListener('click', startReveal);
+          text.removeEventListener('touchstart', startReveal);
+        };
+        text.addEventListener('click', startReveal, { passive: true });
+        text.addEventListener('touchstart', startReveal, { passive: true });
+
         const justifyLines = () => {
           wrappers.forEach((wrapper, idx) => {
             const isLast = idx === wrappers.length - 1;
@@ -127,7 +188,7 @@ const FantasmaSection: React.FC = () => {
 
         gsap.from(wrappers, {
           yPercent: 120,
-          stagger: 0.12,
+          stagger: 0.1,
           ease: 'sine.out',
           scrollTrigger: {
             trigger: container,
@@ -142,6 +203,9 @@ const FantasmaSection: React.FC = () => {
         const cleanup = () => {
           window.removeEventListener('resize', justifyLines);
           ScrollTrigger.removeEventListener('refresh', justifyLines);
+          text.removeEventListener('click', startReveal);
+          text.removeEventListener('touchstart', startReveal);
+          revealTL.kill();
         };
         (container as any).__justifyCleanup = cleanup;
       });
@@ -241,6 +305,7 @@ const FantasmaSection: React.FC = () => {
     }
   }, [inView]);
 
+
   // Bloquear tamaños mínimos al 120% del tamaño visible inicial para elementos clave
   useEffect(() => {
     const section = sectionRef.current;
@@ -297,7 +362,7 @@ const FantasmaSection: React.FC = () => {
           initial={{ opacity: 0, y: 100 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1 }}
-          className="text-center mb-4"
+          className="text-center mb-0"
         >
           <motion.div 
             initial={{ opacity: 0, scale: 0.5 }}
@@ -324,8 +389,12 @@ const FantasmaSection: React.FC = () => {
           {/* Description removed per request */}
         </motion.div>
 
-        {/* Gallery Grid: centered responsive */}
-        <div className="fantasma-grid">
+        <motion.div
+          initial={{ opacity: 0, x: -100 }}
+          animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
+          transition={{ duration: 1, delay: 0.1 }}
+          className="fantasma-grid mt-10 md:mt-12"
+        >
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
@@ -358,7 +427,23 @@ const FantasmaSection: React.FC = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
+
+        {/* Bloque textual movido desde Experiencia, sin título y más cercano a las tarjetas */}
+        <motion.div
+          initial={{ opacity: 0, x: -180 }}
+          animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -180 }}
+          transition={{ duration: 1.25, delay: 0.35, ease: 'easeOut' }}
+          className="mt-7 md:mt-9"
+        >
+          <div className="split-container">
+            <p className="split text-[0.7125em] md:text-[0.8325em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-[1.3] text-justify">
+              Jugar no es cosa de niños: es un método de investigación, una ética de la experimentación, una manera de mantener viva la curiosidad ante el mundo.
+              El videojuego —con su lógica interactiva y su invitación explícita a participar— nos devolvió a ese estado primero.
+              Nos recordó que la imagen no tiene por qué ser solo espejo o ventana: puede ser también terreno de juego, espacio que se recorre, se toca, se altera.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

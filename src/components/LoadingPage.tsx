@@ -26,7 +26,6 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ onLoadingComplete }) => {
     { name: 'Thunder', desc: 'font' },
     { name: 'Services', desc: 'offer' },
     { name: 'Contact', desc: 'form' },
-    { name: 'Experience', desc: 'cv' },
     { name: 'Translations', desc: 'lang' },
     { name: 'Hooks', desc: 'utils' },
     { name: 'Assets', desc: 'media' },

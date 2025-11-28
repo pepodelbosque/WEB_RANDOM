@@ -4,6 +4,7 @@ import Lenis from '@studio-freight/lenis';
 declare global {
   interface Window {
     lenis: Lenis;
+    lenisRecomputeSections?: () => void;
   }
 }
 
@@ -21,7 +22,6 @@ export const useLenis = () => {
       smoothWheel: true,
       wheelMultiplier: BASE_WHEEL,
       touchMultiplier: BASE_TOUCH,
-      smoothTouch: true,
     });
 
     window.lenis = lenis;
@@ -73,18 +73,9 @@ export const useLenis = () => {
       const s = sections.find((sec) => scrollY >= sec.top && scrollY < sec.bottom);
       if (!s) {
         // Default speed
-        if (lastWheel !== BASE_WHEEL) {
-          lenis.options.wheelMultiplier = BASE_WHEEL;
-          lastWheel = BASE_WHEEL;
-        }
-        if (lastTouch !== BASE_TOUCH) {
-          lenis.options.touchMultiplier = BASE_TOUCH;
-          lastTouch = BASE_TOUCH;
-        }
-        if (lastDuration !== BASE_DURATION) {
-          lenis.options.duration = BASE_DURATION;
-          lastDuration = BASE_DURATION;
-        }
+        if (lastWheel !== BASE_WHEEL) lastWheel = BASE_WHEEL;
+        if (lastTouch !== BASE_TOUCH) lastTouch = BASE_TOUCH;
+        if (lastDuration !== BASE_DURATION) lastDuration = BASE_DURATION;
         return;
       }
       const progress = clamp((scrollY - s.top) / s.height, 0, 1);
@@ -95,30 +86,53 @@ export const useLenis = () => {
       const targetTouch = BASE_TOUCH * factor;
       const targetDuration = BASE_DURATION / factor; // inverse: slower -> longer duration
 
-      if (Math.abs(targetWheel - lastWheel) > 0.02) {
-        lenis.options.wheelMultiplier = targetWheel;
-        lastWheel = targetWheel;
-      }
-      if (Math.abs(targetTouch - lastTouch) > 0.05) {
-        lenis.options.touchMultiplier = targetTouch;
-        lastTouch = targetTouch;
-      }
-      if (Math.abs(targetDuration - lastDuration) > 0.02) {
-        lenis.options.duration = targetDuration;
-        lastDuration = targetDuration;
-      }
+      if (Math.abs(targetWheel - lastWheel) > 0.02) lastWheel = targetWheel;
+      if (Math.abs(targetTouch - lastTouch) > 0.05) lastTouch = targetTouch;
+      if (Math.abs(targetDuration - lastDuration) > 0.02) lastDuration = targetDuration;
     };
 
-    // Sync and update speed on each Lenis scroll
+    let snapTimer: number | null = null;
+    const clearSnapTimer = () => { if (snapTimer !== null) { clearTimeout(snapTimer); snapTimer = null; } };
+    const nearestSection = (y: number) => {
+      let nearest: SectionBounds | null = null;
+      let best = Infinity;
+      for (const s of sections) {
+        const d = Math.abs(y - s.top);
+        if (d < best) { best = d; nearest = s; }
+      }
+      return nearest;
+    };
     lenis.on('scroll', (e: any) => {
       updateSpeedForScroll(e.scroll);
+      clearSnapTimer();
+      const v = Math.abs(e.velocity ?? 0);
+      if (v < 0.08 && !e.animated) {
+        snapTimer = window.setTimeout(() => {
+          const target = nearestSection(e.scroll);
+          if (!target) return;
+          const dist = Math.abs(e.scroll - target.top);
+          const win = Math.max(window.innerHeight, 1) * 0.35;
+          if (dist <= win) {
+            const header = document.querySelector('nav');
+            const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
+            const snapOffset = (target.el.id === 'contact') ? -Math.round(window.innerHeight * 0.2) : (target.el.id === 'portfolio') ? headerH + 90 : 0;
+            lenis.scrollTo(target.el, {
+              offset: snapOffset,
+              duration: 0.8,
+              easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            });
+          }
+        }, 120);
+      }
     });
 
     const ready = (document as any).fonts?.ready || Promise.resolve();
     Promise.resolve(ready).then(() => {
       computeSections();
+      window.lenisRecomputeSections = computeSections;
     });
     window.addEventListener('resize', computeSections);
+    window.addEventListener('orientationchange', computeSections);
 
     function raf(time: number) {
       lenis.raf(time);
@@ -129,6 +143,7 @@ export const useLenis = () => {
 
     return () => {
       window.removeEventListener('resize', computeSections);
+      window.removeEventListener('orientationchange', computeSections);
       lenis.destroy();
     };
   }, []);

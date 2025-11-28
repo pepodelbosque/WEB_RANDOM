@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
+import styles from './TripulacionPopUp.module.css';
 
 interface CrewMember {
   nameKey: string;
@@ -28,6 +29,7 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
   const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [overlayActive, setOverlayActive] = useState(false);
   const hVelRef = useRef(0); // horizontal velocity for banner
   const vVelRef = useRef(0); // vertical velocity for text
   const animRef = useRef<number | null>(null);
@@ -178,11 +180,20 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
     touchLastY.current = null;
   }, [applyImpulse]);
 
+  // Activar transición CSS del overlay (opacity del pseudo-elemento)
+  useEffect(() => {
+    if (isVisible) {
+      setOverlayActive(true);
+    } else {
+      setOverlayActive(false);
+    }
+  }, [isVisible]);
+
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center p-2 md:p-4"
+          className={`${styles.overlay} fixed inset-0 z-50 flex flex-col items-center justify-center p-2 md:p-4 ${overlayActive ? styles.overlayVisible : ''}`}
           onWheel={handleWheel}
           onKeyDown={handleKeyDown}
           tabIndex={0}
@@ -193,60 +204,61 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div className="flex-grow flex flex-col items-center justify-center text-center overflow-hidden w-full mt-10 md:mt-12">
-            {/* Top: banner continuo de imágenes, scroll horizontal */}
-            <div
-              ref={imagesRef}
-              className="w-full h-[45vh] md:h-[50vh] overflow-x-auto overflow-y-hidden no-scrollbar"
-            >
-              <div className="flex flex-row gap-0 items-center h-full">
-                {sequenceMembers.map((m, i) => (
-                  <img
-                    key={`img-strip-${m.nameKey}-${i}`}
-                    ref={(el) => (imageRefs.current[i] = el)}
-                    src={m.image}
-                    alt={t(language, m.nameKey)}
-                    className="h-full w-auto flex-none object-contain rounded-none"
-                  />
-                ))}
+          <div className={styles.frame}>
+            <div className={`${styles.content} flex-grow flex flex-col items-center justify-center text-center overflow-hidden w-full mt-10 md:mt-12`}>
+              {/* Top: banner continuo de imágenes, scroll horizontal */}
+              <div
+                ref={imagesRef}
+                className="w-full h-[45vh] md:h-[50vh] overflow-x-auto overflow-y-hidden no-scrollbar"
+              >
+                <div className="flex flex-row gap-0 items-center h-full">
+                  {sequenceMembers.map((m, i) => (
+                    <img
+                      key={`img-strip-${m.nameKey}-${i}`}
+                      ref={(el) => (imageRefs.current[i] = el)}
+                      src={m.image}
+                      alt={t(language, m.nameKey)}
+                      className="h-full w-auto flex-none object-contain rounded-none"
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Bottom: lista vertical, scroll con rueda */}
-            <div
-              ref={textRef}
-              className="w-full h-[35vh] md:h-[40vh] overflow-y-auto mt-2 md:mt-4 no-scrollbar"
-            >
-              <div className="max-w-[85vw] md:max-w-2xl mx-auto text-center px-2 md:px-4">
-                {/* Contenido fijo proporcionado por el usuario */}
-                <div className="mb-3 md:mb-4">
-                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo principal - random 2.0 videojuego</h3>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección del videojuego: Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección conceptual: Pepo Sabatini – Barbara Oettinger</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción ejecutiva: Barbara Oettinger</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Curatorial global y asesoría artística: Sebastián Vidal</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de juego: Pepo Sabatini – Javier Rojas</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Programación: Javier Rojas – Ignacio Concha – Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Director de arte: Pepo Sabatini – Barbara Oettinger</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Director de fotografía y cámaras: Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Arte 3D y entornos: Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Arte 2D y UI (interfaz de usuario): Javier Rojas – Ignacio Concha</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Animación y rigging: Pepo Sabatini – Fernanda Aguirre</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Composición musical: Marco Portilla – Lost Tropicales</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sonido (SFX): Sebastián Lagos Ossa</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Guion y narrativa: Pepo Sabatini – Barbara Oettinger</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Control de calidad (QA): Daniel Cruz, Sebastián Vidal</p>
-                </div>
+              {/* Bottom: lista vertical, scroll con rueda */}
+              <div
+                ref={textRef}
+                className="w-full h-[35vh] md:h-[40vh] overflow-y-auto mt-2 md:mt-4 no-scrollbar"
+              >
+                <div className="max-w-[85vw] md:max-w-2xl mx-auto text-center px-2 md:px-4">
+                  {/* Contenido fijo proporcionado por el usuario */}
+                  <div className="mb-3 md:mb-4">
+                    <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo principal - random 2.0 videojuego</h3>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección del videojuego: Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección conceptual: Pepo Sabatini – Barbara Oettinger</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción ejecutiva: Barbara Oettinger</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Curatorial global y asesoría artística: Sebastián Vidal</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de juego: Pepo Sabatini – Javier Rojas</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Programación: Javier Rojas – Ignacio Concha – Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Director de arte: Pepo Sabatini – Barbara Oettinger</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Director de fotografía y cámaras: Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Arte 3D y entornos: Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Arte 2D y UI (interfaz de usuario): Javier Rojas – Ignacio Concha</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Animación y rigging: Pepo Sabatini – Fernanda Aguirre</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Composición musical: Marco Portilla – Lost Tropicales</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sonido (SFX): Sebastián Lagos Ossa</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Guion y narrativa: Pepo Sabatini – Barbara Oettinger</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Control de calidad (QA): Daniel Cruz, Sebastián Vidal</p>
+                  </div>
 
-                <div className="mb-3 md:mb-4">
-                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo entrevistas - random 2.0 videojuego</h3>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección y montaje: Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistadora y asistencia en terreno: Fernanda Aguirre</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Digitalización y creación de personajes: Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistados y soñadores: Camila Estrella – Eduardo Vega – Kate Hosh</p>
-                </div>
+                  <div className="mb-3 md:mb-4">
+                    <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo entrevistas - random 2.0 videojuego</h3>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección y montaje: Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistadora y asistencia en terreno: Fernanda Aguirre</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Digitalización y creación de personajes: Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistados y soñadores: Camila Estrella – Eduardo Vega – Kate Hosh</p>
+                  </div>
 
                 <div className="mb-3 md:mb-4">
                   <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo principal - random 1.0 (machinima)</h3>
@@ -292,19 +304,18 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
                   <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">agradecimientos</h3>
                   <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Instituciones, apoyos, colaboradores</p>
                 </div>
+                </div>
               </div>
             </div>
-
-            {/* Indicador de pasos removido: scroll continuo */}
+            <motion.button
+              onClick={onClose}
+              className="mt-2 mb-8 text-white hover:text-red-500 transition-colors duration-300 font-lincolnmitre uppercase tracking-widest"
+              whileHover={{ scale: 1.1, rotate: 1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              CERRAR
+            </motion.button>
           </div>
-          <motion.button
-            onClick={onClose}
-            className="mb-8 text-white hover:text-red-500 transition-colors duration-300 font-lincolnmitre uppercase tracking-widest"
-            whileHover={{ scale: 1.1, rotate: 1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            CERRAR
-          </motion.button>
         </motion.div>
       )}
     </AnimatePresence>

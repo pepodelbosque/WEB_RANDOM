@@ -1,4 +1,5 @@
 import React from 'react';
+import { gsap } from 'gsap';
 import { Moon, Sun, Menu, X, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -38,7 +39,7 @@ const Navigation: React.FC = () => {
     } else if (heroInView || poemsInView) {
       setShouldShowNav(false);
     } else {
-      // For other sections (portfolio, services, experience, contact), show nav
+    // For other sections (portfolio, services, fantasma, contact), show nav
       setShouldShowNav(!heroInView && !poemsInView);
     }
   }, [heroInView, poemsInView, aboutInView]);
@@ -48,9 +49,81 @@ const Navigation: React.FC = () => {
     { href: '#portfolio', label: t(language, 'nav.portfolio') },
     { href: '#services', label: t(language, 'nav.services') },
     { href: '#fantasma', label: t(language, 'nav.fantasma') },
-    { href: '#experience', label: t(language, 'nav.experience') },
     { href: '#contact', label: t(language, 'nav.contact') },
   ];
+
+  const linkRefs = React.useRef<(HTMLAnchorElement | null)[]>([]);
+  const cleanupRefs = React.useRef<(() => void)[]>([]);
+
+  React.useEffect(() => {
+    cleanupRefs.current.forEach((fn) => fn());
+    cleanupRefs.current = [];
+
+    const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+
+    linkRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const finalText = navItems[i]?.label ?? el.textContent ?? '';
+
+      const indices = Array.from(finalText)
+        .map((c, idx) => (/^\s$/.test(c) ? -1 : idx))
+        .filter((idx) => idx >= 0);
+      const phi = 0.6180339887498948;
+      const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+      weights.sort((a, b) => a.w - b.w);
+      const revealOrder = weights.map((w) => w.idx);
+      const rankMap = new Map<number, number>();
+      revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+      const setScrambledProgress = (p: number) => {
+        const threshold = p * revealOrder.length;
+        const out = finalText
+          .split('')
+          .map((c, idx) => {
+            if (/^\s$/.test(c)) return c;
+            const rank = rankMap.get(idx) ?? 0;
+            return rank < threshold ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+          })
+          .join('');
+        el.textContent = out;
+      };
+
+      setScrambledProgress(0);
+      const state = { p: 0 };
+      const baseDelay = 0.5 * i;
+      const tl = gsap.timeline({ paused: false, repeat: -1, yoyo: true, repeatDelay: 1.6 + 0.2 * i });
+      tl.to(state, {
+        p: 1,
+        duration: 1.1,
+        ease: 'power2.inOut',
+        onUpdate: () => setScrambledProgress(state.p),
+        delay: baseDelay,
+      })
+        // Hold 2s at fully revealed for readability
+        .to(state, {
+          p: 1,
+          duration: 3,
+          ease: 'none',
+          onUpdate: () => setScrambledProgress(state.p),
+        });
+
+      const startReveal = () => {
+        if (tl.isActive() || state.p >= 1) return;
+        tl.play(0);
+      };
+      el.addEventListener('click', startReveal as any, { passive: true } as any);
+
+      cleanupRefs.current.push(() => {
+        el.removeEventListener('click', startReveal as any);
+        tl.kill();
+      });
+    });
+
+    return () => {
+      cleanupRefs.current.forEach((fn) => fn());
+      cleanupRefs.current = [];
+    };
+  }, [language, isMenuOpen, shouldShowNav]);
 
   const scrollToSection = (href: string) => {
     // Close menu first
@@ -59,12 +132,23 @@ const Navigation: React.FC = () => {
     
     // Small delay to allow menu to close
     setTimeout(() => {
+      (window as any).__accessMode = 'nav';
+      (window as any).__navClickAt = Date.now();
       const element = document.querySelector(href);
       if (element) {
-        element.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
+        const lenis = (window as any).lenis;
+        if (lenis && typeof lenis.scrollTo === 'function') {
+          const header = document.querySelector('nav');
+          const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
+          const dynamicOffset = href === '#contact' ? -Math.round(window.innerHeight * 0.2) : href === '#portfolio' ? headerH + 90 : 0;
+          lenis.scrollTo(element, {
+            offset: dynamicOffset,
+            duration: 1.1,
+            easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          });
+        } else {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     }, 100);
   };
@@ -111,6 +195,11 @@ const Navigation: React.FC = () => {
                   key={item.href}
                   onClick={(e) => {
                     e.preventDefault();
+                    if (item.href === '#about') {
+                      (window as any).__accessMode = 'info';
+                      window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                      return;
+                    }
                     scrollToSection(item.href);
                   }}
                   initial={{ opacity: 0, y: -20 }}
@@ -118,6 +207,7 @@ const Navigation: React.FC = () => {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.1 }}
                   className="text-sm font-lincolnmitre text-red-600 hover:text-orange-500 transition-colors cursor-pointer"
+                  ref={(el) => { linkRefs.current[index] = el; }}
                 >
                   {item.label}
                 </motion.a>
@@ -245,12 +335,18 @@ const Navigation: React.FC = () => {
                     key={item.href}
                     onClick={(e) => {
                       e.preventDefault();
+                      if (item.href === '#about') {
+                        (window as any).__accessMode = 'info';
+                        window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                        return;
+                      }
                       scrollToSection(item.href);
                     }}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                     className="block text-base font-lincolnmitre text-red-600 hover:text-orange-500 transition-colors cursor-pointer text-right py-2"
+                    ref={(el) => { linkRefs.current[index] = el; }}
                   >
                     {item.label}
                   </motion.a>

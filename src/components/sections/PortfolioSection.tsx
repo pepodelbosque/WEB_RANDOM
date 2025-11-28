@@ -24,6 +24,7 @@ const PortfolioSection: React.FC = () => {
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [isPopupMinimal, setPopupMinimal] = useState(false);
   const [popupTitle, setPopupTitle] = useState('VIDEOGAME');
+  const [snapOffset, setSnapOffset] = useState<number>(90);
 
   const openPopup = (minimal: boolean = false, title: string = 'VIDEOGAME') => {
     setPopupMinimal(minimal);
@@ -195,6 +196,24 @@ const PortfolioSection: React.FC = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const computeSnapOffset = () => {
+      const header = document.querySelector('nav');
+      const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
+      setSnapOffset(headerH + 90);
+    };
+    computeSnapOffset();
+    window.addEventListener('resize', computeSnapOffset);
+    return () => window.removeEventListener('resize', computeSnapOffset);
+  }, []);
+
+  useEffect(() => {
+    const fn = (window as any).lenisRecomputeSections;
+    if (typeof fn === 'function') {
+      fn();
+    }
+  }, [snapOffset, inView]);
 
   // Scramble Reveal del título (homogéneo, sincronizado con ScrollTrigger)
   useEffect(() => {
@@ -408,14 +427,19 @@ const PortfolioSection: React.FC = () => {
   }, [inView, language]);
 
   return (
-    <section id="portfolio" ref={handleRef} className="min-h-[50vh] py-6 relative mb-40 md:mb-56">
-      <div className="max-w-3xl mx-auto px-3 sm:px-4 lg:px-6">
+    <section
+      id="portfolio"
+      ref={handleRef}
+      className="min-h-[50vh] py-6 relative mb-40 md:mb-56"
+      style={{ paddingTop: snapOffset, scrollMarginTop: snapOffset }}
+    >
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, x: -100 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 1 }}
-          className="text-left mb-16 md:mb-20"
+          className="text-left mb-0"
         >
           <motion.h2
             className="text-[2.7rem] leading-[1.05] font-bold font-lincolnmitre text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-4 max-w-2xl"
@@ -423,10 +447,13 @@ const PortfolioSection: React.FC = () => {
           >
             {t(language, 'portfolio.title')}
           </motion.h2>
-          <div className="split-container">
-            <p className="split text-[0.9em] md:text-[1.02em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl leading-[1.3] text-justify">
-              {t(language, 'portfolio.description')}
-            </p>
+          {/* Match AboutSection text configuration: spacing, width, typography */}
+          <div className="space-y-5 text-[0.9em] md:text-[1.02em] font-lincolnmitre max-w-2xl mx-auto leading-[1.3]">
+            <div className="split-container">
+              <p className="split text-orange-600 dark:text-gray-300 text-justify">
+                {t(language, 'portfolio.description')}
+              </p>
+            </div>
           </div>
         </motion.div>
 
@@ -435,7 +462,7 @@ const PortfolioSection: React.FC = () => {
           initial={{ opacity: 0, x: -100 }}
           animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
           transition={{ duration: 1, delay: 0.1 }}
-          className="grid md:grid-cols-2 gap-x-4 gap-y-4 justify-items-center"
+          className="grid md:grid-cols-2 gap-x-4 gap-y-4 justify-items-center mt-7"
           ref={gridRef}
         >
           {projects.map((project, index) => (

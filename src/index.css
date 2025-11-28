@@ -61,6 +61,50 @@ body {
   }
 }
 
+/* Popup border effects: blink + grain noise restricted to border ring */
+@keyframes popupBorderBlink {
+  0%, 18% { opacity: 1; }
+  19%, 38% { opacity: 0.65; }
+  39%, 100% { opacity: 1; }
+}
+
+@keyframes popupGrainShift {
+  0% { background-position: 0 0, 0 0, 0 0; transform: translateZ(0); }
+  50% { background-position: 2px -2px, -1px 1px, 1px 0px; }
+  100% { background-position: 0 0, 0 0, 0 0; }
+}
+
+/* Apply only to elements explicitly marked as .popup (global, non-module) */
+.popup {
+  position: relative; /* required for pseudo-element ring */
+  /* Aumentar visibilidad del ruido por defecto */
+  --popup-noise-opacity: 0.32;
+}
+
+.popup::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Match typical border thickness; can be tuned per element via custom property */
+  padding: var(--popup-border-width, 2px);
+  pointer-events: none;
+  opacity: var(--popup-noise-opacity, 0.32); /* aumentado para mayor visibilidad */
+  /* Red-tinted grain built with layered repeating gradients, blended softly */
+  background:
+    repeating-linear-gradient(0deg, rgba(255,0,0,0.18) 0 1px, rgba(255,0,0,0) 1px 2px),
+    repeating-linear-gradient(90deg, rgba(255,0,0,0.16) 0 1px, rgba(255,0,0,0) 1px 3px),
+    radial-gradient(rgba(255,0,0,0.12) 0.5px, transparent 0.8px);
+  background-blend-mode: screen;
+  will-change: background-position, opacity;
+  /* Mask to keep only the border ring */
+  -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  /* Subtle animated jitter to simulate TV static */
+  animation: popupGrainShift var(--popup-grain-interval, 1.5s) steps(2, end) infinite,
+             popupBorderBlink var(--popup-border-blink-duration, 1.5s) ease-in-out infinite;
+}
+
 @keyframes grain {
   0%,
   100% {
@@ -228,32 +272,31 @@ body {
   .pro-justify { text-wrap: pretty; }
 }
 
-/* Fantasma: fully centered responsive grid and cards */
+/* Fantasma: grid sin centrado vertical para quedar pegado al título */
 .fantasma-grid {
   display: grid;
   grid-template-columns: 1fr;
-  place-items: center;
-  place-content: center;
-  gap: 0; /* sin separación global */
-  column-gap: 2ch; /* separación horizontal equivalente a 2 espacios */
-  row-gap: clamp(12px, 2.4vw, 20px);
-  min-height: clamp(280px, 45vh, 520px);
-  /* restar 10 espacios: fijar separación en 0 espacios (mt-0) */
-  margin-top: 0; /* mt-0 */
+  place-items: center;            /* mantener centrado horizontal de cada tarjeta */
+  place-content: start;           /* alinear el contenido arriba, sin espacio extra */
+  gap: 0;                         /* sin separación global */
+  column-gap: 2ch;                /* separación horizontal equivalente a 2 espacios */
+  row-gap: clamp(8px, 1.8vw, 14px);
+  /* eliminar altura mínima que generaba blanco vertical */
+  margin-top: 0;                  /* mt-0 */
 }
 
 @media (min-width: 768px) {
   .fantasma-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)); /* igual que Galería de Medios */
     justify-items: center; /* centrado por columna */
-    min-height: clamp(320px, 50vh, 640px);
-    column-gap: 2ch; /* separación horizontal equivalente a 2 espacios */
+    place-content: start;  /* mantener arriba también en escritorio */
+    column-gap: 2ch;       /* separación horizontal equivalente a 2 espacios */
   }
 }
 
 @media (min-width: 1024px) {
   .fantasma-grid {
-    min-height: clamp(360px, 55vh, 720px);
+    /* sin altura mínima: evitar hueco vertical entre título y tarjetas */
   }
 }
 
