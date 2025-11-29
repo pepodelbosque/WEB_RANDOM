@@ -140,7 +140,7 @@ const Navigation: React.FC = () => {
         if (lenis && typeof lenis.scrollTo === 'function') {
           const header = document.querySelector('nav');
           const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
-          const dynamicOffset = href === '#contact' ? -Math.round(window.innerHeight * 0.2) : href === '#portfolio' ? headerH + 90 : 0;
+          const dynamicOffset = href === '#contact' ? -Math.round(window.innerHeight * 0.2) : href === '#portfolio' ? headerH + Math.round(window.innerHeight * 0.19) : 0;
           lenis.scrollTo(element, {
             offset: dynamicOffset,
             duration: 1.1,

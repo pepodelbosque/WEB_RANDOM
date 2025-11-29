@@ -18,7 +18,7 @@ const HeroSection: React.FC = () => {
       if (lenis && typeof lenis.scrollTo === 'function') {
         const header = document.querySelector('nav');
         const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
-        const dynamicOffset = sectionId === '#contact' ? -Math.round(window.innerHeight * 0.2) : sectionId === '#portfolio' ? headerH + 90 : 0;
+        const dynamicOffset = sectionId === '#contact' ? -Math.round(window.innerHeight * 0.2) : sectionId === '#portfolio' ? headerH + Math.round(window.innerHeight * 0.19) : 0;
         lenis.scrollTo(element, {
           offset: dynamicOffset,
           duration: 1.1,

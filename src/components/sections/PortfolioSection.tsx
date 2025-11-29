@@ -17,6 +17,7 @@ const PortfolioSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const gridRef = useRef<HTMLDivElement | null>(null);
+  const introTLRef = useRef<any>(null);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -201,7 +202,8 @@ const PortfolioSection: React.FC = () => {
     const computeSnapOffset = () => {
       const header = document.querySelector('nav');
       const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
-      setSnapOffset(headerH + 90);
+      const margin = Math.round(window.innerHeight * 0.19);
+      setSnapOffset(headerH + margin);
     };
     computeSnapOffset();
     window.addEventListener('resize', computeSnapOffset);
@@ -267,12 +269,22 @@ const PortfolioSection: React.FC = () => {
         setScrambledText(1);
       },
     });
+    introTLRef.current = introTL;
 
     return () => {
       st.kill();
       introTL.kill();
     };
   }, [language]);
+
+  useEffect(() => {
+    const handler = () => {
+      const tl = introTLRef.current;
+      if (tl && typeof tl.play === 'function') tl.play(0);
+    };
+    window.addEventListener('portfolioEntrance', handler as any, { passive: true } as any);
+    return () => window.removeEventListener('portfolioEntrance', handler as any);
+  }, []);
 
   // Limitar tamaño superior de las tarjetas del grid al tamaño actual
   useEffect(() => {

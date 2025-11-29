@@ -21,7 +21,14 @@ const AboutSection: React.FC = () => {
   const [overlayPage, setOverlayPage] = useState(0);
   const dirRef = useRef(1);
   const touchStartYRef = useRef<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const lastChangeRef = useRef(0);
+  const lastScrollDirRef = useRef<'up' | 'down'>('down');
+  const pageRef = useRef<HTMLDivElement | null>(null);
+  const originRef = useRef<{ y: number; inAbout: boolean } | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isPortrait, setIsPortrait] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
   
   const navigateOnCloseRef = useRef(false);
   const overlayImages = useMemo(() => {
@@ -58,6 +65,35 @@ const AboutSection: React.FC = () => {
     const bEnd = Math.floor((2 * total) / 3);
     return [allWords.slice(0, aEnd), allWords.slice(aEnd, bEnd), allWords.slice(bEnd)];
   }, [allWords]);
+  const [pagesTokens, setPagesTokens] = useState<string[][]>([partA, partB, partC]);
+
+  useEffect(() => {
+    const portrait = isPortrait || isCompact;
+    if (portrait) {
+      const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+      const available = Math.max(0, Math.floor(vh * 0.70));
+      const baseLine = (() => {
+        const el = pageRef.current || overlayRef.current;
+        if (el) {
+          const cs = window.getComputedStyle(el);
+          const lh = parseFloat(cs.lineHeight || '22');
+          return isNaN(lh) ? 22 : lh;
+        }
+        return 22;
+      })();
+      const wordsPerLine = 7;
+      const perPage = Math.max(90, Math.floor((available / baseLine) * wordsPerLine));
+      const out: string[][] = [];
+      for (let i = 0; i < allWords.length; i += perPage) out.push(allWords.slice(i, i + perPage));
+      setPagesTokens(out.length ? out : [allWords]);
+    } else {
+      setPagesTokens([partA, partB, partC]);
+    }
+  }, [overlayOpen, isPortrait, isCompact, allWords, partA, partB, partC]);
+
+  useEffect(() => {
+    setOverlayPage((p) => Math.min(p, Math.max(0, pagesTokens.length - 1)));
+  }, [pagesTokens]);
   const RenderTokens: React.FC<{ tokens: string[]; images: string[] }> = ({ tokens, images }) => {
     const elems: React.ReactNode[] = [];
     let imgIdx = 0;
@@ -139,26 +175,47 @@ const AboutSection: React.FC = () => {
         const w = window as any;
         const last = w.__recentScrollAt || 0;
         const mode = w.__accessMode || 'scroll';
+        const dir = w.__scrollDir || 'down';
         const isRecent = Date.now() - last < 1800;
-        if (isRecent && mode !== 'nav' && mode !== 'external' && mode !== 'up') {
+        if (isRecent && mode === 'scroll' && dir !== 'up') {
           setOverlayOpen(true);
           try { (window as any).lenis?.stop(); } catch (e) { void e; }
         }
       },
       onEnterBack: () => {
         const w = window as any;
-        w.__accessMode = 'up';
-        try {
-          const lenis = (window as any).lenis;
-          const hero = document.querySelector('#home');
-          if (hero && lenis && typeof lenis.scrollTo === 'function') {
+        const last = w.__recentScrollAt || 0;
+        const mode = w.__accessMode || 'scroll';
+        const dir = w.__scrollDir || 'up';
+        const isRecent = Date.now() - last < 1800;
+        const rect = sectionRef.current?.getBoundingClientRect();
+        const vh = window.innerHeight || 800;
+        const nearHero = rect ? rect.bottom <= (vh * 0.08) : false;
+        const portfolio = document.getElementById('portfolio');
+        const titleEl = portfolio?.querySelector('h1, h2, [data-section-title], .section-title') as HTMLElement | null;
+        let okGallery = true;
+        if (titleEl) {
+          const cs = window.getComputedStyle(titleEl);
+          const lh = parseFloat(cs.lineHeight || '24');
+          const threshold = (isNaN(lh) ? 24 : lh) * 4;
+          const tr = titleEl.getBoundingClientRect();
+          okGallery = tr.top >= threshold;
+        }
+        if (isRecent && mode === 'scroll' && dir === 'up' && nearHero && okGallery) {
+          try {
+            const lenis = (window as any).lenis;
+            lenis?.start();
             const header = document.querySelector('nav');
             const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
-            lenis.scrollTo(hero, { offset: 0 - headerH, duration: 1.1, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-          } else {
-            (hero as any)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-          }
-        } catch (e) { void e; }
+            const hero = document.getElementById('home');
+            if (hero && lenis && typeof lenis.scrollTo === 'function') {
+              lenis.scrollTo(hero, { offset: -headerH, duration: 1.15, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            } else {
+              hero?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            (window as any).__accessMode = 'nav';
+          } catch (e) { void e; }
+        }
       },
     });
     return () => { st.kill(); };
@@ -166,13 +223,30 @@ const AboutSection: React.FC = () => {
 
   useEffect(() => {
     const w = window as any;
-    const setNatural = () => { w.__accessMode = 'scroll'; w.__recentScrollAt = Date.now(); };
-    window.addEventListener('wheel', setNatural, { passive: true } as any);
-    window.addEventListener('touchmove', setNatural, { passive: true } as any);
+    const setWheel = (ev: WheelEvent) => {
+      w.__accessMode = 'scroll';
+      w.__recentScrollAt = Date.now();
+      w.__scrollDir = (ev.deltaY > 0 ? 'down' : 'up');
+    };
+    let lastTouchY: number | null = null;
+    const onTouchStart = (ev: TouchEvent) => { lastTouchY = ev.touches?.[0]?.clientY ?? null; };
+    const onTouchMove = (ev: TouchEvent) => {
+      w.__accessMode = 'scroll';
+      w.__recentScrollAt = Date.now();
+      const y = ev.touches?.[0]?.clientY ?? null;
+      if (y != null && lastTouchY != null) {
+        w.__scrollDir = (lastTouchY - y > 0 ? 'down' : 'up');
+      }
+      lastTouchY = y;
+    };
+    window.addEventListener('wheel', setWheel as any, { passive: true } as any);
+    window.addEventListener('touchstart', onTouchStart as any, { passive: true } as any);
+    window.addEventListener('touchmove', onTouchMove as any, { passive: true } as any);
     if (window.location.hash) { w.__accessMode = 'external'; }
     return () => {
-      window.removeEventListener('wheel', setNatural as any);
-      window.removeEventListener('touchmove', setNatural as any);
+      window.removeEventListener('wheel', setWheel as any);
+      window.removeEventListener('touchstart', onTouchStart as any);
+      window.removeEventListener('touchmove', onTouchMove as any);
     };
   }, []);
 
@@ -214,11 +288,64 @@ const AboutSection: React.FC = () => {
 
   useEffect(() => {
     if (overlayOpen) {
+      try {
+        const y = window.scrollY || 0;
+        const rect = sectionRef.current?.getBoundingClientRect();
+        const inAbout = !!rect && rect.top < (window.innerHeight || 0) && rect.bottom > 0;
+        originRef.current = { y, inAbout };
+      } catch (e) { void e; }
       setOverlayPage(0);
       navigateOnCloseRef.current = false;
       dirRef.current = 1;
+      // Focus the overlay for accessibility
+      requestAnimationFrame(() => overlayRef.current?.focus?.());
+      lastChangeRef.current = 0;
     }
   }, [overlayOpen]);
+
+  const stepAdvance = (dir: 'up' | 'down') => {
+    lastScrollDirRef.current = dir;
+    const now = Date.now();
+    if (now - lastChangeRef.current < 360) return;
+    lastChangeRef.current = now;
+    setOverlayPage((p) => {
+      const max = Math.max(0, pagesTokens.length - 1);
+      if (dir === 'down') {
+        if (p < max) return p + 1;
+        navigateOnCloseRef.current = false;
+        setOverlayOpen(false);
+        return p;
+      } else {
+        if (p > 0) return p - 1;
+        return p;
+      }
+    });
+    };
+
+  const pageScrollState = () => {
+    const el = pageRef.current as HTMLElement | null;
+    if (!el) return { scrollable: false, atTop: true, atBottom: true };
+    const maxScroll = el.scrollHeight - el.clientHeight;
+    const scrollable = maxScroll > 4;
+    const atTop = el.scrollTop <= 0;
+    const atBottom = el.scrollTop >= (maxScroll - 1);
+    return { scrollable, atTop, atBottom };
+  };
+
+  useEffect(() => {
+    const updateOrientation = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+      const mm = window.matchMedia('(max-width: 1024px)');
+      setIsCompact(mm.matches);
+    };
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', updateOrientation);
+    return () => {
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, []);
 
   useEffect(() => {
     const onInfo = () => {
@@ -430,19 +557,10 @@ const AboutSection: React.FC = () => {
 
 
   return (
-    <section id="about" ref={handleRef} className="min-h-screen py-20 relative mb-40 md:mb-56">
+    <section id="about" ref={handleRef} className="min-h-[12.5vh] py-0 relative mb-0" style={{ marginBottom: '20vh' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-1 gap-16 items-center">
-          {/* Text Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 1 }}
-            className="space-y-8"
-          >
-            <div className="max-w-2xl mx-auto w-full h-[60vh] md:h-[65vh]" />
-          </motion.div>
+        <div className="grid lg:grid-cols-1 gap-0 items-center">
+          {/* Text Content removed: no empty spacer */}
 
           {/* Visual Element was here */}
         </div>
@@ -451,15 +569,42 @@ const AboutSection: React.FC = () => {
         try {
           const lenis = (window as any).lenis;
           lenis?.start();
-          const target = document.getElementById('portfolio');
-          if (target) {
-            const header = document.querySelector('nav');
-            const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
+          const header = document.querySelector('nav');
+          const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
+          const origin = originRef.current;
+          if (origin?.inAbout) {
+            const y = origin.y;
             if (lenis && typeof lenis.scrollTo === 'function') {
-              lenis.scrollTo(target, { offset: headerH + 20, duration: 1.05, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+              lenis.scrollTo(y, { duration: 1.1, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
             } else {
-              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              window.scrollTo({ top: y, behavior: 'smooth' });
             }
+          } else {
+          const goHero = lastScrollDirRef.current === 'up';
+          if (goHero) {
+            const home = document.getElementById('home');
+            if (home) {
+              const opts = { offset: -headerH, duration: 1.15, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) };
+              if (lenis && typeof lenis.scrollTo === 'function') lenis.scrollTo(home, opts as any);
+              else home.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          } else {
+            const portfolio = document.getElementById('portfolio');
+            const titleEl = portfolio?.querySelector('h2');
+            const targetEl = titleEl || portfolio;
+            if (targetEl) {
+              const margin = Math.round(window.innerHeight * 0.19);
+              const opts = { offset: headerH + margin, duration: 1.15, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) };
+              if (lenis && typeof lenis.scrollTo === 'function') {
+                lenis.scrollTo(targetEl, opts as any);
+              } else {
+                const rect = targetEl.getBoundingClientRect();
+                const top = (window.scrollY || 0) + rect.top - (headerH + margin);
+                window.scrollTo({ top, behavior: 'smooth' });
+              }
+              try { window.dispatchEvent(new CustomEvent('portfolioEntrance')); } catch (e) { void e; }
+            }
+          }
           }
         } catch (e) { void e; }
         navigateOnCloseRef.current = false;
@@ -471,69 +616,62 @@ const AboutSection: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
-          className={`${styles.overlay} ${styles.overlayVisible} fixed inset-0 z-50 flex flex-col items-center justify-center`}
+          transition={{ duration: 0.9, ease: 'easeInOut' }}
+          className={`${styles.overlay} ${styles.overlayVisible} fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full`}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+          style={{ paddingTop: isCompact ? '15vh' : undefined, paddingBottom: isCompact ? '15vh' : undefined }}
           onWheel={(e) => {
-            e.preventDefault();
+            const dx = e.deltaX || 0;
             const dy = e.deltaY || 0;
-            if (dy === 0) return;
-            dirRef.current = dy > 0 ? 1 : -1;
-            if (dy > 0) {
-              if (overlayPage < 2) {
-                setOverlayPage((p) => Math.min(2, p + 1));
-              } else {
-                navigateOnCloseRef.current = false;
-                setOverlayOpen(false);
-                setOverlayPage(0);
-              }
-            } else {
-              if (overlayPage > 0) {
-                setOverlayPage((p) => Math.max(0, p - 1));
-              } else {
-                navigateOnCloseRef.current = false;
-                setOverlayOpen(false);
-                setOverlayPage(0);
+            const useVertical = Math.abs(dy) >= Math.abs(dx);
+            const s = pageScrollState();
+            if (useVertical && s.scrollable) {
+              if ((dy > 0 && !s.atBottom) || (dy < 0 && !s.atTop)) {
+                return; // permitir scroll interno
               }
             }
+            e.preventDefault();
+            const dir = useVertical ? (dy > 0 ? 'down' : 'up') : (dx > 0 ? 'down' : 'up');
+            dirRef.current = dir === 'down' ? 1 : -1;
+            stepAdvance(dir);
           }}
           onTouchStart={(e) => {
             touchStartYRef.current = e.touches?.[0]?.clientY ?? null;
+            touchStartXRef.current = e.touches?.[0]?.clientX ?? null;
           }}
           onTouchMove={(e) => {
             const y = e.touches?.[0]?.clientY ?? null;
+            const x = e.touches?.[0]?.clientX ?? null;
             if (y == null || touchStartYRef.current == null) return;
             const dy = touchStartYRef.current - y;
-            if (Math.abs(dy) < 10) return;
-            e.preventDefault();
-            dirRef.current = dy > 0 ? 1 : -1;
-            if (dy > 0) {
-              if (overlayPage < 2) {
-                setOverlayPage((p) => Math.min(2, p + 1));
-              } else {
-                navigateOnCloseRef.current = false;
-                setOverlayOpen(false);
-                setOverlayPage(0);
-              }
-            } else {
-              if (overlayPage > 0) {
-                setOverlayPage((p) => Math.max(0, p - 1));
-              } else {
-                navigateOnCloseRef.current = false;
-                setOverlayOpen(false);
-                setOverlayPage(0);
+            const dx = (touchStartXRef.current != null && x != null) ? (touchStartXRef.current - x) : 0;
+            const useVertical = Math.abs(dy) >= Math.abs(dx);
+            const s = pageScrollState();
+            if (useVertical && s.scrollable) {
+              if ((dy > 0 && !s.atBottom) || (dy < 0 && !s.atTop)) {
+                touchStartYRef.current = y;
+                if (x != null) touchStartXRef.current = x;
+                return; // permitir scroll interno
               }
             }
+            e.preventDefault();
+            const dir = useVertical ? (dy > 0 ? 'down' : 'up') : (dx > 0 ? 'down' : 'up');
+            dirRef.current = dir === 'down' ? 1 : -1;
+            stepAdvance(dir);
             touchStartYRef.current = y;
+            if (x != null) touchStartXRef.current = x;
           }}
         >
-          <div ref={overlayHeaderRef} className="pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3">{t(language, 'about.title')}</div>
+          <div ref={overlayHeaderRef} className="relative z-10 pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3">{t(language, 'about.title')}</div>
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
-            className={styles.frame}
-            style={{ width: '75vw', maxHeight: '75vh' }}
+            transition={{ duration: 0.9, ease: 'easeInOut' }}
+            className={`${styles.frame}`}
+            style={{ width: isCompact ? '100vw' : '75vw', height: isCompact ? 'calc(100vh - 30vh)' : undefined, maxHeight: isCompact ? undefined : '75vh' }}
           >
             <div className={styles.content} style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
               <motion.div
@@ -541,38 +679,36 @@ const AboutSection: React.FC = () => {
                 initial={{ x: dirRef.current > 0 ? 120 : -120, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -120, opacity: 0 }}
-                transition={{ duration: 0.6, ease: 'easeInOut' }}
-                className="w-full h-full px-10 pt-14 pb-12 md:px-12 md:pt-16 md:pb-14 box-border overflow-hidden"
+                transition={{ duration: 1.1, ease: 'easeInOut' }}
+                ref={pageRef}
+                className="w-full h-full px-3 pt-10 pb-10 md:px-10 md:pt-14 md:pb-12 box-border"
+                style={{ overflowY: 'hidden', overscrollBehavior: 'contain' }}
               >
                 {selectedImage && overlayPage === 0 && (
                   <div className="w-full mb-3 flex items-center justify-center">
                     <img src={selectedImage} alt="selección" className="max-h-[32vh] w-auto object-contain border border-red-600/40" />
                   </div>
                 )}
-                {overlayPage === 0 && (
-                  <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
-                    <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                      <RenderTokens tokens={partA} images={[overlayImages[0], overlayImages[1], overlayImages[2]]} />
-                    </div>
+                <div className="w-full h-full" style={{ columnCount: (isPortrait ? 1 : 2) as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
+                  <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                    <RenderTokens tokens={pagesTokens[Math.min(overlayPage, pagesTokens.length - 1)]} images={overlayImages} />
                   </div>
-                )}
-                {overlayPage === 1 && (
-                  <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
-                    <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                      <RenderTokens tokens={partB} images={[overlayImages[3], overlayImages[4], overlayImages[5]]} />
-                    </div>
-                  </div>
-                )}
-                {overlayPage === 2 && (
-                  <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
-                    <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                      <RenderTokens tokens={partC} images={[overlayImages[1], overlayImages[2], overlayImages[0]]} />
-                    </div>
-                  </div>
-                )}
+                </div>
               </motion.div>
             </div>
           </motion.div>
+          {(() => {
+            const max = Math.max(0, pagesTokens.length - 1);
+            const pct = max > 0 ? Math.round((overlayPage / max) * 100) : 100;
+            return (
+              <div className="relative z-10 mt-2 w-44 flex items-center gap-2">
+                <div className="h-1 w-full bg-red-800/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-orange-500 to-red-600" style={{ width: `${pct}%` }} />
+                </div>
+                <span className="text-[10px] font-lincolnmitre text-orange-400 tabular-nums">{pct}%</span>
+              </div>
+            );
+          })()}
         </motion.div>
       )}
       </AnimatePresence>
