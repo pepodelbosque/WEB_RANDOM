@@ -54,13 +54,20 @@ const AboutSection: React.FC = () => {
   const page1OverrideTokensEs = useMemo(() => page1OverrideEs.split(/(\s+)/).filter((w) => w.length > 0), [page1OverrideEs]);
   const page2OverrideEs = 'utilizando la video-instalación y la creación de un videojuego como medio principal de desarrollo y producción. Nos interesa explorar la intersección entre el videoarte, el cine, los videojuegos y su relación con los sueños como productores de fenómenos visuales y poéticos, a la vez que nos evocan diversos estados emocionales. A partir del análisis de sueños de 3 participantes que han sido invitados a compartirlos con nosotros, junto con la utilización de la plataforma GTA V de videojuego (MACHINIMA), quisimos darle vida a aquellos sueños generando imágenes en movimiento producidas desde el computador como video renderizado (diseño de escenarios, personajes y sonidos virtuales).';
   const page2OverrideTokensEs = useMemo(() => page2OverrideEs.split(/(\s+)/).filter((w) => w.length > 0), [page2OverrideEs]);
+  const page3OverrideEs = 'Estas imágenes expresivas y surrealistas, de carácter cinematográfico, reflejan en su narrativa visual el artificio, un simulacro de universos narrativos no lineales, realidades alternativas y discursos apocalípticos y nostálgicos. En 2025, la experiencia se amplía con una versión unificada y renovada 2.0 que utiliza Unreal Engine, un motor gráfico que permite crear un entorno inmersivo 3D donde la geografía, el tiempo y las reglas se reconfiguran. Este espacio digital invita a explorar modos nuevos de habitar lo onírico, en una experiencia para visitantes que mezcla interactividad, juego y montaje audiovisual, potenciando el viaje sensorial y poético que ofrece la instalación.';
+  const page3OverrideTokensEs = useMemo(() => page3OverrideEs.split(/(\s+)/).filter((w) => w.length > 0), [page3OverrideEs]);
   const [pagesTokens, setPagesTokens] = useState<string[][]>([partA, partB, partC]);
 
   useEffect(() => {
     const portrait = isPortrait || isCompact;
+    const isEs = language === 'es';
+    const p0 = isEs ? page1OverrideTokensEs : desc1Tokens;
+    const p1 = isEs ? page2OverrideTokensEs : desc2Tokens;
+    const rest = isEs ? desc3Tokens : [];
     if (portrait) {
       const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-      const available = Math.max(0, Math.floor(vh * 0.70));
+      const availEl = pageRef.current || overlayRef.current;
+      const available = Math.max(0, Math.floor((availEl ? availEl.clientHeight : vh) * 0.85));
       const baseLine = (() => {
         const el = pageRef.current || overlayRef.current;
         if (el) {
@@ -73,20 +80,16 @@ const AboutSection: React.FC = () => {
       const wordsPerLine = 7;
       const perPage = Math.max(90, Math.floor((available / baseLine) * wordsPerLine));
       const out: string[][] = [];
-      for (let i = 0; i < allWords.length; i += perPage) out.push(allWords.slice(i, i + perPage));
-      setPagesTokens(out.length ? out : [allWords]);
+      out.push(p0);
+      setPagesTokens(out.filter((arr) => arr.length > 0));
     } else {
-      const isEs = language === 'es';
-      const p0 = isEs ? page1OverrideTokensEs : desc1Tokens;
-      const p1 = isEs ? page2OverrideTokensEs : desc2Tokens;
-      const rest = isEs ? desc3Tokens : [];
       setPagesTokens([p0, p1, rest].filter((arr) => arr.length > 0));
     }
-  }, [overlayOpen, isPortrait, isCompact, allWords, partA, partB, partC, desc1Tokens, desc2Tokens, desc3Tokens, language, page1OverrideTokensEs, page2OverrideTokensEs]);
+  }, [overlayOpen, isPortrait, isCompact, allWords, desc1Tokens, desc2Tokens, desc3Tokens, language, page1OverrideTokensEs, page2OverrideTokensEs]);
 
   useEffect(() => {
-    setOverlayPage((p) => Math.min(p, Math.max(0, pagesTokens.length - 1)));
-  }, [pagesTokens]);
+    setOverlayPage((p) => Math.min(p, Math.max(0, (isPortrait ? 5 : pagesTokens.length - 1))));
+  }, [pagesTokens, isPortrait]);
   const RenderTokens: React.FC<{ tokens: string[] }> = ({ tokens }) => {
     const elems: React.ReactNode[] = [];
     for (let i = 0; i < tokens.length; i++) {
@@ -323,7 +326,7 @@ const AboutSection: React.FC = () => {
     if (now - lastChangeRef.current < 360) return;
     lastChangeRef.current = now;
     setOverlayPage((p) => {
-      const max = Math.max(0, pagesTokens.length - 1);
+      const max = isPortrait ? 5 : Math.max(0, pagesTokens.length - 1);
       if (dir === 'down') {
         if (p < max) return p + 1;
         navigateOnCloseRef.current = false;
@@ -623,7 +626,7 @@ const AboutSection: React.FC = () => {
           aria-modal="true"
           aria-busy={!overlayReady}
           tabIndex={-1}
-          style={{ paddingTop: isCompact ? '15vh' : undefined, paddingBottom: isCompact ? '15vh' : undefined }}
+          style={{ paddingTop: isCompact ? '8vh' : undefined, paddingBottom: isCompact ? '8vh' : undefined }}
           onWheel={(e) => {
             if (!overlayReadyRef.current) { e.preventDefault(); return; }
             const dx = e.deltaX || 0;
@@ -675,7 +678,7 @@ const AboutSection: React.FC = () => {
             exit={{ scale: 0 }}
             transition={{ duration: 0.9, ease: 'easeInOut' }}
           className={`${styles.frame}`}
-          style={{ width: isCompact ? '100vw' : '75vw', height: isCompact ? 'calc(100vh - 30vh)' : undefined, maxHeight: isCompact ? undefined : '75vh' }}
+          style={{ width: isCompact ? '95vw' : '75vw', height: isCompact ? '100%' : undefined, maxHeight: isCompact ? '100%' : '75vh' }}
           onAnimationComplete={() => { setOverlayReady(true); overlayReadyRef.current = true; }}
           >
             <div className={styles.content} style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
@@ -687,49 +690,80 @@ const AboutSection: React.FC = () => {
                 transition={{ duration: 1.1, ease: 'easeInOut' }}
                 ref={pageRef}
                 className="w-full h-full px-3 pt-10 pb-10 md:px-10 md:pt-14 md:pb-12 box-border"
-                style={{ overflowY: 'hidden', overscrollBehavior: 'contain' }}
+                style={{ overflowY: 'auto', overscrollBehavior: 'contain' }}
               >
                 {(() => {
-                  const pageIdx = Math.min(overlayPage, pagesTokens.length - 1);
-                  const tokens = pagesTokens[pageIdx];
-                  // Primera página: en escritorio, texto izquierda e imagen derecha; en móvil, texto + imagen apilados
-                  if (pageIdx === 0) {
-                    if (!isPortrait) {
+                  const textPagesCount = pagesTokens.length;
+                  const maxIdx = isPortrait ? 5 : Math.max(0, textPagesCount - 1);
+                  const pageIdx = Math.min(overlayPage, maxIdx);
+                  if (isPortrait) {
+                    if (pageIdx === 0) {
+                      const tokens = pagesTokens[0];
                       return (
-                        <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
+                        <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
                           <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             <RenderTokens tokens={tokens} />
-                          </div>
-                          <div className="w-full h-full">
-                            <img src="/images/AboutSectionFiles/About01b.png" alt="About section visual" className="w-full h-full object-cover" />
                           </div>
                         </div>
                       );
                     }
+                    if (pageIdx === 1) {
+                      return (
+                        <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                          <img src="/images/AboutSectionFiles/About01b.png" alt="About section visual" className="w-full h-auto max-h-[70vh] object-cover" />
+                        </div>
+                      );
+                    }
+                    if (pageIdx === 2) {
+                      const tokens = (language === 'es' ? page2OverrideTokensEs : desc2Tokens);
+                      return (
+                        <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
+                          <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                            <RenderTokens tokens={tokens} />
+                          </div>
+                        </div>
+                      );
+                    }
+                    if (pageIdx === 3) {
+                      return (
+                        <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                          <img src="/images/AboutSectionFiles/About02.png" alt="About section visual 2" className="w-full h-auto max-h-[70vh] object-cover" />
+                        </div>
+                      );
+                    }
+                    if (pageIdx === 4) {
+                      const tokens = (language === 'es' ? page3OverrideTokensEs : desc3Tokens);
+                      return (
+                        <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
+                          <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                            <RenderTokens tokens={tokens} />
+                          </div>
+                        </div>
+                      );
+                    }
+                    if (pageIdx === 5) {
+                      return (
+                        <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                          <img src="/images/AboutSectionFiles/About03.png" alt="About section visual 3" className="w-full h-auto max-h-[70vh] object-cover" />
+                        </div>
+                      );
+                    }
+                    return null;
+                  }
+                  const tokens = pagesTokens[pageIdx];
+                  if (pageIdx === 0) {
                     return (
-                      <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
+                      <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
                         <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                           <RenderTokens tokens={tokens} />
                         </div>
-                        <div className="w-full">
-                          <img src="/images/AboutSectionFiles/About01b.png" alt="About section visual" className="w-full h-auto max-h-[38vh] object-cover" />
+                        <div className="w-full h-full">
+                          <img src="/images/AboutSectionFiles/About01b.png" alt="About section visual" className="w-full h-full object-cover" />
                         </div>
                       </div>
                     );
                   }
-                  if (isPortrait && pageIdx === 1) {
-                    return (
-                      <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
-                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                          <RenderTokens tokens={tokens} />
-                        </div>
-                        <div className="w-full">
-                          <img src="/images/AboutSectionFiles/About02.png" alt="About section visual 2" className="w-full h-auto max-h-[38vh] object-cover" />
-                        </div>
-                      </div>
-                    );
-                  }
-                  if (!isPortrait && pageIdx === 1) {
+                  if (pageIdx === 1) {
                     return (
                       <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
                         <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
@@ -741,19 +775,7 @@ const AboutSection: React.FC = () => {
                       </div>
                     );
                   }
-                  if (isPortrait && pageIdx === 2) {
-                    return (
-                      <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
-                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                          <RenderTokens tokens={tokens} />
-                        </div>
-                        <div className="w-full">
-                          <img src="/images/AboutSectionFiles/About03.png" alt="About section visual 3" className="w-full h-auto max-h-[38vh] object-cover" />
-                        </div>
-                      </div>
-                    );
-                  }
-                  if (!isPortrait && pageIdx === 2) {
+                  if (pageIdx === 2) {
                     return (
                       <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
                         <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
@@ -766,7 +788,7 @@ const AboutSection: React.FC = () => {
                     );
                   }
                   return (
-                    <div className="w-full h-full" style={{ columnCount: (isPortrait ? 1 : 2) as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
+                    <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
                       <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                         <RenderTokens tokens={tokens} />
                       </div>
@@ -777,8 +799,8 @@ const AboutSection: React.FC = () => {
             </div>
           </motion.div>
           {(() => {
-            const max = Math.max(0, pagesTokens.length - 1);
-            const pct = overlayPage === 0 ? 0 : (max > 0 ? Math.round((overlayPage / max) * 100) : 100);
+            const max = isPortrait ? 5 : Math.max(0, pagesTokens.length - 1);
+            const pct = max > 0 ? Math.round((overlayPage / max) * 100) : 100;
             return (
               <div className="relative z-10 mt-2 w-44 flex items-center gap-2">
                 <div className="h-1 w-full bg-red-800/40 rounded-full overflow-hidden">
