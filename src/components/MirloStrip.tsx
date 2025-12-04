@@ -130,8 +130,29 @@ const MirloStrip: React.FC<MirloStripProps> = ({ progress, width = 320, height =
           transform: `scale(${scale})`,
           transformOrigin: 'center',
           transition: 'transform 80ms linear, filter 80ms linear',
-          // Tinte negro completo manteniendo la transparencia
-          filter: 'brightness(0) drop-shadow(0 8px 14px rgba(0,0,0,0.45))',
+          opacity: 0,
+        }}
+      />
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'block',
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(180deg, #000000 0%, #2a0000 55%, #3a1400 100%)',
+          WebkitMaskImage: `url(${frames[idx]})`,
+          WebkitMaskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          WebkitMaskSize: 'contain',
+          maskImage: `url(${frames[idx]})`,
+          maskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          maskSize: 'contain',
+          transform: `scale(${scale})`,
+          transformOrigin: 'center',
+          transition: 'transform 80ms linear, filter 80ms linear',
+          filter: 'brightness(0.82) drop-shadow(0 8px 14px rgba(0,0,0,0.45))',
         }}
       />
     </div>

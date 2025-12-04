@@ -196,8 +196,11 @@ const Navigation: React.FC = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     if (item.href === '#about') {
-                      (window as any).__accessMode = 'info';
-                      window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                      scrollToSection(item.href);
+                      setTimeout(() => {
+                        (window as any).__accessMode = 'info';
+                        window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                      }, 300);
                       return;
                     }
                     scrollToSection(item.href);
@@ -336,8 +339,11 @@ const Navigation: React.FC = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       if (item.href === '#about') {
-                        (window as any).__accessMode = 'info';
-                        window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                        scrollToSection(item.href);
+                        setTimeout(() => {
+                          (window as any).__accessMode = 'info';
+                          window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                        }, 300);
                         return;
                       }
                       scrollToSection(item.href);

@@ -27,7 +27,7 @@ const FantasmaSection: React.FC = () => {
       id: 1,
       title: t(language, 'fantasma.projects.dreamscape.title'),
       description: t(language, 'fantasma.projects.dreamscape.description'),
-      image: 'https://images.pexels.com/photos/1089438/pexels-photo-1089438.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/fantasmaSectionFiles/fantasmaSectionA.png',
       gradient: 'from-purple-600 via-pink-600 to-red-600',
     },
     {
@@ -89,8 +89,9 @@ const FantasmaSection: React.FC = () => {
           wrapper.className = 'split-line';
           wrapper.style.display = 'block';
           wrapper.style.overflow = 'hidden';
-          wrapper.style.textAlign = 'justify';
-          (wrapper.style as any)['textAlignLast'] = 'justify';
+          const align = container.getAttribute('data-align') || 'justify';
+          wrapper.style.textAlign = align as any;
+          (wrapper.style as any)['textAlignLast'] = align as any;
           wrapper.style.hyphens = 'auto';
           text.insertBefore(wrapper, lineWords[0]);
           lineWords.forEach((w) => wrapper.appendChild(w));
@@ -326,8 +327,14 @@ const FantasmaSection: React.FC = () => {
         if (!baseWAttr) el.setAttribute('data-min-base-w', String(baseW));
         if (!baseHAttr) el.setAttribute('data-min-base-h', String(baseH));
 
-        const minW = Math.round(baseW * 1.2);
+        const minW = el.classList.contains('logo-fntsm')
+          ? Math.round(baseW * 1.2)
+          : Math.round(baseW * 0.8);
         el.style.minWidth = `${minW}px`;
+
+        if (!el.classList.contains('logo-fntsm')) {
+          el.style.maxWidth = `${baseW}px`;
+        }
 
         // Para el logo, también fijar altura mínima para evitar reducción en layouts pequeños
         if (el.classList.contains('logo-fntsm')) {
@@ -398,9 +405,9 @@ const FantasmaSection: React.FC = () => {
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 100, rotateX: -15 }}
-              animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-              transition={{ duration: 1, delay: index * 0.3 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.25 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
               className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 mt-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
             >
@@ -436,14 +443,15 @@ const FantasmaSection: React.FC = () => {
           transition={{ duration: 1.25, delay: 0.35, ease: 'easeOut' }}
           className="mt-7 md:mt-9"
         >
-          <div className="split-container">
-            <p className="split text-[0.7125em] md:text-[0.8325em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-[1.3] text-justify">
+          <div className="split-container" data-align="center">
+            <p className="split text-[0.7125em] md:text-[0.8325em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-[1.3] text-center">
               Jugar no es cosa de niños: es un método de investigación, una ética de la experimentación, una manera de mantener viva la curiosidad ante el mundo.
               El videojuego —con su lógica interactiva y su invitación explícita a participar— nos devolvió a ese estado primero.
               Nos recordó que la imagen no tiene por qué ser solo espejo o ventana: puede ser también terreno de juego, espacio que se recorre, se toca, se altera.
             </p>
           </div>
-        </motion.div>
+        </motion.div
+        >
       </div>
     </section>
   );

@@ -191,8 +191,11 @@ const HeroSection: React.FC = () => {
               whileHover={{ scale: 1.05, rotateZ: 2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                (window as any).__accessMode = 'info';
-                window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                scrollToSection('#about');
+                setTimeout(() => {
+                  (window as any).__accessMode = 'info';
+                  window.dispatchEvent(new CustomEvent('openAboutInfoPopup'));
+                }, 300);
               }}
               className="w-16 h-8 px-2 py-1 bg-black/50 border border-red-600 text-red-500 font-lincolnmitre hover:bg-orange-900 hover:text-orange-400 transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
               aria-label="Navigate to About section"

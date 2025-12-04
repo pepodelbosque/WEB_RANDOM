@@ -19,6 +19,8 @@ const AboutSection: React.FC = () => {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [overlayPage, setOverlayPage] = useState(0);
+  const [overlayReady, setOverlayReady] = useState(false);
+  const overlayReadyRef = useRef(false);
   const dirRef = useRef(1);
   const touchStartYRef = useRef<number | null>(null);
   const touchStartXRef = useRef<number | null>(null);
@@ -26,32 +28,12 @@ const AboutSection: React.FC = () => {
   const lastScrollDirRef = useRef<'up' | 'down'>('down');
   const pageRef = useRef<HTMLDivElement | null>(null);
   const originRef = useRef<{ y: number; inAbout: boolean } | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  // Imágenes incrustadas eliminadas del popup: mantener solo texto
   const [isPortrait, setIsPortrait] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
   
   const navigateOnCloseRef = useRef(false);
-  const overlayImages = useMemo(() => {
-    const pool = [
-      '/images/brbr1.jpg',
-      '/images/pepo1.jpg',
-      '/images/seba1.jpg',
-      '/images/kate1.jpg',
-      '/images/edu1.jpg',
-      '/images/cami1.jpg',
-      '/images/chini2.jpg',
-    ];
-    const picks: string[] = [];
-    const used = new Set<number>();
-    while (picks.length < 6 && used.size < pool.length) {
-      const idx = Math.floor(Math.random() * pool.length);
-      if (used.has(idx)) continue;
-      used.add(idx);
-      picks.push(pool[idx]);
-    }
-    while (picks.length < 6) picks.push(pool[picks.length % pool.length]);
-    return picks;
-  }, []);
+  // Sin imágenes embebidas en el cuerpo del popup
   const desc1 = useMemo(() => t(language, 'about.description1'), [language]);
   const desc2 = useMemo(() => t(language, 'about.description2'), [language]);
   const desc3 = useMemo(() => t(language, 'about.description3'), [language]);
@@ -65,6 +47,13 @@ const AboutSection: React.FC = () => {
     const bEnd = Math.floor((2 * total) / 3);
     return [allWords.slice(0, aEnd), allWords.slice(aEnd, bEnd), allWords.slice(bEnd)];
   }, [allWords]);
+  const desc1Tokens = useMemo(() => (desc1 || '').split(/(\s+)/).filter((w) => w.length > 0), [desc1]);
+  const desc2Tokens = useMemo(() => (desc2 || '').split(/(\s+)/).filter((w) => w.length > 0), [desc2]);
+  const desc3Tokens = useMemo(() => (desc3 || '').split(/(\s+)/).filter((w) => w.length > 0), [desc3]);
+  const page1OverrideEs = 'Durante el año 2020, muchos de nosotros jamás imaginamos vivir una pandemia. Jamás pensamos que tendríamos que pasar meses confinados en nuestros hogares, en cuarentena, para no contagiarnos. Ir al supermercado o salir a pasear suponía un riesgo de contraer la enfermedad. Estar expuestos a este riesgo constante generaba estados de ánimo marcados por la ansiedad, que en muchos casos se manifestaba a través de sueños experimentados con gran intensidad. Estos sueños vívidos, de alto contenido emotivo y visual, aparecían durante la etapa del sueño REM o rapid eye movement. La propuesta que presentamos trata de un proyecto de creación coautoral';
+  const page1OverrideTokensEs = useMemo(() => page1OverrideEs.split(/(\s+)/).filter((w) => w.length > 0), [page1OverrideEs]);
+  const page2OverrideEs = 'utilizando la video-instalación y la creación de un videojuego como medio principal de desarrollo y producción. Nos interesa explorar la intersección entre el videoarte, el cine, los videojuegos y su relación con los sueños como productores de fenómenos visuales y poéticos, a la vez que nos evocan diversos estados emocionales. A partir del análisis de sueños de 3 participantes que han sido invitados a compartirlos con nosotros, junto con la utilización de la plataforma GTA V de videojuego (MACHINIMA), quisimos darle vida a aquellos sueños generando imágenes en movimiento producidas desde el computador como video renderizado (diseño de escenarios, personajes y sonidos virtuales).';
+  const page2OverrideTokensEs = useMemo(() => page2OverrideEs.split(/(\s+)/).filter((w) => w.length > 0), [page2OverrideEs]);
   const [pagesTokens, setPagesTokens] = useState<string[][]>([partA, partB, partC]);
 
   useEffect(() => {
@@ -87,33 +76,22 @@ const AboutSection: React.FC = () => {
       for (let i = 0; i < allWords.length; i += perPage) out.push(allWords.slice(i, i + perPage));
       setPagesTokens(out.length ? out : [allWords]);
     } else {
-      setPagesTokens([partA, partB, partC]);
+      const isEs = language === 'es';
+      const p0 = isEs ? page1OverrideTokensEs : desc1Tokens;
+      const p1 = isEs ? page2OverrideTokensEs : desc2Tokens;
+      const rest = isEs ? desc3Tokens : [];
+      setPagesTokens([p0, p1, rest].filter((arr) => arr.length > 0));
     }
-  }, [overlayOpen, isPortrait, isCompact, allWords, partA, partB, partC]);
+  }, [overlayOpen, isPortrait, isCompact, allWords, partA, partB, partC, desc1Tokens, desc2Tokens, desc3Tokens, language, page1OverrideTokensEs, page2OverrideTokensEs]);
 
   useEffect(() => {
     setOverlayPage((p) => Math.min(p, Math.max(0, pagesTokens.length - 1)));
   }, [pagesTokens]);
-  const RenderTokens: React.FC<{ tokens: string[]; images: string[] }> = ({ tokens, images }) => {
+  const RenderTokens: React.FC<{ tokens: string[] }> = ({ tokens }) => {
     const elems: React.ReactNode[] = [];
-    let imgIdx = 0;
-    let count = 0;
     for (let i = 0; i < tokens.length; i++) {
       const tk = tokens[i];
       elems.push(<span key={`w-${i}`}>{tk}</span>);
-      count++;
-      if (count % 32 === 0 && imgIdx < images.length) {
-        const sideRight = imgIdx % 2 === 1;
-        elems.push(
-          <img
-            key={`im-${i}`}
-            src={images[imgIdx++]}
-            alt={`overlay-${imgIdx}`}
-            className={(sideRight ? 'float-right ml-2' : 'float-left mr-2') + ' w-[30%] max-w-[40%] h-auto object-cover rounded-none border border-red-500/30 box-border mb-2'}
-            style={{ breakInside: 'avoid-column', shapeOutside: 'inset(0)' }}
-          />
-        );
-      }
     }
     return <>{elems}</>;
   };
@@ -178,8 +156,24 @@ const AboutSection: React.FC = () => {
         const dir = w.__scrollDir || 'down';
         const isRecent = Date.now() - last < 1800;
         if (isRecent && mode === 'scroll' && dir !== 'up') {
-          setOverlayOpen(true);
-          try { (window as any).lenis?.stop(); } catch (e) { void e; }
+          try {
+            const header = document.querySelector('nav') as HTMLElement | null;
+            const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
+            const target = document.getElementById('about-empty') || sectionRef.current;
+            const lenis = (window as any).lenis;
+            if (target) {
+              if (lenis && typeof lenis.scrollTo === 'function') {
+                lenis.scrollTo(target, { offset: -headerH, duration: 0.9, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+              } else {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }
+          } catch (e) { void e; }
+          setOverlayPage(0);
+          setTimeout(() => {
+            setOverlayOpen(true);
+            try { (window as any).lenis?.stop(); } catch (e) { void e; }
+          }, 240);
         }
       },
       onEnterBack: () => {
@@ -256,38 +250,57 @@ const AboutSection: React.FC = () => {
     if (!el) return;
     const finalText = t(language, 'about.title');
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
-    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
-    const phi = 0.6180339887498948;
-    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
-    weights.sort((a, b) => a.w - b.w);
-    const revealOrder = weights.map((w) => w.idx);
-    const rankMap = new Map<number, number>();
-    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
-    const setScrambledText = (p: number) => {
-      const threshold = Math.floor(p * revealOrder.length);
-      el.textContent = finalText
-        .split('')
-        .map((c, i) => {
-          if (c === ' ') return c;
-          const rank = rankMap.get(i) ?? 0;
-          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
-        })
-        .join('');
+    const base = finalText.split('');
+    const positions = base.map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    const initialWidth = el.getBoundingClientRect().width;
+    el.style.display = 'inline-block';
+    el.style.whiteSpace = 'nowrap';
+    el.style.width = `${Math.ceil(initialWidth)}px`;
+    let waveId: any = null;
+    let nextId: any = null;
+    const microIds: any[] = [];
+    const waveOnce = () => {
+      let f = 0;
+      const L = positions.length;
+      const totalFrames = Math.max(48, Math.ceil(L * 1.6));
+      const bandSize = Math.max(2, Math.floor(L * 0.06));
+      const tick = () => {
+        const center = Math.round((f / totalFrames) * (L - 1));
+        const start = Math.max(0, center - Math.floor(bandSize / 2));
+        const end = Math.min(L - 1, start + bandSize - 1);
+        const set = new Set<number>();
+        for (let i = start; i <= end; i++) set.add(positions[i]);
+        el.textContent = base.map((c, i) => (set.has(i) ? chars[Math.floor(Math.random() * chars.length)] : c)).join('');
+        const microUpdate = () => {
+          el.textContent = base.map((c, i) => (set.has(i) ? chars[Math.floor(Math.random() * chars.length)] : c)).join('');
+        };
+        microIds.push(setTimeout(microUpdate, 30));
+        microIds.push(setTimeout(microUpdate, 60));
+        f++;
+        if (f < totalFrames) {
+          waveId = setTimeout(tick, 90);
+        } else {
+          el.textContent = finalText;
+          nextId = setTimeout(() => waveOnce(), 1500);
+        }
+      };
+      tick();
     };
-    setScrambledText(0);
-    const state = { p: 0 };
-    const tl = gsap.to(state, {
-      p: 1,
-      duration: 1.2,
-      ease: 'power3.inOut',
-      onUpdate: () => setScrambledText(state.p),
-      onComplete: () => { el.textContent = finalText; },
-    });
-    return () => { tl.kill(); };
+    waveOnce();
+    return () => {
+      if (waveId) clearTimeout(waveId);
+      if (nextId) clearTimeout(nextId);
+      microIds.forEach((id) => clearTimeout(id));
+      microIds.length = 0;
+      el.textContent = finalText;
+      el.style.width = '';
+    };
   }, [overlayOpen, language]);
 
   useEffect(() => {
     if (overlayOpen) {
+      setOverlayReady(false);
+      overlayReadyRef.current = false;
       try {
         const y = window.scrollY || 0;
         const rect = sectionRef.current?.getBoundingClientRect();
@@ -304,6 +317,7 @@ const AboutSection: React.FC = () => {
   }, [overlayOpen]);
 
   const stepAdvance = (dir: 'up' | 'down') => {
+    if (!overlayReadyRef.current) return;
     lastScrollDirRef.current = dir;
     const now = Date.now();
     if (now - lastChangeRef.current < 360) return;
@@ -349,56 +363,31 @@ const AboutSection: React.FC = () => {
 
   useEffect(() => {
     const onInfo = () => {
-      setOverlayOpen(true);
-      try { (window as any).lenis?.stop(); } catch (e) { void e; }
-    };
-    const onMedia = (ev: any) => {
-      const src = ev?.detail?.src as string | undefined;
-      (window as any).__accessMode = 'media';
-      setSelectedImage(src || null);
-      setOverlayOpen(true);
-      try { (window as any).lenis?.stop(); } catch (e) { void e; }
+      try {
+        const header = document.querySelector('nav') as HTMLElement | null;
+        const headerH = header ? Math.round(header.getBoundingClientRect().height) : 64;
+        const target = document.getElementById('about-empty') || sectionRef.current;
+        const lenis = (window as any).lenis;
+        if (target) {
+          if (lenis && typeof lenis.scrollTo === 'function') {
+            lenis.scrollTo(target, { offset: -headerH, duration: 1.0, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+          } else {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      } catch (e) { void e; }
+      navigateOnCloseRef.current = true;
+      setOverlayPage(0);
+      setTimeout(() => {
+        setOverlayOpen(true);
+        try { (window as any).lenis?.stop(); } catch (e) { void e; }
+      }, 280);
     };
     window.addEventListener('openAboutInfoPopup', onInfo as any);
-    window.addEventListener('openAboutImagePopup', onMedia as any);
     return () => { window.removeEventListener('openAboutInfoPopup', onInfo as any); };
   }, []);
 
-  useEffect(() => {
-    if (!overlayOpen) return;
-    const el = overlayHeaderRef.current;
-    if (!el) return;
-    const finalText = t(language, 'about.title');
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
-    const indices = Array.from(finalText).map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
-    const phi = 0.6180339887498948;
-    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
-    weights.sort((a, b) => a.w - b.w);
-    const revealOrder = weights.map((w) => w.idx);
-    const rankMap = new Map<number, number>();
-    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
-    const setScrambledText = (p: number) => {
-      const threshold = Math.floor(p * revealOrder.length);
-      el.textContent = finalText
-        .split('')
-        .map((c, i) => {
-          if (c === ' ') return c;
-          const rank = rankMap.get(i) ?? 0;
-          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
-        })
-        .join('');
-    };
-    setScrambledText(0);
-    const state = { p: 0 };
-    const tl = gsap.to(state, {
-      p: 1,
-      duration: 2,
-      ease: 'power2.inOut',
-      onUpdate: () => setScrambledText(state.p),
-      onComplete: () => { el.textContent = finalText; },
-    });
-    return () => { tl.kill(); };
-  }, [overlayOpen, language]);
+  useEffect(() => {}, [overlayOpen, language]);
 
 
   // GSAP split-line animation tied to scroll
@@ -563,6 +552,7 @@ const AboutSection: React.FC = () => {
           {/* Text Content removed: no empty spacer */}
 
           {/* Visual Element was here */}
+          <div id="about-empty" aria-hidden="true" className="sr-only" />
         </div>
       </div>
       <AnimatePresence onExitComplete={() => {
@@ -572,7 +562,15 @@ const AboutSection: React.FC = () => {
           const header = document.querySelector('nav');
           const headerH = header ? Math.round((header as HTMLElement).getBoundingClientRect().height) : 64;
           const origin = originRef.current;
-          if (origin?.inAbout) {
+          const forceHero = navigateOnCloseRef.current || ((window as any).__accessMode === 'info');
+          if (forceHero) {
+            const home = document.getElementById('home');
+            if (home) {
+              const opts = { offset: -headerH, duration: 1.1, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) };
+              if (lenis && typeof lenis.scrollTo === 'function') lenis.scrollTo(home, opts as any);
+              else home.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          } else if (origin?.inAbout) {
             const y = origin.y;
             if (lenis && typeof lenis.scrollTo === 'function') {
               lenis.scrollTo(y, { duration: 1.1, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
@@ -593,14 +591,15 @@ const AboutSection: React.FC = () => {
             const titleEl = portfolio?.querySelector('h2');
             const targetEl = titleEl || portfolio;
             if (targetEl) {
-              const margin = Math.round(window.innerHeight * 0.19);
-              const opts = { offset: headerH + margin, duration: 1.15, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) };
+              const desiredPos = headerH + Math.round(window.innerHeight * 0.28);
+              const rect = targetEl.getBoundingClientRect();
+              const titleAbsTop = (window.scrollY || 0) + rect.top;
+              const finalTop = Math.max(0, titleAbsTop - desiredPos);
+              const optsNum = { duration: 1.1, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) };
               if (lenis && typeof lenis.scrollTo === 'function') {
-                lenis.scrollTo(targetEl, opts as any);
+                (lenis as any).scrollTo(finalTop, optsNum as any);
               } else {
-                const rect = targetEl.getBoundingClientRect();
-                const top = (window.scrollY || 0) + rect.top - (headerH + margin);
-                window.scrollTo({ top, behavior: 'smooth' });
+                window.scrollTo({ top: finalTop, behavior: 'smooth' });
               }
               try { window.dispatchEvent(new CustomEvent('portfolioEntrance')); } catch (e) { void e; }
             }
@@ -608,7 +607,9 @@ const AboutSection: React.FC = () => {
           }
         } catch (e) { void e; }
         navigateOnCloseRef.current = false;
-        setSelectedImage(null);
+        setOverlayPage(0);
+        setOverlayReady(false);
+        overlayReadyRef.current = false;
       }}>
       {overlayOpen && (
         <motion.div
@@ -620,9 +621,11 @@ const AboutSection: React.FC = () => {
           className={`${styles.overlay} ${styles.overlayVisible} fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full`}
           role="dialog"
           aria-modal="true"
+          aria-busy={!overlayReady}
           tabIndex={-1}
           style={{ paddingTop: isCompact ? '15vh' : undefined, paddingBottom: isCompact ? '15vh' : undefined }}
           onWheel={(e) => {
+            if (!overlayReadyRef.current) { e.preventDefault(); return; }
             const dx = e.deltaX || 0;
             const dy = e.deltaY || 0;
             const useVertical = Math.abs(dy) >= Math.abs(dx);
@@ -642,6 +645,7 @@ const AboutSection: React.FC = () => {
             touchStartXRef.current = e.touches?.[0]?.clientX ?? null;
           }}
           onTouchMove={(e) => {
+            if (!overlayReadyRef.current) { e.preventDefault(); return; }
             const y = e.touches?.[0]?.clientY ?? null;
             const x = e.touches?.[0]?.clientX ?? null;
             if (y == null || touchStartYRef.current == null) return;
@@ -664,14 +668,15 @@ const AboutSection: React.FC = () => {
             if (x != null) touchStartXRef.current = x;
           }}
         >
-          <div ref={overlayHeaderRef} className="relative z-10 pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3">{t(language, 'about.title')}</div>
+          <div ref={overlayHeaderRef} className="relative z-10 pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3" style={{ letterSpacing: '-0.06em', whiteSpace: 'nowrap', display: 'inline-block' }}>{t(language, 'about.title')}</div>
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             transition={{ duration: 0.9, ease: 'easeInOut' }}
-            className={`${styles.frame}`}
-            style={{ width: isCompact ? '100vw' : '75vw', height: isCompact ? 'calc(100vh - 30vh)' : undefined, maxHeight: isCompact ? undefined : '75vh' }}
+          className={`${styles.frame}`}
+          style={{ width: isCompact ? '100vw' : '75vw', height: isCompact ? 'calc(100vh - 30vh)' : undefined, maxHeight: isCompact ? undefined : '75vh' }}
+          onAnimationComplete={() => { setOverlayReady(true); overlayReadyRef.current = true; }}
           >
             <div className={styles.content} style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
               <motion.div
@@ -684,22 +689,96 @@ const AboutSection: React.FC = () => {
                 className="w-full h-full px-3 pt-10 pb-10 md:px-10 md:pt-14 md:pb-12 box-border"
                 style={{ overflowY: 'hidden', overscrollBehavior: 'contain' }}
               >
-                {selectedImage && overlayPage === 0 && (
-                  <div className="w-full mb-3 flex items-center justify-center">
-                    <img src={selectedImage} alt="selección" className="max-h-[32vh] w-auto object-contain border border-red-600/40" />
-                  </div>
-                )}
-                <div className="w-full h-full" style={{ columnCount: (isPortrait ? 1 : 2) as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
-                  <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                    <RenderTokens tokens={pagesTokens[Math.min(overlayPage, pagesTokens.length - 1)]} images={overlayImages} />
-                  </div>
-                </div>
+                {(() => {
+                  const pageIdx = Math.min(overlayPage, pagesTokens.length - 1);
+                  const tokens = pagesTokens[pageIdx];
+                  // Primera página: en escritorio, texto izquierda e imagen derecha; en móvil, texto + imagen apilados
+                  if (pageIdx === 0) {
+                    if (!isPortrait) {
+                      return (
+                        <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
+                          <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                            <RenderTokens tokens={tokens} />
+                          </div>
+                          <div className="w-full h-full">
+                            <img src="/images/AboutSectionFiles/About01b.png" alt="About section visual" className="w-full h-full object-cover" />
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
+                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <RenderTokens tokens={tokens} />
+                        </div>
+                        <div className="w-full">
+                          <img src="/images/AboutSectionFiles/About01b.png" alt="About section visual" className="w-full h-auto max-h-[38vh] object-cover" />
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (isPortrait && pageIdx === 1) {
+                    return (
+                      <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
+                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <RenderTokens tokens={tokens} />
+                        </div>
+                        <div className="w-full">
+                          <img src="/images/AboutSectionFiles/About02.png" alt="About section visual 2" className="w-full h-auto max-h-[38vh] object-cover" />
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (!isPortrait && pageIdx === 1) {
+                    return (
+                      <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
+                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <RenderTokens tokens={tokens} />
+                        </div>
+                        <div className="w-full h-full">
+                          <img src="/images/AboutSectionFiles/About02.png" alt="About section visual 2" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (isPortrait && pageIdx === 2) {
+                    return (
+                      <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
+                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <RenderTokens tokens={tokens} />
+                        </div>
+                        <div className="w-full">
+                          <img src="/images/AboutSectionFiles/About03.png" alt="About section visual 3" className="w-full h-auto max-h-[38vh] object-cover" />
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (!isPortrait && pageIdx === 2) {
+                    return (
+                      <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
+                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <RenderTokens tokens={tokens} />
+                        </div>
+                        <div className="w-full h-full">
+                          <img src="/images/AboutSectionFiles/About03.png" alt="About section visual 3" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="w-full h-full" style={{ columnCount: (isPortrait ? 1 : 2) as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
+                      <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                        <RenderTokens tokens={tokens} />
+                      </div>
+                    </div>
+                  );
+                })()}
               </motion.div>
             </div>
           </motion.div>
           {(() => {
             const max = Math.max(0, pagesTokens.length - 1);
-            const pct = max > 0 ? Math.round((overlayPage / max) * 100) : 100;
+            const pct = overlayPage === 0 ? 0 : (max > 0 ? Math.round((overlayPage / max) * 100) : 100);
             return (
               <div className="relative z-10 mt-2 w-44 flex items-center gap-2">
                 <div className="h-1 w-full bg-red-800/40 rounded-full overflow-hidden">
