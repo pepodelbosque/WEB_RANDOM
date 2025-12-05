@@ -315,7 +315,9 @@ const FantasmaSection: React.FC = () => {
         el.style.minWidth = `${minW}px`;
 
         if (!el.classList.contains('logo-fntsm')) {
-          el.style.maxWidth = `${baseW}px`;
+          const isPortrait = window.matchMedia && window.matchMedia('(orientation: portrait)').matches;
+          const maxW = isPortrait ? Math.round(baseW * 1.15) : baseW;
+          el.style.maxWidth = `${maxW}px`;
         }
 
         // Para el logo, también fijar altura mínima para evitar reducción en layouts pequeños
@@ -391,7 +393,7 @@ const FantasmaSection: React.FC = () => {
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.25 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
-              className={`group relative aspect-[16/9] w-[69%] mx-auto md:mx-0 mt-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
+              className={`group relative aspect-[16/9] w-[79%] md:w-[69%] mx-auto md:mx-0 mt-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
             >
               {/* Background image fills square */}
               <motion.img
