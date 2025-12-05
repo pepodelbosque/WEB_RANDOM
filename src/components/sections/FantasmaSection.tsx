@@ -160,27 +160,9 @@ const FantasmaSection: React.FC = () => {
         text.addEventListener('touchstart', startReveal, { passive: true });
 
         const justifyLines = () => {
-          wrappers.forEach((wrapper, idx) => {
-            const isLast = idx === wrappers.length - 1;
-            (wrapper.style as any)['textAlignLast'] = isLast ? 'left' : 'justify';
-            if (isLast) {
-              wrapper.style.wordSpacing = '';
-              return;
-            }
-            const children = Array.from(wrapper.children) as HTMLElement[];
-            const spaceCount = children.reduce((acc, el) => {
-              const txt = el.textContent || '';
-              return acc + (/^\s+$/.test(txt) ? 1 : 0);
-            }, 0);
-            if (spaceCount <= 0) {
-              wrapper.style.wordSpacing = '';
-              return;
-            }
-            const wrapperWidth = wrapper.getBoundingClientRect().width;
-            const contentWidth = children.reduce((acc, el) => acc + el.getBoundingClientRect().width, 0);
-            const leftover = wrapperWidth - contentWidth;
-            const perSpace = leftover / spaceCount;
-            wrapper.style.wordSpacing = perSpace > 0 ? `${perSpace}px` : '';
+          wrappers.forEach((wrapper) => {
+            (wrapper.style as any)['textAlignLast'] = 'center';
+            wrapper.style.wordSpacing = '';
           });
         };
 
@@ -362,7 +344,7 @@ const FantasmaSection: React.FC = () => {
   }, []);
 
   return (
-    <section id="fantasma" ref={handleRef} className="min-h-screen py-20 relative overflow-hidden mb-24 md:mb-32">
+    <section id="fantasma" ref={handleRef} className="min-h-screen py-20 relative overflow-hidden mb-12 md:mb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <motion.div
@@ -441,10 +423,10 @@ const FantasmaSection: React.FC = () => {
           initial={{ opacity: 0, x: -180 }}
           animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -180 }}
           transition={{ duration: 1.25, delay: 0.35, ease: 'easeOut' }}
-          className="mt-7 md:mt-9"
+          className="mt-4 md:mt-6"
         >
           <div className="split-container" data-align="center">
-            <p className="split text-[0.7125em] md:text-[0.8325em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto leading-[1.3] text-center">
+            <p className="split text-[0.7125em] md:text-[0.8325em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-center">
               Jugar no es cosa de niños: es un método de investigación, una ética de la experimentación, una manera de mantener viva la curiosidad ante el mundo.
               El videojuego —con su lógica interactiva y su invitación explícita a participar— nos devolvió a ese estado primero.
               Nos recordó que la imagen no tiene por qué ser solo espejo o ventana: puede ser también terreno de juego, espacio que se recorre, se toca, se altera.

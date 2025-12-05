@@ -165,7 +165,7 @@ function App() {
                 {/* Separador grande entre Fantasma y Contact */}
                 <div
                   aria-hidden="true"
-                  className="h-[16rem] md:h-[24rem] lg:h-[28rem]"
+                  className="h-[8rem] md:h-[12rem] lg:h-[14rem]"
                 />
                 <ContactSection />
               </motion.div>

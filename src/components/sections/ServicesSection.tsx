@@ -35,6 +35,9 @@ const ServicesSection: React.FC = () => {
   const skipNextPulseRef = useRef(false); // evita doble latido cuando ya se lanzó con adelanto
   const autoPausedUntilRef = useRef(0); // timestamp hasta el que el auto-movimiento debe pausar
   const pauseMsRef = useRef(3000); // pausa automática 3s tras interacción
+  const maxTranslateRef = useRef(0);
+  const [layoutVersion, setLayoutVersion] = useState(0);
+
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -280,12 +283,29 @@ const ServicesSection: React.FC = () => {
       const step = cardWidth + gap;
       stepRef.current = step;
       const containerWidth = container.clientWidth;
-      const perView = step > 0 ? Math.max(1, Math.floor((containerWidth + gap) / step)) : 1;
-      const itemCount = track.querySelectorAll('[role="listitem"]').length;
-      const newMax = Math.max(0, itemCount - perView);
+      const scrollWidth = track.scrollWidth;
+      // Calculate max negative translation (limit)
+      // If content fits (scrollWidth <= containerWidth), maxTranslate is >= 0.
+      // If content overflows, maxTranslate is negative (e.g. -500).
+      maxTranslateRef.current = containerWidth - scrollWidth;
+
+      const totalScroll = Math.max(0, scrollWidth - containerWidth);
+      const exactSteps = step > 0 ? totalScroll / step : 0;
+      
+      // Threshold increased to 20% of step to avoid small final adjustments
+      const threshold = step * 0.2; 
+      const remainder = step > 0 ? totalScroll % step : 0;
+      
+      let newMax = Math.ceil(exactSteps);
+      // If remainder is small (less than threshold), ignore that last partial step
+      if (remainder > 0 && remainder < threshold) {
+        newMax = Math.floor(exactSteps);
+      }
+
       setMaxIndex(newMax);
       maxIndexRef.current = newMax;
       setCurrentIndex((prev) => Math.min(prev, newMax));
+      setLayoutVersion((v) => v + 1);
     };
 
     // Bloquear tamaño fijo de tarjetas al tamaño actualmente observado (no reactivo)
@@ -414,9 +434,23 @@ const ServicesSection: React.FC = () => {
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const dx = -currentIndex * (stepRef.current || 0);
-    track.style.transform = `translateX(${dx}px)`;
-  }, [currentIndex, maxIndex]);
+    const step = stepRef.current || 0;
+    const targetDx = -currentIndex * step;
+    const limit = maxTranslateRef.current;
+    
+    let finalDx = targetDx;
+    // Only clamp if content overflows (limit < 0)
+    if (limit < 0) {
+      // limit is negative (e.g. -1000), targetDx is negative (e.g. -1200).
+      // We want to stop at -1000. So Math.max.
+      finalDx = Math.max(targetDx, limit);
+    } else {
+      // If content fits, keep aligned to start (0)
+      finalDx = 0;
+    }
+
+    track.style.transform = `translateX(${finalDx}px)`;
+  }, [currentIndex, maxIndex, layoutVersion]);
 
   // Mantener referencia de maxIndex sincronizada
   useEffect(() => {
@@ -451,86 +485,92 @@ const ServicesSection: React.FC = () => {
       roleKey: "services.crew.barbara.role",
       image: "/images/brbr1.jpg",
       bioKey: "services.crew.barbara.bio",
-      skills: ["Arte", "Video", "plan"],
+      skills: ["arte", "video", "plan"],
     },
     {
       nameKey: "services.crew.pepo.name",
       roleKey: "services.crew.pepo.role",
       image: "/images/pepo1.jpg",
       bioKey: "services.crew.pepo.bio",
-      skills: ["CINE", "animacion", "guión"],
+      skills: ["cine", "animacion", "guion"],
     },
     {
       nameKey: "services.crew.sebastian.name",
       roleKey: "services.crew.sebastian.role",
       image: "/images/seba1.jpg",
       bioKey: "services.crew.sebastian.bio",
-      skills: ["ESTUDIO", "Gestión", "CULTURA"],
+      skills: ["estudio", "gestion", "cultura"],
     },
     {
-      nameKey: "services.crew.katherine.name",
-      roleKey: "services.crew.katherine.role",
+      nameKey: "services.crew.kate.name",
+      roleKey: "services.crew.kate.role",
       image: "/images/kate1.jpg",
-      bioKey: "services.crew.katherine.bio",
-      skills: ["Sueños", "Relato", "Poética"],
+      bioKey: "services.crew.kate.bio",
+      skills: ["suenos", "relato", "poetica"],
     },
     {
       nameKey: "services.crew.eduardo.name",
       roleKey: "services.crew.eduardo.role",
       image: "/images/edu1.jpg",
       bioKey: "services.crew.eduardo.bio",
-      skills: ["Sueños", "Memoria", "Diálogo"],
+      skills: ["suenos", "memoria", "dialogo"],
     },
     {
       nameKey: "services.crew.camila.name",
       roleKey: "services.crew.camila.role",
       image: "/images/cami1.jpg",
       bioKey: "services.crew.camila.bio",
-      skills: ["Teoría", "estudio", "Sueños"],
+      skills: ["teoria", "estudio", "suenos"],
     },
     {
-      nameKey: "services.crew.chini.name",
-      roleKey: "services.crew.chini.role",
+      nameKey: "services.crew.fer.name",
+      roleKey: "services.crew.fer.role",
       image: "/images/chini2.jpg",
-      bioKey: "services.crew.chini.bio",
-      skills: ["Sueños", "Relato", "Memoria"],
+      bioKey: "services.crew.fer.bio",
+      skills: ["animacion", "arte", "video"],
     },
     {
-      nameKey: "services.crew.yeikob.name",
-      roleKey: "services.crew.yeikob.role",
+      nameKey: "services.crew.jav.name",
+      roleKey: "services.crew.jav.role",
       image: "/images/yeikob1.jpg",
-      bioKey: "services.crew.yeikob.bio",
-      skills: ["Sueños", "Relato", "Memoria"],
+      bioKey: "services.crew.jav.bio",
+      skills: ["video", "animacion", "arte"],
     },
     {
-      nameKey: "services.crew.nacho.name",
-      roleKey: "services.crew.nacho.role",
+      nameKey: "services.crew.ignacio.name",
+      roleKey: "services.crew.ignacio.role",
       image: "/images/nacho1.jpg",
-      bioKey: "services.crew.nacho.bio",
-      skills: ["Sueños", "Relato", "Memoria"],
+      bioKey: "services.crew.ignacio.bio",
+      skills: ["video", "arte", "plan"],
     },
     {
-      nameKey: "services.crew.marco.name",
-      roleKey: "services.crew.marco.role",
+      nameKey: "services.crew.lost.name",
+      roleKey: "services.crew.lost.role",
       image: "/images/marco1.jpg",
-      bioKey: "services.crew.marco.bio",
-      skills: ["Sueños", "Relato", "Memoria"],
+      bioKey: "services.crew.lost.bio",
+      skills: ["musica", "sonido", "arte"],
     },
     {
       nameKey: "services.crew.chico.name",
       roleKey: "services.crew.chico.role",
       image: "/images/chico1.jpg",
       bioKey: "services.crew.chico.bio",
-      skills: ["Sueños", "Relato", "Memoria"],
+      skills: ["sonido", "relato", "arte"],
     },
     {
-      nameKey: "services.crew.erika.name",
-      roleKey: "services.crew.erika.role",
+      nameKey: "services.crew.inebitable.name",
+      roleKey: "services.crew.inebitable.role",
       image: "/images/death1.jpg",
-      bioKey: "services.crew.erika.bio",
-      skills: ["Curaduría", "Investigación", "Arquitectura"],
+      bioKey: "services.crew.inebitable.bio",
+      skills: ["memoria", "investigacion", "poetica"],
     },
-    
+    {
+      nameKey: "services.crew.controlito.name",
+      roleKey: "services.crew.controlito.role",
+      image: "/images/Controli.jpg",
+      bioKey: "services.crew.controlito.bio",
+      skills: ["gestion", "dialogo", "poetica"],
+    },
   ];
 
   return (
@@ -547,7 +587,7 @@ const ServicesSection: React.FC = () => {
             TRIPULACIÓN
           </motion.h2>
           <div className="split-container">
-            <p className="split text-[0.9em] md:text-[1.02em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto text-justify leading-[1.3]">
+            <p className="split text-[0.9em] md:text-[1.02em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-2xl mx-auto text-justify leading-[1.3] whitespace-pre-wrap">
               {t(language, 'services.description')}
             </p>
           </div>
@@ -582,7 +622,7 @@ const ServicesSection: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
   
               {/* Bottom overlay band (name, role, bio, skills) */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/35 backdrop-blur-sm">
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/35 backdrop-blur-sm max-h-[75%] overflow-y-auto no-scrollbar">
                 <h3 className="text-sm font-black font-lincolnmitre text-orange-400/70 dark:text-orange-300/70 mb-1">
                   {t(language, member.nameKey)}
                 </h3>
@@ -593,7 +633,7 @@ const ServicesSection: React.FC = () => {
                   {t(language, member.bioKey)}
                 </p>
 
-                <div className="flex flex-wrap gap-1.5">
+                <div className="hidden md:landscape:flex flex-wrap gap-1.5">
                   {member.skills.map((skill) => (
                     <span
                       key={skill}

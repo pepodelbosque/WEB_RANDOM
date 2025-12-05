@@ -442,7 +442,7 @@ const PortfolioSection: React.FC = () => {
     <section
       id="portfolio"
       ref={handleRef}
-      className="min-h-[50vh] py-6 relative mb-40 md:mb-56"
+      className="min-h-[50vh] py-6 relative mb-16 md:mb-24"
       style={{ paddingTop: snapOffset, scrollMarginTop: snapOffset }}
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -501,26 +501,18 @@ const PortfolioSection: React.FC = () => {
               </div>
               {/* Project Content (bottom band inside square) */}
               <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/35 backdrop-blur-sm">
-                <h3 className="text-[0.8em] font-black font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
+                <motion.h3
+                  className="text-[0.8em] font-black font-lincolnmitre text-red-500 dark:text-red-400 mb-1"
+                  initial={{ color: '#ef4444' }}
+                  animate={{ color: ['#ef4444', '#ef4444', '#60a5fa', '#ef4444'] }}
+                  transition={{ duration: 5, times: [0, 0.85, 0.9, 1], repeat: Infinity, ease: 'easeInOut' }}
+                >
                   {customTitles?.[index] ?? project.title}
-                </h3>
+                </motion.h3>
                 <p className="text-[0.8em] font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-2 leading-relaxed">
                   {project.description}
                 </p>
-                <div className="flex flex-wrap gap-1">
-                  {project.tech.map((tech, techIndex) => (
-                    <motion.span
-                      key={tech}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: false, amount: 0.2 }}
-                      transition={{ delay: (index * 0.2) + (techIndex * 0.1) + 0.5 }}
-                      className="px-1 py-[1px] bg-gradient-to-r from-primary/15 to-secondary/15 text-[7.2px] font-lincolnmitre rounded-none border border-primary/20 text-orange-400 dark:text-orange-300 font-extrabold"
-                    >
-                      {tech}
-                    </motion.span>
-                  ))}
-                </div>
+                {/* badges removed */}
               </div>
             </motion.div>
           ))}
