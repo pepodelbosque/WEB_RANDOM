@@ -3,5 +3,7 @@
   "git.allowEmptyCommits": true,
   "git.confirmEmptyCommits": false,
   "scm.inputFontSize": 14,
-  "scm.alwaysShowActions": true
+  "scm.alwaysShowActions": true,
+  "git.suggestSmartCommit": true,
+  "git.smartCommitChanges": "all"
 }
