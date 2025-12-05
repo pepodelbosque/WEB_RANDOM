@@ -253,7 +253,7 @@ export const translations = {
     // Navigation
     nav: {
       // home: 'Inicio', - removed
-      about: 'Info',
+      about: 'Info (test)',
       poems: 'Poemas (test)',
       portfolio: 'Galería',
       services: 'Tripulación',
