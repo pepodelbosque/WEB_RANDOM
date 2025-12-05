@@ -264,7 +264,7 @@ export const translations = {
     // Hero Section
     hero: {
       title: 'RANDOM',
-      subtitle: 'Random nace del cruce entre lo onírico, lo político, el arte, el cine y la tecnología. Un espacio donde lo imaginado y lo vivido se mezclan, dando forma a relatos y paisajes que invitan a explorar desde otros lugares y experiencias.',
+      subtitle: 'Cruce entre lo onírico, lo político, el arte, el cine y la tecnología. Un espacio donde lo imaginado y lo vivido dan forma a relatos y paisajes.',
       description: '',
       viewPortfolio: 'Sueños',
       getInTouch: 'Pesadillas',
