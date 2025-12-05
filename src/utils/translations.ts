@@ -253,8 +253,8 @@ export const translations = {
     // Navigation
     nav: {
       // home: 'Inicio', - removed
-      about: 'Info (test)',
-      poems: 'Poemas (test)',
+      about: 'Info',
+      poems: 'Poemas',
       portfolio: 'Galería',
       services: 'Tripulación',
       fantasma: 'FNTSM',
