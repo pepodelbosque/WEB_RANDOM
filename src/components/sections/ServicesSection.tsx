@@ -31,8 +31,8 @@ const ServicesSection: React.FC = () => {
   const maxIndexRef = useRef(0);
   const dirRef = useRef<1 | -1>(1); // 1 = derecha, -1 = izquierda
   const currentIndexRef = useRef(0);
-  const leadMsRef = useRef(500); //  adelantar latido 0.5 s // test conexión
-  const skipNextPulseRef = useRef(false); //   evita doble latido cuando ya se lanzó con adelanto
+  const leadMsRef = useRef(500); // adelantar latido 0.5 s // test conexión
+  const skipNextPulseRef = useRef(false); // evita doble latido cuando ya se lanzó con adelanto
   const autoPausedUntilRef = useRef(0); // timestamp hasta el que el auto-movimiento debe pausar
   const pauseMsRef = useRef(3000); // pausa automática 3s tras interacción
   const maxTranslateRef = useRef(0);
