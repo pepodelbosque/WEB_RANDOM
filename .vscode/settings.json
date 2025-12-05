@@ -1,0 +1,7 @@
+{
+  "git.enableSmartCommit": true,
+  "git.allowEmptyCommits": true,
+  "git.confirmEmptyCommits": false,
+  "scm.inputFontSize": 14,
+  "scm.alwaysShowActions": true
+}
