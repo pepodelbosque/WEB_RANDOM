@@ -7,14 +7,15 @@ interface VideogamePopupProps {
   isVisible: boolean;
   onClose: () => void;
   minimal?: boolean;
+  title?: string;
 }
 
 // 3D viewer removed per request
 
-const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, minimal = false }) => {
+const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, minimal = false, title }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [overlayActive, setOverlayActive] = useState(false);
-  const [isCompact, setIsCompact] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);  
   const [isPortrait, setIsPortrait] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const leftParaRef = useRef<HTMLParagraphElement | null>(null);
@@ -151,7 +152,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
             className="relative z-10 pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3"
             style={{ letterSpacing: '-0.06em', whiteSpace: 'nowrap', display: 'inline-block', marginBottom: '10px' }}
           >
-            videogame
+            {title ?? 'videogame'}
           </div>
           <motion.div
             initial={{ scale: 0 }}
