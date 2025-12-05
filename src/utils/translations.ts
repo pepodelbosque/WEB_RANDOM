@@ -254,7 +254,7 @@ export const translations = {
     nav: {
       // home: 'Inicio', - removed
       about: 'Info',
-      poems: 'Poemas',
+      poems: 'Poemas (test)',
       portfolio: 'Galería',
       services: 'Tripulación',
       fantasma: 'FNTSM',
