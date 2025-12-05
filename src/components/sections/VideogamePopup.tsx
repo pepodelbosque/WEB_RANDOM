@@ -15,15 +15,19 @@ interface VideogamePopupProps {
 const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, minimal = false, title }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [overlayActive, setOverlayActive] = useState(false);
-  const [isCompact, setIsCompact] = useState(false);  
+  const [isCompact, setIsCompact] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
   const leftParaRef = useRef<HTMLParagraphElement | null>(null);
   const rightParaRef = useRef<HTMLParagraphElement | null>(null);
   const [fontLeft, setFontLeft] = useState<number>(16);
   const [fontRight, setFontRight] = useState<number>(16);
   const [pageIndex, setPageIndex] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(0);
+  const [mode, setMode] = useState<'qr' | 'game' | 'honorem'>('game');
+  const [headerTopPx, setHeaderTopPx] = useState<number | undefined>(undefined);
   const touchStartX = useRef<number>(0);
   const touchEndX = useRef<number>(0);
 
@@ -88,6 +92,35 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
     };
   }, [isVisible]);
 
+  useEffect(() => {
+    const computeHeaderTop = () => {
+      if (!isPortrait) { setHeaderTopPx(undefined); return; }
+      const vh = window.innerHeight;
+      const minPx = Math.round(vh * 0.12);
+      const maxPx = Math.round(vh * 0.18);
+      const gapPx = Math.round(vh * 0.012);
+      const headerH = Math.round(headerRef.current?.getBoundingClientRect().height || vh * 0.03);
+      const rect = frameRef.current?.getBoundingClientRect();
+      let candidate = Math.round(vh * 0.15);
+      if (rect) {
+        const safeTop = Math.round(rect.top - gapPx - headerH);
+        candidate = safeTop;
+      }
+      const topPx = Math.max(minPx, Math.min(candidate, maxPx));
+      setHeaderTopPx(topPx);
+    };
+    computeHeaderTop();
+    const ro = new ResizeObserver(() => computeHeaderTop());
+    if (frameRef.current) ro.observe(frameRef.current);
+    window.addEventListener('resize', computeHeaderTop);
+    window.addEventListener('orientationchange', computeHeaderTop);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', computeHeaderTop);
+      window.removeEventListener('orientationchange', computeHeaderTop);
+    };
+  }, [isPortrait]);
+
   const handleWheel = (e: React.WheelEvent) => {
     if (!isPortrait) return;
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
@@ -148,39 +181,66 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
           exit={{ opacity: 0 }}
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
-          <div
-            className="relative z-10 pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3"
-            style={{ letterSpacing: '-0.06em', whiteSpace: 'nowrap', display: 'inline-block', marginBottom: '10px' }}
-          >
-            {title ?? 'videogame'}
-          </div>
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            transition={{ duration: 0.9, ease: 'easeInOut' }}
-            className={`${styles.frame}`}
-            style={{
-              width: isCompact ? '95vw' : '75vw',
-              maxHeight: (isCompact || isPortrait) ? '90vh' : '75vh',
-              marginTop: (isCompact || isPortrait) ? '5vh' : undefined,
-              marginBottom: (isCompact || isPortrait) ? '5vh' : undefined,
-            }}
-          >
+          {!isPortrait && (
+            <div
+              className="relative z-10 pointer-events-none select-none bg-gradient-to-r from-red-700 via-orange-500 to-red-600 text-transparent bg-clip-text font-lincolnmitre text-[1.6rem] md:text-[2rem] leading-[1] mb-3"
+              style={{
+                letterSpacing: '-0.06em',
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
+                marginBottom: '10px',
+              }}
+              ref={headerRef}
+            >
+              {title ?? 'videogame'}
+            </div>
+          )}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              transition={{ duration: 0.9, ease: 'easeInOut' }}
+              className={`${styles.frame}`}
+              style={{
+                width: isCompact ? '95vw' : '75vw',
+                maxHeight: (isCompact || isPortrait) ? '90vh' : '75vh',
+                marginTop: (isCompact || isPortrait) ? '5vh' : undefined,
+                marginBottom: (isCompact || isPortrait) ? '5vh' : undefined,
+              }}
+              ref={frameRef}
+            >
             <div className="w-full box-border p-3 md:p-4 mt-6 md:mt-8" style={{ zIndex: 1 }}>
               <div className="flex justify-center items-center gap-1 md:gap-2">
-                {['CODIGO QR', 'VIDEO GAME', 'HONOREM'].map((label) => (
-                  <motion.button
-                    key={label}
-                    whileHover={{ scale: 1.05, rotateZ: 2 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-16 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)] transition-all duration-300 text-[10px] leading-none uppercase tracking-wide"
-                    style={{ borderColor: 'rgba(255,0,0,0.5)' }}
-                    aria-label={label}
-                  >
-                    {label}
-                  </motion.button>
-                ))}
+                <motion.button
+                  whileHover={{ scale: 1.05, rotateZ: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setMode('qr'); setPageIndex(0); }}
+                  className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'qr' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
+                  style={{ borderColor: 'rgba(255,0,0,0.5)' }}
+                  aria-label="CODIGO QR"
+                >
+                  CODIGO QR
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05, rotateZ: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setMode('game'); setPageIndex(0); }}
+                  className={`w-24 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'game' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
+                  style={{ borderColor: 'rgba(255,0,0,0.5)' }}
+                  aria-label="VIDEO GAME"
+                >
+                  VIDEO GAME
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05, rotateZ: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setMode('honorem'); setPageIndex(0); }}
+                  className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'honorem' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
+                  style={{ borderColor: 'rgba(255,0,0,0.5)' }}
+                  aria-label="HONOREM"
+                >
+                  HONOREM
+                </motion.button>
               </div>
             </div>
             <div
@@ -207,52 +267,80 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                 </div>
               ) : (
                 <div className="mx-auto px-6 md:px-8 py-6 md:py-8" style={{ maxWidth: isCompact ? '95%' : '85%' }}>
-                  {isPortrait && !canShowBothPortrait ? (
-                    <div className="relative w-full h-full overflow-hidden">
-                      <motion.div
-                        className="flex"
-                        animate={{ x: -pageIndex * pageWidth }}
-                        transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-                        style={{ width: `${2 * pageWidth}px` }}
-                      >
-                        <div style={{ width: `${pageWidth}px`, paddingRight: '1rem' }}>
-                          <p
-                            ref={leftParaRef}
-                            className="font-lincolnmitre text-orange-200/90 text-justify"
-                            style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
-                          >
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia, nunc a dapibus scelerisque, lectus turpis malesuada risus, at tristique quam tellus at mauris. Integer congue ultrices massa, nec mattis ante. Suspendisse potenti. Donec venenatis, augue quis luctus malesuada, turpis ante pellentesque nisl, a cursus arcu turpis nec nibh. Sed quis mi in ipsum varius vulputate. Integer euismod, urna et ultricies sagittis, orci nisl tristique tellus, vitae dapibus lorem elit vitae sem. Duis nec nulla et arcu commodo euismod. Aenean ultricies, nunc et tristique faucibus, justo arcu facilisis mi, vel fringilla massa augue ac augue.
-                          </p>
+                  {mode === 'qr' ? (
+                    isPortrait && !canShowBothPortrait ? (
+                      <div className="relative w-full h-full overflow-hidden">
+                        <motion.div
+                          className="flex"
+                          animate={{ x: -pageIndex * pageWidth }}
+                          transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+                          style={{ width: `${2 * pageWidth}px` }}
+                        >
+                          <div style={{ width: `${pageWidth}px`, paddingRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=Proyecto%20RANDOM&color=ff0000&bgcolor=000000`} alt="Código QR" style={{ width: '220px', height: '220px' }} />
+                          </div>
+                          <div style={{ width: `${pageWidth}px`, paddingLeft: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <img src="/images/Instalacion_Buena.jpg" alt="Imagen" style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }} />
+                          </div>
+                        </motion.div>
+                      </div>
+                    ) : (
+                      <div className="grid" style={{ gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
+                        <div className="w-full flex items-center justify-center">
+                          <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=Proyecto%20RANDOM&color=ff0000&bgcolor=000000`} alt="Código QR" style={{ width: '220px', height: '220px' }} />
                         </div>
-                        <div style={{ width: `${pageWidth}px`, paddingLeft: '1rem' }}>
-                          <p
-                            ref={rightParaRef}
-                            className="font-lincolnmitre text-orange-200/90 text-justify"
-                            style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontRight}px`, lineHeight: 1.25 }}
-                          >
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus bibendum, neque sed placerat efficitur, purus felis imperdiet erat, non facilisis velit lorem sed arcu. Etiam et nulla id mauris porta tempor. Curabitur at vulputate justo. In hac habitasse platea dictumst. Integer rhoncus efficitur risus, at laoreet libero fermentum non. Sed feugiat risus at urna consectetur, at pulvinar orci aliquet. Nullam non lectus ultrices, ullamcorper ligula ac, faucibus nisl. Cras id lacinia arcu, vitae sodales justo. Nunc id venenatis neque, quis ultrices sem.
-                          </p>
+                        <div className="w-full flex items-center justify-center">
+                          <img src="/images/Instalacion_Buena.jpg" alt="Imagen" style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }} />
                         </div>
-                      </motion.div>
-                      
-                    </div>
+                      </div>
+                    )
                   ) : (
-                    <div className="grid" style={{ gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
-                      <p
-                        ref={leftParaRef}
-                        className="font-lincolnmitre text-orange-200/90 text-justify"
-                        style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
-                      >
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia, nunc a dapibus scelerisque, lectus turpis malesuada risus, at tristique quam tellus at mauris. Integer congue ultrices massa, nec mattis ante. Suspendisse potenti. Donec venenatis, augue quis luctus malesuada, turpis ante pellentesque nisl, a cursus arcu turpis nec nibh. Sed quis mi in ipsum varius vulputate. Integer euismod, urna et ultricies sagittis, orci nisl tristique tellus, vitae dapibus lorem elit vitae sem. Duis nec nulla et arcu commodo euismod. Aenean ultricies, nunc et tristique faucibus, justo arcu facilisis mi, vel fringilla massa augue ac augue.
-                      </p>
-                      <p
-                        ref={rightParaRef}
-                        className="font-lincolnmitre text-orange-200/90 text-justify"
-                        style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontRight}px`, lineHeight: 1.25 }}
-                      >
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus bibendum, neque sed placerat efficitur, purus felis imperdiet erat, non facilisis velit lorem sed arcu. Etiam et nulla id mauris porta tempor. Curabitur at vulputate justo. In hac habitasse platea dictumst. Integer rhoncus efficitur risus, at laoreet libero fermentum non. Sed feugiat risus at urna consectetur, at pulvinar orci aliquet. Nullam non lectus ultrices, ullamcorper ligula ac, faucibus nisl. Cras id lacinia arcu, vitae sodales justo. Nunc id venenatis neque, quis ultrices sem.
-                      </p>
-                    </div>
+                    isPortrait && !canShowBothPortrait ? (
+                      <div className="relative w-full h-full overflow-hidden">
+                        <motion.div
+                          className="flex"
+                          animate={{ x: -pageIndex * pageWidth }}
+                          transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+                          style={{ width: `${2 * pageWidth}px` }}
+                        >
+                          <div style={{ width: `${pageWidth}px`, paddingRight: '1rem' }}>
+                            <p
+                              ref={leftParaRef}
+                              className="font-lincolnmitre text-orange-200/90 text-justify"
+                              style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
+                            >
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia, nunc a dapibus scelerisque, lectus turpis malesuada risus, at tristique quam tellus at mauris. Integer congue ultrices massa, nec mattis ante. Suspendisse potenti. Donec venenatis, augue quis luctus malesuada, turpis ante pellentesque nisl, a cursus arcu turpis nec nibh. Sed quis mi in ipsum varius vulputate. Integer euismod, urna et ultricies sagittis, orci nisl tristique tellus, vitae dapibus lorem elit vitae sem. Duis nec nulla et arcu commodo euismod. Aenean ultricies, nunc et tristique faucibus, justo arcu facilisis mi, vel fringilla massa augue ac augue.
+                            </p>
+                          </div>
+                          <div style={{ width: `${pageWidth}px`, paddingLeft: '1rem' }}>
+                            <p
+                              ref={rightParaRef}
+                              className="font-lincolnmitre text-orange-200/90 text-justify"
+                              style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontRight}px`, lineHeight: 1.25 }}
+                            >
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus bibendum, neque sed placerat efficitur, purus felis imperdiet erat, non facilisis velit lorem sed arcu. Etiam et nulla id mauris porta tempor. Curabitur at vulputate justo. In hac habitasse platea dictumst. Integer rhoncus efficitur risus, at laoreet libero fermentum non. Sed feugiat risus at urna consectetur, at pulvinar orci aliquet. Nullam non lectus ultrices, ullamcorper ligula ac, faucibus nisl. Cras id lacinia arcu, vitae sodales justo. Nunc id venenatis neque, quis ultrices sem.
+                            </p>
+                          </div>
+                        </motion.div>
+                      </div>
+                    ) : (
+                      <div className="grid" style={{ gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
+                        <p
+                          ref={leftParaRef}
+                          className="font-lincolnmitre text-orange-200/90 text-justify"
+                          style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
+                        >
+                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia, nunc a dapibus scelerisque, lectus turpis malesuada risus, at tristique quam tellus at mauris. Integer congue ultrices massa, nec mattis ante. Suspendisse potenti. Donec venenatis, augue quis luctus malesuada, turpis ante pellentesque nisl, a cursus arcu turpis nec nibh. Sed quis mi in ipsum varius vulputate. Integer euismod, urna et ultricies sagittis, orci nisl tristique tellus, vitae dapibus lorem elit vitae sem. Duis nec nulla et arcu commodo euismod. Aenean ultricies, nunc et tristique faucibus, justo arcu facilisis mi, vel fringilla massa augue ac augue.
+                        </p>
+                        <p
+                          ref={rightParaRef}
+                          className="font-lincolnmitre text-orange-200/90 text-justify"
+                          style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontRight}px`, lineHeight: 1.25 }}
+                        >
+                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus bibendum, neque sed placerat efficitur, purus felis imperdiet erat, non facilisis velit lorem sed arcu. Etiam et nulla id mauris porta tempor. Curabitur at vulputate justo. In hac habitasse platea dictumst. Integer rhoncus efficitur risus, at laoreet libero fermentum non. Sed feugiat risus at urna consectetur, at pulvinar orci aliquet. Nullam non lectus ultrices, ullamcorper ligula ac, faucibus nisl. Cras id lacinia arcu, vitae sodales justo. Nunc id venenatis neque, quis ultrices sem.
+                        </p>
+                      </div>
+                    )
                   )}
                 </div>
               )}
