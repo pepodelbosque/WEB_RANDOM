@@ -37,6 +37,8 @@ const ServicesSection: React.FC = () => {
   const pauseMsRef = useRef(3000); // pausa automática 3s tras interacción
   const maxTranslateRef = useRef(0);
   const [layoutVersion, setLayoutVersion] = useState(0);
+  const [isPortraitLike, setIsPortraitLike] = useState(false);
+  const resumeTimerRef = useRef<number | null>(null);
 
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
@@ -431,6 +433,51 @@ const ServicesSection: React.FC = () => {
       mo.disconnect();
     };
   }, [language]);
+
+  // Detectar formato móvil/vertical
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)');
+    const update = () => {
+      const w = window.innerWidth || 0;
+      setIsPortraitLike(mq.matches || w < 768);
+    };
+    update();
+    mq.addEventListener?.('change', update as any);
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    return () => {
+      mq.removeEventListener?.('change', update as any);
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+    };
+  }, []);
+
+  // En móviles/vertical: pausar autoscroll en actividad y reactivar tras 2s de inactividad
+  useEffect(() => {
+    if (!isPortraitLike) return;
+    pauseMsRef.current = 2000;
+    const onActivity = () => {
+      autoPausedUntilRef.current = Date.now() + 2000;
+      carouselRef.current?.classList.add('paused');
+      if (resumeTimerRef.current != null) { window.clearTimeout(resumeTimerRef.current); resumeTimerRef.current = null; }
+      resumeTimerRef.current = window.setTimeout(() => {
+        carouselRef.current?.classList.remove('paused');
+      }, 2000);
+    };
+    window.addEventListener('wheel', onActivity as any, { passive: true } as any);
+    window.addEventListener('touchstart', onActivity as any, { passive: true } as any);
+    window.addEventListener('touchmove', onActivity as any, { passive: true } as any);
+    window.addEventListener('scroll', onActivity as any, { passive: true } as any);
+    window.addEventListener('pointerdown', onActivity as any, { passive: true } as any);
+    return () => {
+      window.removeEventListener('wheel', onActivity as any);
+      window.removeEventListener('touchstart', onActivity as any);
+      window.removeEventListener('touchmove', onActivity as any);
+      window.removeEventListener('scroll', onActivity as any);
+      window.removeEventListener('pointerdown', onActivity as any);
+      if (resumeTimerRef.current != null) { window.clearTimeout(resumeTimerRef.current); resumeTimerRef.current = null; }
+    };
+  }, [isPortraitLike]);
 
   // Aplicar transformación cuando cambie el índice o métricas
   useEffect(() => {
