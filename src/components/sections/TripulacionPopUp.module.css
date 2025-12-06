@@ -13,7 +13,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9); /* fondo negro al 90% */
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.9));
   opacity: 0; /* inicia transparente */
   transition: opacity 300ms ease-in-out; /* transición suave */
   will-change: opacity;
@@ -66,7 +66,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border: 2px solid rgba(255, 0, 0, 0.5);
+  border: 2px solid var(--frame-border-color, rgba(255, 0, 0, 0.5));
   transform: scale(0);
   -webkit-transform: scale(0);
   transform-origin: center;
@@ -96,9 +96,9 @@
   pointer-events: none;
   opacity: var(--popup-noise-opacity, 0.35);
   background:
-    repeating-linear-gradient(0deg, rgba(255,0,0,0.18) 0 1px, rgba(255,0,0,0) 1px 2px),
-    repeating-linear-gradient(90deg, rgba(255,0,0,0.16) 0 1px, rgba(255,0,0,0) 1px 3px),
-    radial-gradient(rgba(255,0,0,0.12) 0.5px, transparent 0.8px);
+    repeating-linear-gradient(0deg, rgba(var(--accent-r,255), var(--accent-g,0), var(--accent-b,0), 0.18) 0 1px, rgba(var(--accent-r,255), var(--accent-g,0), var(--accent-b,0), 0) 1px 2px),
+    repeating-linear-gradient(90deg, rgba(var(--accent-r,255), var(--accent-g,0), var(--accent-b,0), 0.16) 0 1px, rgba(var(--accent-r,255), var(--accent-g,0), var(--accent-b,0), 0) 1px 3px),
+    radial-gradient(rgba(var(--accent-r,255), var(--accent-g,0), var(--accent-b,0), 0.12) 0.5px, transparent 0.8px);
   background-blend-mode: screen;
   /* Solo mostrar el ring del borde */
   -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);

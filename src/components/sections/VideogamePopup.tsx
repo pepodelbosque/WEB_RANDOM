@@ -8,11 +8,12 @@ interface VideogamePopupProps {
   onClose: () => void;
   minimal?: boolean;
   title?: string;
+  theme?: 'black' | 'red';
 }
 
 // 3D viewer removed per request
 
-const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, minimal = false, title }) => {
+const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, minimal = false, title, theme = 'red' }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [overlayActive, setOverlayActive] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
@@ -26,7 +27,8 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
   const [fontRight, setFontRight] = useState<number>(16);
   const [pageIndex, setPageIndex] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(0);
-  const [mode, setMode] = useState<'qr' | 'game' | 'honorem'>('game');
+  const [mode, setMode] = useState<'qr' | 'game' | 'honorem'>('qr');
+  const activePulse = { scale: [1, 1.06, 1], transition: { duration: 1.2, repeat: Infinity, repeatType: 'reverse' } } as any;
   const [headerTopPx, setHeaderTopPx] = useState<number | undefined>(undefined);
   const touchStartX = useRef<number>(0);
   const touchEndX = useRef<number>(0);
@@ -180,6 +182,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.9, ease: 'easeInOut' }}
+          style={theme === 'black' ? ({ ['--overlay-bg' as any]: 'rgba(0,0,0,0.92)' } as React.CSSProperties) : undefined}
         >
           {!isPortrait && (
             <div
@@ -206,6 +209,9 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                 maxHeight: (isCompact || isPortrait) ? '90vh' : '75vh',
                 marginTop: (isCompact || isPortrait) ? '5vh' : undefined,
                 marginBottom: (isCompact || isPortrait) ? '5vh' : undefined,
+                ...(theme === 'black'
+                  ? ({ ['--frame-border-color' as any]: 'rgba(255,255,255,0.35)', ['--accent-r' as any]: 255, ['--accent-g' as any]: 255, ['--accent-b' as any]: 255, ['--popup-noise-opacity' as any]: 0.25 } as React.CSSProperties)
+                  : ({ ['--frame-border-color' as any]: 'rgba(255,0,0,0.5)', ['--accent-r' as any]: 255, ['--accent-g' as any]: 0, ['--accent-b' as any]: 0, ['--popup-noise-opacity' as any]: 0.35 } as React.CSSProperties)),
               }}
               ref={frameRef}
             >
@@ -216,7 +222,8 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setMode('qr'); setPageIndex(0); }}
                   className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'qr' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
-                  style={{ borderColor: 'rgba(255,0,0,0.5)' }}
+                  style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'qr' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'qr' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
+                  animate={mode === 'qr' ? activePulse : undefined}
                   aria-label="CODIGO QR"
                 >
                   CODIGO QR
@@ -226,7 +233,8 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setMode('game'); setPageIndex(0); }}
                   className={`w-24 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'game' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
-                  style={{ borderColor: 'rgba(255,0,0,0.5)' }}
+                  style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'game' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'game' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
+                  animate={mode === 'game' ? activePulse : undefined}
                   aria-label="VIDEO GAME"
                 >
                   VIDEO GAME
@@ -236,7 +244,8 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setMode('honorem'); setPageIndex(0); }}
                   className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'honorem' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
-                  style={{ borderColor: 'rgba(255,0,0,0.5)' }}
+                  style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'honorem' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'honorem' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
+                  animate={mode === 'honorem' ? activePulse : undefined}
                   aria-label="HONOREM"
                 >
                   HONOREM

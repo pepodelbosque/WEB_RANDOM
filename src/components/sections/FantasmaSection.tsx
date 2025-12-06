@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -6,6 +6,8 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import FantasmaPopup1 from './FantasmaPopup1';
+import FantasmaPopup2 from './FantasmaPopup2';
 
 const FantasmaSection: React.FC = () => {
   const { language } = useLanguage();
@@ -17,6 +19,8 @@ const FantasmaSection: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const revealTLRef = useRef<gsap.core.Timeline | null>(null);
   const revealStateRef = useRef<{ p: number }>({ p: 0 });
+  const [popup1Open, setPopup1Open] = useState(false);
+  const [popup2Open, setPopup2Open] = useState(false);
   const handleRef = (el: HTMLElement | null) => {
     ref(el);
     sectionRef.current = el;
@@ -394,6 +398,7 @@ const FantasmaSection: React.FC = () => {
               transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.25 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
               className={`group relative aspect-[16/9] w-[79%] md:w-[69%] mx-auto md:mx-0 mt-0 rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-700 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
+              onClick={() => { index === 0 ? setPopup1Open(true) : setPopup2Open(true); }}
             >
               {/* Background image fills square */}
               <motion.img
@@ -436,6 +441,17 @@ const FantasmaSection: React.FC = () => {
           </div>
         </motion.div
         >
+
+        <FantasmaPopup1
+          isVisible={popup1Open}
+          onClose={() => setPopup1Open(false)}
+          title={language === 'es' ? 'Paisaje' : 'Landscape'}
+        />
+        <FantasmaPopup2
+          isVisible={popup2Open}
+          onClose={() => setPopup2Open(false)}
+          title={language === 'es' ? 'videogame' : 'videogame'}
+        />
       </div>
     </section>
   );

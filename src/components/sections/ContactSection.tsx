@@ -18,9 +18,15 @@ const ContactSection: React.FC = () => {
     threshold: 0.3,
     triggerOnce: false,
   });
+  const [overlayObserveRef, overlayInView] = useInView({
+    threshold: 0.2,
+    triggerOnce: false,
+  });
   const sectionRef = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [birdProgress, setBirdProgress] = useState(0);
   const [birdAutoPlay, setBirdAutoPlay] = useState(false);
   const handleRef = (el: HTMLElement | null) => {
@@ -241,6 +247,20 @@ const ContactSection: React.FC = () => {
     };
   }, [language]);
 
+  useEffect(() => {
+    const updateOrientation = () => {
+      const mp = window.matchMedia('(orientation: portrait)');
+      setIsPortrait(mp.matches);
+    };
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', updateOrientation);
+    return () => {
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, []);
+
   // Scramble reveal en el párrafo de "Conectemos" reactivo al clic
   const handleIntroClick = () => {
     const el = introRef.current;
@@ -348,6 +368,34 @@ const ContactSection: React.FC = () => {
   return (
   <section id="contact" ref={handleRef} className="pt-0 pb-0 relative mb-0 -mt-12 md:-mt-16 scroll-mt-24 md:scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          ref={(node) => { contentRef.current = node; overlayObserveRef(node); }}
+          className="relative"
+          style={
+            isPortrait
+              ? undefined
+              : ({
+                  ['--contact-frame-left' as any]: '20%',
+                  ['--contact-frame-right' as any]: '20%',
+                  ['--contact-frame-top' as any]: 'clamp(4px, 1vw, 12px)',
+                  ['--contact-frame-bottom' as any]: 'clamp(4px, 1vw, 12px)',
+                  marginLeft: 'var(--contact-frame-left)',
+                  marginRight: 'var(--contact-frame-right)',
+                  marginTop: 'var(--contact-frame-top)',
+                  marginBottom: 'var(--contact-frame-bottom)',
+                } as React.CSSProperties)
+          }
+        >
+          {!isPortrait && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={overlayInView ? { opacity: 1, scale: 1, boxShadow: '0 0 18px rgba(165,0,0,0.35)', scaleY: 1.1, y: '-10%' } : { opacity: 0, scale: 0.94, boxShadow: '0 0 0 rgba(165,0,0,0)', y: '-10%' }}
+              transition={{ duration: 1.8, ease: 'easeInOut' }}
+              className="pointer-events-none"
+              style={{ position: 'absolute', top: 'var(--contact-frame-top)', bottom: 'var(--contact-frame-bottom)', left: '5%', right: '5%', border: '2px solid rgba(165,0,0,0.7)', zIndex: 5, transformOrigin: 'center' }}
+            />
+          )}
+          <div className="contact-inner" style={isPortrait ? undefined : ({ paddingLeft: '12%', paddingRight: '12%' } as React.CSSProperties)}>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: -100 }}
@@ -362,7 +410,7 @@ const ContactSection: React.FC = () => {
             {t(language, 'contact.title')}
           </h2>
           <div className="split-container">
-            <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 max-w-3xl mx-auto leading-[1.3] text-center">
+            <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 leading-[1.3] text-center" style={{ maxWidth: '100%', hyphens: 'auto', wordBreak: 'break-word', whiteSpace: 'normal' }}>
              {t(language, 'contact.description')}
             </p>
           </div>
@@ -433,7 +481,7 @@ const ContactSection: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-10 max-w-2xl mx-auto text-center"
+          className="mt-10 text-center"
         >
           <p
             ref={(node) => {
@@ -442,6 +490,7 @@ const ContactSection: React.FC = () => {
             }}
             onClick={handleIntroClick}
             className="text-orange-600 dark:text-gray-300 font-lincolnmitre leading-[1.1] cursor-pointer"
+            style={{ maxWidth: '100%', hyphens: 'auto', wordBreak: 'break-word', whiteSpace: 'normal' }}
           >
             {t(language, 'contact.intro')}
           </p>
@@ -454,8 +503,10 @@ const ContactSection: React.FC = () => {
           aria-label="Activar conversión de texto en Conectemos"
         >
           <MirloStrip progress={birdProgress} autoPlay={birdAutoPlay} />
+          </div>
         </div>
         {/* Bloque de "Visítanos" con íconos eliminado; los íconos se subieron arriba */}
+        </div>
       </div>
     </section>
   );
