@@ -169,12 +169,12 @@ export const translations = {
         inebitable: {
           name: 'INEBITABLE',
           role: 'Memento Mori',
-          bio: 'Investiga y articula los minutos de tu vida.',
+          bio: 'Investiga y articula los minutos y sus momentos.',
         },
         controlito: {
           name: 'CONTROLITO',
           role: 'Constante Candidato',
-          bio: 'Con el voto de confianza hace magia y desaparece.',
+          bio: 'Al primer voto de confianza desaparece.',
         },
         // Skills translations
         arte: 'Arte',
@@ -417,12 +417,12 @@ export const translations = {
         inebitable: {
           name: 'INEBITABLE',
           role: 'Memento Mori',
-          bio: 'Investiga y articula los minutos de tu vida.',
+          bio: 'Investiga y articula los minutos y sus momentos.',
         },
         controlito: {
           name: 'CONTROLITO',
           role: 'Constante Candidato',
-          bio: 'Con el voto de confianza hace magia y desaparece.',
+          bio: 'Al primer voto de confianza desaparece.',
         },
         // Skills translations
         arte: 'Arte',
