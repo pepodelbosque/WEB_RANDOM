@@ -384,7 +384,8 @@ const ServicesSection: React.FC = () => {
       card.addEventListener('mouseenter', onCardEnter);
       card.addEventListener('mouseleave', onCardLeave);
       card.addEventListener('touchstart', onCardEnter, { passive: true } as any);
-      card.addEventListener('touchend', onCardLeave);
+      card.addEventListener('touchmove', onCardEnter as any, { passive: true } as any);
+      card.addEventListener('touchend', onCardLeave as any, { passive: true } as any);
     });
 
     // Recalcular en resize
@@ -424,7 +425,8 @@ const ServicesSection: React.FC = () => {
         card.removeEventListener('mouseenter', onCardEnter);
         card.removeEventListener('mouseleave', onCardLeave);
         card.removeEventListener('touchstart', onCardEnter as any);
-        card.removeEventListener('touchend', onCardLeave);
+        card.removeEventListener('touchmove', onCardEnter as any);
+        card.removeEventListener('touchend', onCardLeave as any);
       });
       mo.disconnect();
     };

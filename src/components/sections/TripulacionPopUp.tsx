@@ -194,6 +194,7 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
       {isVisible && (
         <motion.div
           className={`${styles.overlay} fixed inset-0 z-50 flex flex-col items-center justify-center p-2 md:p-4 ${overlayActive ? styles.overlayVisible : ''}`}
+          style={{ touchAction: 'none', overscrollBehavior: 'contain' } as any}
           onWheel={handleWheel}
           onKeyDown={handleKeyDown}
           tabIndex={0}

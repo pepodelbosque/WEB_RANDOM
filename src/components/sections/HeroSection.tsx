@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../hooks/useLanguage';
 import { t } from '../../utils/translations';
@@ -10,6 +10,7 @@ const HeroSection: React.FC = () => {
   const subtitleRef = useRef<HTMLParagraphElement | null>(null);
   const sectionRef = useRef<HTMLElement | null>(null);
   const tickRef = useRef<number | null>(null);
+  const [isPortraitLike, setIsPortraitLike] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -137,8 +138,25 @@ const HeroSection: React.FC = () => {
     };
   }, [language]);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)');
+    const update = () => {
+      const w = window.innerWidth || 0;
+      setIsPortraitLike(mq.matches || w < 768);
+    };
+    update();
+    mq.addEventListener?.('change', update as any);
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    return () => {
+      mq.removeEventListener?.('change', update as any);
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+    };
+  }, []);
+
   return (
-    <section ref={sectionRef} id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden mb-24 md:mb-32">
+    <section ref={sectionRef} id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden mb-24 md:mb-32" style={isPortraitLike ? { transform: 'translateY(-5vh)' } : undefined}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Main Content */}
         <motion.div

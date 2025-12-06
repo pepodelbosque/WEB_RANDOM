@@ -92,6 +92,12 @@ export const useLenis = () => {
     };
 
     let snapTimer: number | null = null;
+    const isCoarsePointer = typeof window !== 'undefined' && (window.matchMedia?.('(pointer: coarse)').matches ?? false);
+    let touchActive = false;
+    let lastTouchEndAt = 0;
+    const TOUCH_GRACE_MS = 320;
+    window.addEventListener('touchstart', () => { touchActive = true; }, { passive: true } as any);
+    window.addEventListener('touchend', () => { touchActive = false; lastTouchEndAt = Date.now(); }, { passive: true } as any);
     const clearSnapTimer = () => { if (snapTimer !== null) { clearTimeout(snapTimer); snapTimer = null; } };
     const nearestSection = (y: number) => {
       let nearest: SectionBounds | null = null;
@@ -106,7 +112,9 @@ export const useLenis = () => {
       updateSpeedForScroll(e.scroll);
       clearSnapTimer();
       const v = Math.abs(e.velocity ?? 0);
-      if (v < 0.08 && !e.animated) {
+      const withinTouchGrace = touchActive || (Date.now() - lastTouchEndAt < TOUCH_GRACE_MS);
+      const allowSnap = !(isCoarsePointer && withinTouchGrace);
+      if (allowSnap && v < 0.08 && !e.animated) {
         snapTimer = window.setTimeout(() => {
           const target = nearestSection(e.scroll);
           if (!target) return;
