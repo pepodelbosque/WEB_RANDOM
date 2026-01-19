@@ -275,7 +275,13 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                   </p>
                 </div>
               ) : (
-                <div className="mx-auto px-6 md:px-8 py-6 md:py-8" style={{ maxWidth: isCompact ? '95%' : '85%' }}>
+                <div 
+                  className={`mx-auto ${mode === 'qr' && isPortrait ? 'w-full h-full flex flex-col justify-center' : 'px-6 md:px-8 py-6 md:py-8'}`} 
+                  style={{ 
+                     maxWidth: (mode === 'qr' && isPortrait) ? '100%' : (isCompact ? '95%' : '85%'),
+                     paddingBottom: (mode === 'qr' && isPortrait) ? '3rem' : undefined
+                   }}
+                 >
                   {mode === 'qr' ? (
                     isPortrait && !canShowBothPortrait ? (
                       <div className="relative w-full h-full overflow-hidden">
@@ -283,12 +289,12 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                           className="flex"
                           animate={{ x: -pageIndex * pageWidth }}
                           transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-                          style={{ width: `${2 * pageWidth}px` }}
+                          style={{ width: `${2 * pageWidth}px`, height: '100%' }}
                         >
-                          <div style={{ width: `${pageWidth}px`, paddingRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: `${pageWidth}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=Proyecto%20RANDOM&color=ff0000&bgcolor=000000`} alt="Código QR" style={{ width: '220px', height: '220px' }} />
                           </div>
-                          <div style={{ width: `${pageWidth}px`, paddingLeft: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ width: `${pageWidth}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <img src="/images/Instalacion_Buena.jpg" alt="Imagen" style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }} />
                           </div>
                         </motion.div>
