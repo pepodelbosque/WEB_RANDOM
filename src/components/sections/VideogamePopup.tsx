@@ -50,6 +50,94 @@ const ScrambleText = ({ text, className, delay = 0, as: Tag = 'p' }: { text: str
   return <Tag ref={ref} className={className} style={{ whiteSpace: 'pre-line' }}>{text}</Tag>;
 };
 
+const MacImageSlideshow = () => {
+  const images = [
+    "/images/mac_GAME11.png",
+    "/images/macGame2.png",
+    "/images/mac_game1.png"
+  ];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={images[index]}
+          src={images[index]}
+          alt={`MAC GAME ${index + 1}`}
+          className="max-w-[90%] max-h-[90%] object-contain opacity-90"
+          initial={{ opacity: 0, filter: "brightness(1.2) contrast(1.1)" }}
+          animate={{ 
+            opacity: [0, 1, 0.8, 0.9],
+            filter: ["brightness(1.5) contrast(1.2)", "brightness(0.9)", "brightness(1) contrast(1)"]
+          }}
+          exit={{ 
+            opacity: 0,
+            filter: ["brightness(1)", "brightness(2)", "brightness(0)"]
+          }}
+          transition={{ 
+            duration: 0.2,
+            times: [0, 0.4, 0.8, 1],
+            ease: "linear"
+          }}
+        />
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const ScrambleElement = ({ children, className, delay = 0, repeatInterval, size = '2rem' }: { children: React.ReactNode, className?: string, delay?: number, repeatInterval?: number, size?: string | number }) => {
+  const [showContent, setShowContent] = React.useState(true);
+  const ref = React.useRef<HTMLSpanElement>(null);
+
+  React.useEffect(() => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    let interval: any;
+    let loopTimer: any;
+
+    const playAnimation = () => {
+      setShowContent(false);
+      let frames = 0;
+      interval = setInterval(() => {
+        if (ref.current) {
+          ref.current.innerText = chars[Math.floor(Math.random() * chars.length)];
+        }
+        frames++;
+        if (frames > 15) { // ~450ms duration
+          clearInterval(interval);
+          setShowContent(true);
+        }
+      }, 30);
+    };
+
+    const startTimer = setTimeout(() => {
+      playAnimation();
+      if (repeatInterval) {
+        loopTimer = setInterval(playAnimation, repeatInterval);
+      }
+    }, delay);
+
+    return () => {
+      clearTimeout(startTimer);
+      clearInterval(interval);
+      if (loopTimer) clearInterval(loopTimer);
+    };
+  }, [delay, repeatInterval]);
+
+  return showContent ? (
+    <>{children}</>
+  ) : (
+    <span ref={ref} className={className} style={{ display: 'inline-block', textAlign: 'center', width: size, height: size, lineHeight: size, overflow: 'hidden', verticalAlign: 'middle' }}></span>
+  );
+};
+
 const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, minimal = false, title, theme = 'red' }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [overlayActive, setOverlayActive] = useState(false);
@@ -261,6 +349,11 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
     };
   }, [isPortrait]);
 
+  // Ensure we always start on the first page/column when mode changes or popup opens
+  useEffect(() => {
+    setPageIndex(0);
+  }, [mode, isVisible]);
+
   const handleWheel = (e: React.WheelEvent) => {
     if (!isPortrait) return;
     const maxPage = (mode === 'qr' || mode === 'random' || mode === 'random2' || mode === 'promo') ? 1 : 2;
@@ -413,9 +506,9 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'random' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
                       style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'random' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'random' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
                       animate={mode === 'random' ? activePulse : undefined}
-                      aria-label="random"
+                      aria-label="VIDEOS 1.0"
                     >
-                      random
+                      VIDEOS 1.0
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05, rotateZ: 2 }}
@@ -424,9 +517,9 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       className={`w-24 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'random2' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
                       style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'random2' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'random2' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
                       animate={mode === 'random2' ? activePulse : undefined}
-                      aria-label="random 2.0"
+                      aria-label="VIDEOS 2.0"
                     >
-                      random 2.0
+                      VIDEOS 2.0
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05, rotateZ: 2 }}
@@ -435,9 +528,9 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'promo' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
                       style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'promo' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'promo' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
                       animate={mode === 'promo' ? activePulse : undefined}
-                      aria-label="Promo"
+                      aria-label="PROMO"
                     >
-                      Promo
+                      PROMO
                     </motion.button>
                   </>
                 ) : (
@@ -729,26 +822,26 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                           style={{ width: '200%' }}
                         >
                           <div style={{ width: '50%', padding: '0 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            {mode !== 'random2' && (
+                            {(mode !== 'random2' || title === 'VIDEO INSTALACIÓN RANDOM 2.0') && (
                               <>
                                 <img 
-                                  src={mode === 'promo' ? "/images/FONDO2.jpg" : "/images/fondo_random1.jpg"}
+                                  src={mode === 'promo' ? "/images/FONDO2.jpg" : (mode === 'random2' ? "/images/MAC1.png" : (title === 'VIDEOS RANDOM' ? "/images/fondo_random1.jpg" : "/images/CEINAA1.png"))}
                                   alt="Fondo Random" 
-                                  className="w-full h-auto max-w-[75%] max-h-[75%] object-contain opacity-90 mb-4" 
+                                  className={`w-full h-auto max-w-[90%] ${title === 'VIDEOS RANDOM' ? 'max-h-[80%]' : 'max-h-[90%]'} object-contain opacity-90 mb-4`} 
                                 />
                                 <div className="text-center px-2 leading-tight">
                                   <ScrambleText 
-                                  text={`LA PRODUCCIÓN DEL IMAGINARIO\nCOMIENZA DURANTE LA PANDEMIA 2020`}
-                                  className={`font-lincolnmitre text-red-500 text-[10px] leading-tight tracking-normal ${styles.orangePulse}`} 
+                                  text={mode === 'promo' ? `LA PRODUCCIÓN DE RANDOM 2.0\nCOMIENZA INICIOS DEL 2025` : (mode === 'random2' ? `VIDEO INSTALACIÓN EN MAC\nFORESTAL 2025 (3 MESES)` : (title === 'VIDEOS RANDOM' ? `LA PRODUCCIÓN DEL IMAGINARIO\nCOMIENZA DURANTE LA PANDEMIA 2020` : `VIDEO INSTALACION EN CEINA 2022 (3 MESES)`))}
+                                  className={`font-lincolnmitre text-red-500 ${title === 'VIDEOS RANDOM' ? 'text-[9px]' : 'text-[10px]'} leading-tight tracking-normal ${styles.orangePulse}`} 
                                   delay={200} 
                                 />
                                 </div>
                               </>
                             )}
-                            {mode === 'random2' && (
-                              <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[12.35px] md:text-[14.25px] -mt-[20px]" style={{ lineHeight: 1.25 }}>
+                            {(mode === 'random2' && title !== 'VIDEO INSTALACIÓN RANDOM 2.0') && (
+                              <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[12.35px] md:text-[14.25px]" style={{ lineHeight: 1.25 }}>
                                 <ScrambleText 
-                                  text="SEIS PERSONAJES"
+                                  text="SEIS PERSONAJES 2025"
                                   className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
                                   delay={200} 
                                 />
@@ -758,30 +851,111 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                                   delay={400} 
                                 />
                                 <div className="flex items-center gap-4 mb-4">
-                                <img src="/images/kate1.jpg" alt="Kate" className="h-[3.8rem] w-auto opacity-90 object-contain" />
-                                <div>
-                                  <span className="text-red-500 font-bold block">Kate – Animacion UE5</span>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
+                                  <img src="/images/kate1.jpg" alt="Kate" className="h-[3.8rem] w-auto opacity-90 object-contain" />
+                                  <div>
+                                    <span className="text-red-500 font-bold block">Kate - Anim UE5(1-2MINS)</span>
+                                    <motion.a 
+                                      href="https://youtu.be/E4AzwuhNcJI" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Performance musical
+                                    </motion.a><br/>
+                                    <motion.a 
+                                      href="https://youtu.be/HMoeyIKjsJA" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Entrevista real
+                                    </motion.a>
+                                  </div>
                                 </div>
-                              </div>
 
                                 <div className="flex items-center gap-4 mb-4">
                                   <img src="/images/cami1.jpg" alt="Camila" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                   <div>
-                                    <span className="text-red-500 font-bold block">Camila – Animacion UE5</span>
-                                    1 min. Performance musical<br/>
-                                    2 mins. Entrevista real
+                                    <span className="text-red-500 font-bold block">Camila - Anim UE5(1-2MINS)</span>
+                                    <motion.a 
+                                      href="https://youtu.be/wJ4K8c4fvB0" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Performance musical
+                                    </motion.a><br/>
+                                    <motion.a 
+                                      href="https://youtu.be/9bye_8dSZPE" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Entrevista real
+                                    </motion.a>
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 mb-4">
+                                <div className="flex items-center gap-4 mb-4 relative">
                                   <img src="/images/edu1.jpg" alt="Eduardo" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                   <div>
-                                    <span className="text-red-500 font-bold block">Eduardo – Animacion UE5</span>
-                                    1 min. Performance musical<br/>
-                                    2 mins. Entrevista real
+                                    <span className="text-red-500 font-bold block">EDU - Anim UE5(1-2MINS)</span>
+                                    <motion.a 
+                                      href="https://youtu.be/oJS5yKgTn6I" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Performance musical
+                                    </motion.a><br/>
+                                    <motion.a 
+                                      href="https://youtu.be/8LgXcLD3bsY" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Entrevista real
+                                    </motion.a>
                                   </div>
+                                </div>
+
+                                <div className={`w-full flex justify-center -mt-5 ${styles.orangePulse}`}>
+                                  <ScrambleElement delay={600} repeatInterval={4000} size="1.25rem" className="font-lincolnmitre text-2xl">
+                                    <svg 
+                                      xmlns="http://www.w3.org/2000/svg" 
+                                      fill="none" 
+                                      viewBox="0 0 24 24" 
+                                      strokeWidth={2} 
+                                      stroke="currentColor" 
+                                      className="w-5 h-5"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0 4" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                    </svg>
+                                  </ScrambleElement>
                                 </div>
                               </div>
                             )}
@@ -789,68 +963,170 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                           <div style={{ width: '50%', padding: '0 1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[12.35px] md:text-[14.25px]" style={{ lineHeight: 1.25 }}>
                               {mode !== 'random2' ? (
-                                <>
-                                  <div className="flex items-center gap-4 mb-4">
-                                    <img src="/images/covid3.jpg" alt="COVID" className="h-[3.8rem] w-auto opacity-90 object-contain" />
-                                    <div>
-                                      <a href="https://youtu.be/JtRa59EP3EM" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Invitación RANDOM 2020</a>
-                                      * Machinima 60 segs.
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-4 mb-4">
-                                    <img src={mode === 'promo' ? "/images/Controli.jpg" : "/images/edu22.jpg"} alt="Eduardo" className="h-[3.8rem] w-auto opacity-90 object-contain" />
-                                    <div>
-                                      <span className="text-red-500 font-bold block">
-                                        {mode === 'promo' ? "INVITACION RANDOM 2.0" : "EDUARDO - MACHINIMAS"}
-                                      </span>
-                                      {mode === 'promo' ? (
-                                        <>* ANIMACIÓN UE5 60 SEGS.</>
-                                      ) : (
-                                        <>
-                                          8 mins. pantalla soñador<br/>
-                                          8 mins. pantalla pajaro
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-4 mb-4">
-                                    <img src={mode === 'promo' ? "/images/death1.jpg" : "/images/cami2.jpg"} alt="Camila" className="h-[3.8rem] w-auto opacity-90 object-contain" />
-                                    <div>
-                                      <span className="text-red-500 font-bold block">
-                                        {mode === 'promo' ? "PAJARO VIDEO INSTALACIÓN" : "CAMILA - MACHINIMAS"}
-                                      </span>
-                                      {mode === 'promo' ? (
-                                        <>* ANIMACION UE5 8 MINS.</>
-                                      ) : (
-                                        <>
-                                          8 mins. pantalla soñadora<br/>
-                                          8 mins. pantalla pajaro
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {mode !== 'promo' && (
-                                    <div className="flex items-center gap-4 mb-4">
-                                      <img src="/images/kate22.jpg" alt="Kate" className="h-[3.8rem] w-auto opacity-90 object-contain" />
+                                (mode === 'promo' || title !== 'VIDEO INSTALACIÓN RANDOM 2.0') && (
+                                  <>
+                                    <div className="flex items-center gap-4 mb-3">
+                                      <img src="/images/covid3.jpg" alt="COVID" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                       <div>
-                                        <span className="text-red-500 font-bold block">
-                                          Kate - Machinimas
-                                        </span>
-                                        <>
-                                          8 mins. pantalla soñadora<br/>
-                                          8 mins. pantalla pajaro
-                                        </>
+                                        <span className="text-red-500 font-bold block">Invitación RANDOM 2020</span>
+                                        <motion.a 
+                                          href="https://youtu.be/JtRa59EP3EM" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          * Machinima 60 segs.
+                                        </motion.a>
                                       </div>
                                     </div>
-                                  )}
-                                </>
+
+                                    <div className="flex items-center gap-4 mb-3">
+                                      <img src={mode === 'promo' ? "/images/Controli.jpg" : "/images/edu22.jpg"} alt="Eduardo" className="h-[3.8rem] w-auto opacity-90 object-contain" />
+                                      <div>
+                                        <span className="text-red-500 font-bold block">
+                                          {mode === 'promo' ? "INVITACION RANDOM 2.0" : "EDU - MACHINIMAS (8mins)"}
+                                        </span>
+                                        {mode === 'promo' ? (
+                                          <motion.a 
+                                            href="https://youtu.be/KxjEt8ApZuw" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="cursor-pointer"
+                                            whileHover={{ 
+                                              color: ["#ef4444", "#ffff00", "#ef4444"],
+                                              transition: { duration: 0.2, repeat: Infinity }
+                                            }}
+                                          >
+                                            * ANIMACIÓN UE5 60 SEGS.
+                                          </motion.a>
+                                        ) : (
+                                          <>
+                                            <motion.a 
+                                              href="https://youtu.be/cjP86McO_i4" 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="cursor-pointer"
+                                              whileHover={{ 
+                                                color: ["#ef4444", "#ffff00", "#ef4444"],
+                                                transition: { duration: 0.2, repeat: Infinity }
+                                              }}
+                                            >
+                                              pantalla soñador
+                                            </motion.a><br/>
+                                            <motion.a 
+                                              href="https://youtu.be/DE-UgFRsSww" 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="cursor-pointer"
+                                              whileHover={{ 
+                                                color: ["#ef4444", "#ffff00", "#ef4444"],
+                                                transition: { duration: 0.2, repeat: Infinity }
+                                              }}
+                                            >
+                                              pantalla pajaro
+                                            </motion.a>
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 mb-3">
+                                      <img src={mode === 'promo' ? "/images/death1.jpg" : "/images/cami2.jpg"} alt="Camila" className="h-[3.8rem] w-auto opacity-90 object-contain" />
+                                      <div>
+                                        <span className="text-red-500 font-bold block">
+                                          {mode === 'promo' ? "PAJARO VIDEO INSTALACIÓN" : "CAMI - MACHINIMAS (8mins)"}
+                                        </span>
+                                        {mode === 'promo' ? (
+                                          <motion.a 
+                                            href="https://youtu.be/BjVqI0NZBoU" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="cursor-pointer"
+                                            whileHover={{ 
+                                              color: ["#ef4444", "#ffff00", "#ef4444"],
+                                              transition: { duration: 0.2, repeat: Infinity }
+                                            }}
+                                          >
+                                            * ANIMACION UE5 8 MINS.
+                                          </motion.a>
+                                        ) : (
+                                          <>
+                                            <motion.a 
+                                              href="https://youtu.be/3eW-dS2PuMI" 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="cursor-pointer"
+                                              whileHover={{ 
+                                                color: ["#ef4444", "#ffff00", "#ef4444"],
+                                                transition: { duration: 0.2, repeat: Infinity }
+                                              }}
+                                            >
+                                              pantalla soñadora
+                                            </motion.a><br/>
+                                            <motion.a 
+                                              href="https://youtu.be/kU6Hli2Ed3s" 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="cursor-pointer"
+                                              whileHover={{ 
+                                                color: ["#ef4444", "#ffff00", "#ef4444"],
+                                                transition: { duration: 0.2, repeat: Infinity }
+                                              }}
+                                            >
+                                              pantalla pajaro
+                                            </motion.a>
+                                          </>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {mode !== 'promo' && (
+                                      <div className="flex items-center gap-4 mb-3">
+                                        <img src="/images/kate22.jpg" alt="Kate" className="h-[3.8rem] w-auto opacity-90 object-contain" />
+                                        <div>
+                                          <span className="text-red-500 font-bold block">
+                                            KATE - MACHINIMAS (8mins)
+                                          </span>
+                                          <>
+                                            <motion.a 
+                                              href="https://youtu.be/6DlwEnoB5Bg" 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="cursor-pointer"
+                                              whileHover={{ 
+                                                color: ["#ef4444", "#ffff00", "#ef4444"],
+                                                transition: { duration: 0.2, repeat: Infinity }
+                                              }}
+                                            >
+                                              pantalla soñadora
+                                            </motion.a><br/>
+                                            <motion.a 
+                                              href="https://youtu.be/FLu9-ElNKBg" 
+                                              target="_blank" 
+                                              rel="noopener noreferrer" 
+                                              className="cursor-pointer"
+                                              whileHover={{ 
+                                                color: ["#ef4444", "#ffff00", "#ef4444"],
+                                                transition: { duration: 0.2, repeat: Infinity }
+                                              }}
+                                            >
+                                              pantalla pajaro
+                                            </motion.a>
+                                          </>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </>
+                                )
                               ) : (
+                                title !== 'VIDEO INSTALACIÓN RANDOM 2.0' ? (
                                 <div className="mt-[5px]">
                                   <ScrambleText 
-                                    text="SEIS PERSONAJES"
+                                    text="SEIS PERSONAJES 2025"
                                     className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
                                     delay={200} 
                                   />
@@ -862,30 +1138,114 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                                   <div className="flex items-center gap-4 mb-4">
                                     <img src="/images/pepo1.jpg" alt="Pepo" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                     <div>
-                                      <span className="text-red-500 font-bold block">Pepo – Animacion UE5</span>
-                                      1 min. Performance musical<br/>
-                                      2 mins. Entrevista real
+                                      <span className="text-red-500 font-bold block">Pepo - Anim UE5(1-2MINS)</span>
+                                      <motion.a 
+                                        href="https://youtu.be/7vnFs4LjnFA" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Performance musical
+                                      </motion.a><br/>
+                                      <motion.a 
+                                        href="https://youtu.be/8tIy1V8Fvnw" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Entrevista real
+                                      </motion.a>
                                     </div>
                                   </div>
 
                                   <div className="flex items-center gap-4 mb-4">
-                                    <img src="/images/brbr1.jpg" alt="Bárbara" className="h-[3.8rem] w-auto opacity-90 object-contain" />
-                                    <div>
-                                      <a href="https://youtu.be/bfmMWLYdPWU" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Bárbara – Animacion UE5</a>
-                                      1 min. Performance musical<br/>
-                                      2 mins. Entrevista real
+                                      <img src="/images/brbr1.jpg" alt="Bárbara" className="h-[3.8rem] w-auto opacity-90 object-contain" />
+                                      <div>
+                                        <span className="text-red-500 font-bold block">Bárbara - Anim UE5(1-2MINS)</span>
+                                        <motion.a 
+                                          href="https://youtu.be/W-_fscZRhjc" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          Performance musical
+                                        </motion.a><br/>
+                                        <motion.a 
+                                          href="https://youtu.be/bfmMWLYdPWU" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          Entrevista real
+                                        </motion.a>
+                                      </div>
                                     </div>
-                                  </div>
 
-                                  <div className="flex items-center gap-4 mb-4">
+                                  <div className="flex items-center gap-4 mb-4 relative">
                                     <img src="/images/seba2.jpg" alt="Sebastián" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                     <div>
-                                      <span className="text-red-500 font-bold block">Sebastián – Animacion UE5</span>
-                                      1 min. Performance musical<br/>
-                                      2 mins. Entrevista real
+                                      <span className="text-red-500 font-bold block">Seba - Anim UE5(1-2MINS)</span>
+                                      <motion.a 
+                                        href="https://youtu.be/qqHvMtDV-Iw" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Performance musical
+                                      </motion.a><br/>
+                                      <motion.a 
+                                        href="https://youtu.be/Jlwt9ipYPoY" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Entrevista real
+                                      </motion.a>
                                     </div>
                                   </div>
+
+                                  <div className={`w-full flex justify-center -mt-5 ${styles.orangePulse}`}>
+                                    <ScrambleElement delay={600} repeatInterval={4000} size="1.25rem" className="font-lincolnmitre text-2xl">
+                                      <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        fill="none" 
+                                        viewBox="0 0 24 24" 
+                                        strokeWidth={2} 
+                                        stroke="currentColor" 
+                                        className="w-5 h-5 rotate-180"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0 4" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                      </svg>
+                                    </ScrambleElement>
+                                  </div>
                                 </div>
+                                ) : (
+                                  <MacImageSlideshow />
+                                )
                               )}
                             </div>
                           </div>
@@ -894,26 +1254,26 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
                         <div className="w-full h-full flex flex-col items-center justify-center">
-                          {mode !== 'random2' && (
+                          {(mode !== 'random2' || title === 'VIDEO INSTALACIÓN RANDOM 2.0') && (
                             <>
                               <img 
-                                src={mode === 'promo' ? "/images/FONDO2.jpg" : "/images/fondo_random1.jpg"}
+                                src={mode === 'promo' ? "/images/FONDO2.jpg" : (mode === 'random2' ? "/images/MAC1.png" : (title === 'VIDEOS RANDOM' ? "/images/fondo_random1.jpg" : "/images/CEINAA1.png"))}
                                 alt="Fondo Random" 
-                                className="w-full h-auto max-w-[75%] max-h-[75%] object-contain opacity-90 mb-4" 
+                                className={`w-full h-auto max-w-[90%] ${title === 'VIDEOS RANDOM' ? 'max-h-[80%]' : 'max-h-[90%]'} object-contain opacity-90 mb-4`} 
                               />
                               <div className="text-center px-2 leading-tight">
                                 <ScrambleText 
-                                  text={`LA PRODUCCIÓN DEL IMAGINARIO\nCOMIENZA DURANTE LA PANDEMIA 2020`}
-                                  className={`font-lincolnmitre text-red-500 text-[10px] leading-tight tracking-normal ${styles.orangePulse}`} 
+                                  text={mode === 'promo' ? `LA PRODUCCIÓN DE RANDOM 2.0\nCOMIENZA INICIOS DEL 2025` : (mode === 'random2' ? `VIDEO INSTALACIÓN EN MAC\nFORESTAL 2025 (3 MESES)` : (title === 'VIDEOS RANDOM' ? `LA PRODUCCIÓN DEL IMAGINARIO\nCOMIENZA DURANTE LA PANDEMIA 2020` : `VIDEO INSTALACION EN CEINA 2022 (3 MESES)`))}
+                                  className={`font-lincolnmitre text-red-500 ${title === 'VIDEOS RANDOM' ? 'text-[9px]' : 'text-[10px]'} leading-tight tracking-normal ${styles.orangePulse}`} 
                                   delay={200} 
                                 />
                               </div>
                             </>
                           )}
-                          {mode === 'random2' && (
-                            <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[13px] md:text-[15px] -mt-[20px]" style={{ lineHeight: 1.25 }}>
+                          {(mode === 'random2' && title !== 'VIDEO INSTALACIÓN RANDOM 2.0') && (
+                            <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[13px] md:text-[15px]" style={{ lineHeight: 1.25 }}>
                               <ScrambleText 
-                                text="SEIS PERSONAJES"
+                                text="SEIS PERSONAJES 2025"
                                 className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
                                 delay={200} 
                               />
@@ -923,134 +1283,401 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                                 delay={400} 
                               />
                               <div className="flex items-center gap-4 mb-4">
-                                <img src="/images/kate1.jpg" alt="Kate" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <span className="text-red-500 font-bold block">Kate – Animacion UE5</span>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
+                                  <img src="/images/kate1.jpg" alt="Kate" className="h-16 w-auto opacity-90 object-contain" />
+                                  <div>
+                                    <span className="text-red-500 font-bold block">Kate - Anim UE5(1-2MINS)</span>
+                                    <motion.a 
+                                    href="https://youtu.be/E4AzwuhNcJI" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="cursor-pointer"
+                                    whileHover={{ 
+                                      color: ["#ef4444", "#ffff00", "#ef4444"],
+                                      transition: { duration: 0.2, repeat: Infinity }
+                                    }}
+                                  >
+                                    Performance musical
+                                  </motion.a><br/>
+                                    <motion.a 
+                                      href="https://youtu.be/HMoeyIKjsJA" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      Entrevista real
+                                    </motion.a>
+                                  </div>
                                 </div>
-                              </div>
 
                               <div className="flex items-center gap-4 mb-4">
                                 <img src="/images/cami1.jpg" alt="Camila" className="h-16 w-auto opacity-90 object-contain" />
                                 <div>
-                                  <span className="text-red-500 font-bold block">Camila – Animacion UE5</span>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
+                                  <span className="text-red-500 font-bold block">Camila - Anim UE5(1-2MINS)</span>
+                                  <motion.a 
+                                    href="https://youtu.be/wJ4K8c4fvB0" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="cursor-pointer"
+                                    whileHover={{ 
+                                      color: ["#ef4444", "#ffff00", "#ef4444"],
+                                      transition: { duration: 0.2, repeat: Infinity }
+                                    }}
+                                  >
+                                    Performance musical
+                                  </motion.a><br/>
+                                  <motion.a 
+                                    href="https://youtu.be/9bye_8dSZPE" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="cursor-pointer"
+                                    whileHover={{ 
+                                      color: ["#ef4444", "#ffff00", "#ef4444"],
+                                      transition: { duration: 0.2, repeat: Infinity }
+                                    }}
+                                  >
+                                    Entrevista real
+                                  </motion.a>
                                 </div>
                               </div>
 
-                              <div className="flex items-center gap-4 mb-4">
+                              <div className="flex items-center gap-4 mb-4 relative">
                                 <img src="/images/edu1.jpg" alt="Eduardo" className="h-16 w-auto opacity-90 object-contain" />
                                 <div>
-                                  <span className="text-red-500 font-bold block">Eduardo – Animacion UE5</span>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
+                                  <span className="text-red-500 font-bold block">EDU - Anim UE5(1-2MINS)</span>
+                                  <motion.a 
+                                    href="https://youtu.be/oJS5yKgTn6I" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="cursor-pointer"
+                                    whileHover={{ 
+                                      color: ["#ef4444", "#ffff00", "#ef4444"],
+                                      transition: { duration: 0.2, repeat: Infinity }
+                                    }}
+                                  >
+                                    Performance musical
+                                  </motion.a><br/>
+                                  <motion.a 
+                                    href="https://youtu.be/8LgXcLD3bsY" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="cursor-pointer"
+                                    whileHover={{ 
+                                      color: ["#ef4444", "#ffff00", "#ef4444"],
+                                      transition: { duration: 0.2, repeat: Infinity }
+                                    }}
+                                  >
+                                    Entrevista real
+                                  </motion.a>
                                 </div>
                               </div>
+
+                              <div className={`w-full flex justify-center -mt-5 md:hidden ${styles.orangePulse}`}>
+                                   <ScrambleElement delay={600} repeatInterval={4000} size="1.25rem" className="font-lincolnmitre text-2xl">
+                                     <svg 
+                                       xmlns="http://www.w3.org/2000/svg" 
+                                       fill="none" 
+                                       viewBox="0 0 24 24" 
+                                       strokeWidth={2} 
+                                       stroke="currentColor" 
+                                       className="w-5 h-5"
+                                     >
+                                       <path strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0 4" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                     </svg>
+                                   </ScrambleElement>
+                                 </div>
                             </div>
                           )}
                         </div>
                         <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[13px] md:text-[15px]" style={{ lineHeight: 1.25 }}>
                           {mode !== 'random2' ? (
-                            <>
-                              <div className="flex items-center gap-4 mb-4">
-                                <img src="/images/covid3.jpg" alt="COVID" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <a href="https://youtu.be/JtRa59EP3EM" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Invitación RANDOM 2020</a>
-                                  * Machinima 60 segs.
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-4 mb-4">
-                                <img src={mode === 'promo' ? "/images/Controli.jpg" : "/images/edu22.jpg"} alt="Eduardo" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <span className="text-red-500 font-bold block">
-                                    {mode === 'promo' ? "INVITACION RANDOM 2.0" : "EDUARDO - MACHINIMAS"}
-                                  </span>
-                                  {mode === 'promo' ? (
-                                    <>* ANIMACIÓN UE5 60 SEGS.</>
-                                  ) : (
-                                    <>
-                                      8 mins. pantalla soñador<br/>
-                                      8 mins. pantalla pajaro
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-4 mb-4">
-                                <img src={mode === 'promo' ? "/images/death1.jpg" : "/images/cami2.jpg"} alt="Camila" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <span className="text-red-500 font-bold block">
-                                    {mode === 'promo' ? "PAJARO VIDEO INSTALACIÓN" : "CAMILA - MACHINIMAS"}
-                                  </span>
-                                  {mode === 'promo' ? (
-                                    <>* ANIMACION UE5 8 MINS.</>
-                                  ) : (
-                                    <>
-                                      8 mins. pantalla soñadora<br/>
-                                      8 mins. pantalla pajaro
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-
-                              {mode !== 'promo' && (
+                            (mode === 'promo' || title !== 'VIDEO INSTALACIÓN RANDOM 2.0') && (
+                              <>
                                 <div className="flex items-center gap-4 mb-4">
-                                  <img src="/images/kate22.jpg" alt="Kate" className="h-16 w-auto opacity-90 object-contain" />
+                                  <img src="/images/covid3.jpg" alt="COVID" className="h-16 w-auto opacity-90 object-contain" />
                                   <div>
-                                    <span className="text-red-500 font-bold block">
-                                      Kate - Machinimas
-                                    </span>
-                                    <>
-                                      8 mins. pantalla soñadora<br/>
-                                      8 mins. pantalla pajaro
-                                    </>
+                                    <span className="text-red-500 font-bold block">Invitación RANDOM 2020</span>
+                                    <motion.a 
+                                      href="https://youtu.be/JtRa59EP3EM" 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="cursor-pointer"
+                                      whileHover={{ 
+                                        color: ["#ef4444", "#ffff00", "#ef4444"],
+                                        transition: { duration: 0.2, repeat: Infinity }
+                                      }}
+                                    >
+                                      * Machinima 60 segs.
+                                    </motion.a>
                                   </div>
                                 </div>
-                              )}
-                            </>
+
+                                <div className="flex items-center gap-4 mb-4">
+                                  <img src={mode === 'promo' ? "/images/Controli.jpg" : "/images/edu22.jpg"} alt="Eduardo" className="h-16 w-auto opacity-90 object-contain" />
+                                  <div>
+                                    <span className="text-red-500 font-bold block">
+                                      {mode === 'promo' ? "INVITACION RANDOM 2.0" : "EDU - MACHINIMAS (8mins)"}
+                                    </span>
+                                    {mode === 'promo' ? (
+                                      <motion.a 
+                                        href="https://youtu.be/KxjEt8ApZuw" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        * ANIMACIÓN UE5 60 SEGS.
+                                      </motion.a>
+                                    ) : (
+                                      <>
+                                        <motion.a 
+                                          href="https://youtu.be/cjP86McO_i4" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          pantalla soñador
+                                        </motion.a><br/>
+                                        <motion.a 
+                                          href="https://youtu.be/DE-UgFRsSww" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          pantalla pajaro
+                                        </motion.a>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-4 mb-4">
+                                  <img src={mode === 'promo' ? "/images/death1.jpg" : "/images/cami2.jpg"} alt="Camila" className="h-16 w-auto opacity-90 object-contain" />
+                                  <div>
+                                    <span className="text-red-500 font-bold block">
+                                      {mode === 'promo' ? "PAJARO VIDEO INSTALACIÓN" : "CAMI - MACHINIMAS (8mins)"}
+                                    </span>
+                                    {mode === 'promo' ? (
+                                      <motion.a 
+                                        href="https://youtu.be/BjVqI0NZBoU" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        * ANIMACION UE5 8 MINS.
+                                      </motion.a>
+                                    ) : (
+                                      <>
+                                        <motion.a 
+                                          href="https://youtu.be/3eW-dS2PuMI" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          pantalla soñadora
+                                        </motion.a><br/>
+                                        <motion.a 
+                                          href="https://youtu.be/kU6Hli2Ed3s" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          pantalla pajaro
+                                        </motion.a>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {mode !== 'promo' && (
+                                  <div className="flex items-center gap-4 mb-4">
+                                    <img src="/images/kate22.jpg" alt="Kate" className="h-16 w-auto opacity-90 object-contain" />
+                                    <div>
+                                      <span className="text-red-500 font-bold block">
+                                      KATE - MACHINIMAS (8mins)
+                                    </span>
+                                      <>
+                                        <motion.a 
+                                          href="https://youtu.be/6DlwEnoB5Bg" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          pantalla soñadora
+                                        </motion.a><br/>
+                                        <motion.a 
+                                          href="https://youtu.be/FLu9-ElNKBg" 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="cursor-pointer"
+                                          whileHover={{ 
+                                            color: ["#ef4444", "#ffff00", "#ef4444"],
+                                            transition: { duration: 0.2, repeat: Infinity }
+                                          }}
+                                        >
+                                          pantalla pajaro
+                                        </motion.a>
+                                      </>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )
                           ) : (
-                            <div className="mt-[5px]">
-                              <ScrambleText 
-                                text="SEIS PERSONAJES"
-                                className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
-                                delay={200} 
-                              />
-                              <ScrambleText 
-                                text="TRES COLABORADORES"
-                                className={`font-lincolnmitre text-red-500 text-[12px] leading-tight tracking-normal mb-4 ${styles.orangePulse}`} 
-                                delay={400} 
-                              />
-                              <div className="flex items-center gap-4 mb-4">
-                                <img src="/images/pepo1.jpg" alt="Pepo" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <span className="text-red-500 font-bold block">Pepo – Animacion UE5</span>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
-                                </div>
-                              </div>
+                                title !== 'VIDEO INSTALACIÓN RANDOM 2.0' ? (
+                                <div className="mt-[5px]">
+                                  <ScrambleText 
+                                    text="SEIS PERSONAJES 2025"
+                                    className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
+                                    delay={200} 
+                                  />
+                                  <ScrambleText 
+                                    text="TRES COLABORADORES"
+                                    className={`font-lincolnmitre text-red-500 text-[12px] leading-tight tracking-normal mb-4 ${styles.orangePulse}`} 
+                                    delay={400} 
+                                  />
+                                  <div className="flex items-center gap-4 mb-4">
+                                    <img src="/images/pepo1.jpg" alt="Pepo" className="h-16 w-auto opacity-90 object-contain" />
+                                    <div>
+                                      <span className="text-red-500 font-bold block">Pepo - Anim UE5(1-2MINS)</span>
+                                      <motion.a 
+                                        href="https://youtu.be/7vnFs4LjnFA" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Performance musical
+                                      </motion.a><br/>
+                                      <motion.a 
+                                        href="https://youtu.be/8tIy1V8Fvnw" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Entrevista real
+                                      </motion.a>
+                                    </div>
+                                  </div>
 
-                              <div className="flex items-center gap-4 mb-4">
-                                <img src="/images/brbr1.jpg" alt="Bárbara" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <a href="https://youtu.be/bfmMWLYdPWU" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Bárbara – Animacion UE5</a>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
-                                </div>
-                              </div>
+                                  <div className="flex items-center gap-4 mb-4">
+                                    <img src="/images/brbr1.jpg" alt="Bárbara" className="h-16 w-auto opacity-90 object-contain" />
+                                    <div>
+                                      <span className="text-red-500 font-bold block">Bárbara - Anim UE5(1-2MINS)</span>
+                                      <motion.a 
+                                        href="https://youtu.be/W-_fscZRhjc" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Performance musical
+                                      </motion.a><br/>
+                                      <motion.a 
+                                        href="https://youtu.be/bfmMWLYdPWU" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Entrevista real
+                                      </motion.a>
+                                    </div>
+                                  </div>
 
-                              <div className="flex items-center gap-4 mb-4">
-                                <img src="/images/seba2.jpg" alt="Sebastián" className="h-16 w-auto opacity-90 object-contain" />
-                                <div>
-                                  <span className="text-red-500 font-bold block">Sebastián – Animacion UE5</span>
-                                  1 min. Performance musical<br/>
-                                  2 mins. Entrevista real
+                                  <div className="flex items-center gap-4 mb-4 relative">
+                                    <img src="/images/seba2.jpg" alt="Sebastián" className="h-16 w-auto opacity-90 object-contain" />
+                                    <div>
+                                      <span className="text-red-500 font-bold block">Seba - Anim UE5(1-2MINS)</span>
+                                      <motion.a 
+                                        href="https://youtu.be/qqHvMtDV-Iw" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Performance musical
+                                      </motion.a><br/>
+                                      <motion.a 
+                                        href="https://youtu.be/Jlwt9ipYPoY" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="cursor-pointer"
+                                        whileHover={{ 
+                                          color: ["#ef4444", "#ffff00", "#ef4444"],
+                                          transition: { duration: 0.2, repeat: Infinity }
+                                        }}
+                                      >
+                                        Entrevista real
+                                      </motion.a>
+                                    </div>
+                                  </div>
+
+                                  <div className={`w-full flex justify-center -mt-5 md:hidden ${styles.orangePulse}`}>
+                                    <ScrambleElement delay={600} repeatInterval={4000} size="1.25rem" className="font-lincolnmitre text-2xl">
+                                      <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        fill="none" 
+                                        viewBox="0 0 24 24" 
+                                        strokeWidth={2} 
+                                        stroke="currentColor" 
+                                        className="w-5 h-5 rotate-180"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0 4" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                      </svg>
+                                    </ScrambleElement>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          )}
+                                ) : (
+                                  <MacImageSlideshow />
+                                )
+                              )}
                         </div>
                       </div>
                     )

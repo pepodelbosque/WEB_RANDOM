@@ -689,7 +689,7 @@ const AboutSection: React.FC = () => {
                 exit={{ x: -120, opacity: 0 }}
                 transition={{ duration: 1.1, ease: 'easeInOut' }}
                 ref={pageRef}
-                className="w-full h-full px-3 pt-10 pb-10 md:px-10 md:pt-14 md:pb-12 box-border"
+                className="w-full h-full px-8 pt-12 pb-12 md:px-24 md:pt-24 md:pb-24 box-border"
                 style={{ overflowY: 'auto', overscrollBehavior: 'contain' }}
               >
                 {(() => {
@@ -701,7 +701,7 @@ const AboutSection: React.FC = () => {
                       const tokens = pagesTokens[0];
                       return (
                         <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
-                          <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             <RenderTokens tokens={tokens} />
                           </div>
                         </div>
@@ -718,7 +718,7 @@ const AboutSection: React.FC = () => {
                       const tokens = (language === 'es' ? page2OverrideTokensEs : desc2Tokens);
                       return (
                         <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
-                          <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             <RenderTokens tokens={tokens} />
                           </div>
                         </div>
@@ -735,7 +735,7 @@ const AboutSection: React.FC = () => {
                       const tokens = (language === 'es' ? page3OverrideTokensEs : desc3Tokens);
                       return (
                         <div className="w-full h-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' }}>
-                          <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             <RenderTokens tokens={tokens} />
                           </div>
                         </div>
@@ -754,7 +754,7 @@ const AboutSection: React.FC = () => {
                   if (pageIdx === 0) {
                     return (
                       <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
-                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                        <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                           <RenderTokens tokens={tokens} />
                         </div>
                         <div className="w-full h-full">
@@ -766,7 +766,7 @@ const AboutSection: React.FC = () => {
                   if (pageIdx === 1) {
                     return (
                       <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
-                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                        <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                           <RenderTokens tokens={tokens} />
                         </div>
                         <div className="w-full h-full">
@@ -778,7 +778,7 @@ const AboutSection: React.FC = () => {
                   if (pageIdx === 2) {
                     return (
                       <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1.05rem', gap: '1.05rem', height: '100%' }}>
-                        <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                        <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                           <RenderTokens tokens={tokens} />
                         </div>
                         <div className="w-full h-full">
@@ -789,7 +789,7 @@ const AboutSection: React.FC = () => {
                   }
                   return (
                     <div className="w-full h-full" style={{ columnCount: 2 as any, columnGap: '1.05rem', columnFill: 'auto', height: '100%' }}>
-                      <div className="text-[0.88em] md:text-[0.98em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.6] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                      <div className="text-[0.76em] md:text-[0.86em] tracking-tight font-lincolnmitre text-[rgba(255,0,0,0.85)] leading-[1.35] text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                         <RenderTokens tokens={tokens} />
                       </div>
                     </div>

@@ -261,6 +261,91 @@ const ContactSection: React.FC = () => {
     };
   }, []);
 
+  const descriptionRef = useRef<HTMLParagraphElement | null>(null);
+
+  // Efecto de Glitch Perpetuo (Hard Scramble)
+  useEffect(() => {
+    const element = descriptionRef.current;
+    if (!element) return;
+
+    // Guardar texto original si no está guardado
+    const originalText = t(language, 'contact.description');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    
+    // Función para generar texto glitcheado (mayoría caracteres random)
+    const generateGlitchText = () => {
+      // 80% de probabilidad de carácter random, 20% original
+      return originalText
+        .split('')
+        .map(char => {
+          if (/\s/.test(char)) return char;
+          return Math.random() > 0.2 ? chars[Math.floor(Math.random() * chars.length)] : char;
+        })
+        .join('');
+    };
+
+    // Timeline infinito de glitch
+    const glitchTl = gsap.timeline({ repeat: -1 });
+    
+    // Actualizar texto cada 50ms-150ms
+    glitchTl.to({}, {
+      duration: 0.08,
+      repeat: -1,
+      onRepeat: () => {
+        // Solo aplicar si no estamos mostrando el mensaje de "copiado"
+        if (isCopiedRef.current) return;
+        
+        element.textContent = generateGlitchText();
+      }
+    });
+
+    return () => {
+      glitchTl.kill();
+    };
+  }, [language]);
+
+  const isCopiedRef = useRef(false);
+
+  const scrambleTo = (element: HTMLElement, newText: string) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*+?';
+    
+    // Configurar índices y orden de revelado para el nuevo texto
+    const indices = Array.from(newText)
+      .map((c, i) => (/\s/.test(c) ? -1 : i))
+      .filter((i) => i >= 0);
+    const phi = 0.6180339887498948;
+    const weights = indices.map((idx) => ({ idx, w: ((idx * phi) % 1) + Math.random() * 0.02 }));
+    weights.sort((a, b) => a.w - b.w);
+    const revealOrder = weights.map((w) => w.idx);
+    const rankMap = new Map<number, number>();
+    revealOrder.forEach((idx, rank) => rankMap.set(idx, rank));
+
+    const state = { p: 0 };
+    const setScrambledText = (progress: number) => {
+      const threshold = progress * revealOrder.length;
+      const out = newText
+        .split('')
+        .map((c, i) => {
+          if (/\s/.test(c)) return c;
+          const rank = rankMap.get(i) ?? 0;
+          return rank < threshold ? c : chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      element.textContent = out;
+    };
+
+    gsap.killTweensOf(state); // Detener animación previa si existe
+    gsap.to(state, {
+      p: 1,
+      duration: 1.2,
+      ease: 'power2.out',
+      onUpdate: () => setScrambledText(state.p),
+      onComplete: () => {
+        element.textContent = newText;
+      },
+    });
+  };
+
   // Scramble reveal en el párrafo de "Conectemos" reactivo al clic
   const handleIntroClick = () => {
     const el = introRef.current;
@@ -410,7 +495,11 @@ const ContactSection: React.FC = () => {
             {t(language, 'contact.title')}
           </h2>
           <div className="split-container">
-            <p className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 leading-[1.3] text-center" style={{ maxWidth: '100%', hyphens: 'auto', wordBreak: 'break-word', whiteSpace: 'normal' }}>
+            <p 
+              ref={descriptionRef}
+              className="split text-[1.0em] font-lincolnmitre text-orange-600 dark:text-gray-300 leading-[1.3] text-center" 
+              style={{ maxWidth: '100%', hyphens: 'auto', wordBreak: 'break-word', whiteSpace: 'pre-line' }}
+            >
              {t(language, 'contact.description')}
             </p>
           </div>
@@ -425,7 +514,43 @@ const ContactSection: React.FC = () => {
         >
           <div className="flex flex-wrap items-center justify-center gap-4 max-w-3xl mx-auto dotted-icons">
             <motion.a
-              href="mailto:hello@random.dev"
+              href="mailto:fntsm.cine@gmail.com"
+              onClick={(e) => {
+                e.preventDefault();
+                navigator.clipboard.writeText('fntsm.cine@gmail.com');
+                
+                if (descriptionRef.current) {
+                  isCopiedRef.current = true;
+                  // Iniciar efecto pulsante (colores de la paleta: primary/secondary)
+                  gsap.to(descriptionRef.current, {
+                    color: '#ef4444', // Red-500 (Primary)
+                    duration: 0.1, 
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "steps(1)", 
+                    startAt: { color: '#7f1d1d' } // Red-900 (Dark Red - alto contraste sin usar blanco)
+                  });
+
+                  scrambleTo(descriptionRef.current, "correo copiado\nen tu clipboard\nFNTSM.CINE@GMAIL.COM");
+                  
+                  setTimeout(() => {
+                    if (descriptionRef.current) {
+                      // Detener efecto pulsante y restaurar color
+                      gsap.killTweensOf(descriptionRef.current, "color");
+                      gsap.to(descriptionRef.current, {
+                        color: "inherit", // O limpiar el estilo inline
+                        duration: 0.5,
+                        onComplete: () => {
+                          if (descriptionRef.current) descriptionRef.current.style.color = "";
+                          isCopiedRef.current = false;
+                        }
+                      });
+                      
+                      scrambleTo(descriptionRef.current, t(language, 'contact.description'));
+                    }
+                  }, 7000);
+                }
+              }}
               variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
@@ -449,7 +574,7 @@ const ContactSection: React.FC = () => {
               <ScrambleIcon Original={Bird} HoverIcon={MessageCircle} size={24} exclude={[Mail, Instagram, Youtube]} startDelay={800} />
             </motion.a>
             <motion.a
-              href="#"
+              href="https://instagram.com/fntsm.random"
               variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
@@ -462,7 +587,7 @@ const ContactSection: React.FC = () => {
               <ScrambleIcon Original={Skull} HoverIcon={Instagram} size={24} exclude={[Mail, MessageCircle, Youtube]} startDelay={1600} />
             </motion.a>
             <motion.a
-              href="https://youtube.com"
+              href="https://www.youtube.com/@fantasmafntsm5585/posts"
               variants={iconItemVariants}
               whileHover={{ scale: 1.2, rotate: 10 }}
               whileTap={{ scale: 0.95 }}
