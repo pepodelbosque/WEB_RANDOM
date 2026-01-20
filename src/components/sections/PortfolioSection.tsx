@@ -486,7 +486,7 @@ const PortfolioSection: React.FC = () => {
               transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.6 }}
               whileHover={{ y: -8, rotateY: 4, scale: 1.01 }}
               className={`group relative aspect-square w-[80%] rounded-none border border-white/10 bg-white/5 dark:bg-black/10 hover:border-primary/30 transition-all duration-300 overflow-hidden cursor-pointer ${index % 2 === 0 ? 'md:justify-self-end' : 'md:justify-self-start'}`}
-              onClick={() => openPopup(false, index === 1 ? 'VIDEO INSTALACIÓN' : 'VIDEOGAME')} // Open popup on click
+              onClick={() => openPopup(false, customTitles[index])} // Open popup on click
             >
               {/* Project Image (fills square) */}
               <div className="absolute inset-0 overflow-hidden">

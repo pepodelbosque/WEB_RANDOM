@@ -249,7 +249,6 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sonido (SFX): Sebastián Lagos Ossa</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Guion y narrativa: Pepo Sabatini – Barbara Oettinger</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
-                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Control de calidad (QA): Daniel Cruz, Sebastián Vidal</p>
                   </div>
 
                   <div className="mb-3 md:mb-4">
@@ -263,7 +262,7 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
 
                 <div className="mb-3 md:mb-4">
                   <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">equipo principal - random 1.0 (machinima)</h3>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Concepto y dirección creativa: Pepo Sabatini – Barbara Oettinger</p>
+                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Concepto y dirección creativa: Barbara Oettinger - Pepo Sabatini</p>
                   <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección de machinima: Pepo Sabatini</p>
                   <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Edición: Barbara Oettinger</p>
                   <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Asesoría artística: Sebastián Vidal</p>
