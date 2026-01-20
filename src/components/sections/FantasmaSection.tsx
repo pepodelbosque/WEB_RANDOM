@@ -420,8 +420,10 @@ const FantasmaSection: React.FC = () => {
                 <p className="font-extrabold font-lincolnmitre text-orange-400 dark:text-orange-300 mb-1">
                   {project.description}
                 </p>
-              </div>
-            </motion.div>
+          </div>
+
+
+        </motion.div>
           ))}
         </motion.div>
 
@@ -438,6 +440,46 @@ const FantasmaSection: React.FC = () => {
               El videojuego —con su lógica interactiva y su invitación explícita a participar— nos devolvió a ese estado primero.
               Nos recordó que la imagen no tiene por qué ser solo espejo o ventana: puede ser también terreno de juego, espacio que se recorre, se toca, se altera.
             </p>
+          </div>
+
+          <div className="flex justify-center items-center gap-6 mt-8">
+            {/* Left Image - Monocromo */}
+            <span
+              style={{
+                width: '5rem',
+                height: '5rem',
+                display: 'block',
+                background: 'linear-gradient(90deg, #ff0000 0%, #ff7300 50%, #ff0000 100%)',
+                WebkitMaskImage: `url("/images/monocromo Blanco_MCAP.png")`,
+                WebkitMaskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                WebkitMaskSize: 'contain',
+                maskImage: `url("/images/monocromo Blanco_MCAP.png")`,
+                maskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                maskSize: 'contain',
+                filter: 'drop-shadow(0 0 8px rgba(255, 115, 0, 0.5))',
+              }}
+            />
+
+            {/* Right Image - Logo Fantasma */}
+            <span
+              style={{
+                width: '5rem',
+                height: '5rem',
+                display: 'block',
+                background: 'linear-gradient(90deg, #ff0000 0%, #ff7300 50%, #ff0000 100%)',
+                WebkitMaskImage: `url("/images/logo-fntsm_bn2.png")`,
+                WebkitMaskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                WebkitMaskSize: 'contain',
+                maskImage: `url("/images/logo-fntsm_bn2.png")`,
+                maskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                maskSize: 'contain',
+                filter: 'drop-shadow(0 0 8px rgba(255, 115, 0, 0.5))',
+              }}
+            />
           </div>
         </motion.div
         >

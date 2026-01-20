@@ -377,9 +377,9 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       className={`w-20 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'random' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
                       style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'random' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'random' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
                       animate={mode === 'random' ? activePulse : undefined}
-                      aria-label="RANDOM"
+                      aria-label="RANDOM1"
                     >
-                      RANDOM
+                      RANDOM1
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05, rotateZ: 2 }}
@@ -388,9 +388,9 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       className={`w-24 h-8 px-2 py-1 bg-black/50 border text-[rgba(255,0,0,0.85)] font-lincolnmitre transition-all duration-300 text-[10px] leading-none uppercase tracking-wide ${mode === 'random2' ? 'hover:bg-[rgba(255,0,0,0.30)] hover:text-[rgba(255,0,0,0.98)]' : 'hover:bg-[rgba(255,0,0,0.20)] hover:text-[rgba(255,0,0,0.95)]'}`}
                       style={{ borderColor: 'rgba(255,0,0,0.6)', backgroundColor: mode === 'random2' ? 'rgba(255,0,0,0.30)' : 'rgba(0,0,0,0.5)', color: mode === 'random2' ? 'rgba(255,0,0,0.98)' : 'rgba(255,0,0,0.85)' }}
                       animate={mode === 'random2' ? activePulse : undefined}
-                      aria-label="RANDOM 2.0"
+                      aria-label="RANDOM2"
                     >
-                      RANDOM 2.0
+                      RANDOM2
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05, rotateZ: 2 }}
@@ -746,7 +746,17 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               </>
                             )}
                             {mode === 'random2' && (
-                              <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[12.35px] md:text-[14.25px] mt-12" style={{ lineHeight: 1.25 }}>
+                              <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[12.35px] md:text-[14.25px] -mt-[20px]" style={{ lineHeight: 1.25 }}>
+                                <ScrambleText 
+                                  text="SEIS PERSONAJES"
+                                  className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
+                                  delay={200} 
+                                />
+                                <ScrambleText 
+                                  text="TRES SOÑADORES"
+                                  className={`font-lincolnmitre text-red-500 text-[12px] leading-tight tracking-normal mb-4 ${styles.orangePulse}`} 
+                                  delay={400} 
+                                />
                                 <div className="flex items-center gap-4 mb-4">
                                 <img src="/images/kate1.jpg" alt="Kate" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                 <div>
@@ -783,7 +793,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                                   <div className="flex items-center gap-4 mb-4">
                                     <img src="/images/covid3.jpg" alt="COVID" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                     <div>
-                                      <span className="text-red-500 font-bold block">Invitación RANDOM 2020</span>
+                                      <a href="https://youtu.be/JtRa59EP3EM" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Invitación RANDOM 2020</a>
                                       * Machinima 60 segs.
                                     </div>
                                   </div>
@@ -838,7 +848,17 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                                   )}
                                 </>
                               ) : (
-                                <div className="mt-12">
+                                <div className="mt-[5px]">
+                                  <ScrambleText 
+                                    text="SEIS PERSONAJES"
+                                    className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
+                                    delay={200} 
+                                  />
+                                  <ScrambleText 
+                                    text="TRES COLABORADORES"
+                                    className={`font-lincolnmitre text-red-500 text-[12px] leading-tight tracking-normal mb-4 ${styles.orangePulse}`} 
+                                    delay={400} 
+                                  />
                                   <div className="flex items-center gap-4 mb-4">
                                     <img src="/images/pepo1.jpg" alt="Pepo" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                     <div>
@@ -851,7 +871,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                                   <div className="flex items-center gap-4 mb-4">
                                     <img src="/images/brbr1.jpg" alt="Bárbara" className="h-[3.8rem] w-auto opacity-90 object-contain" />
                                     <div>
-                                      <span className="text-red-500 font-bold block">Bárbara – Animacion UE5</span>
+                                      <a href="https://youtu.be/bfmMWLYdPWU" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Bárbara – Animacion UE5</a>
                                       1 min. Performance musical<br/>
                                       2 mins. Entrevista real
                                     </div>
@@ -891,7 +911,17 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                             </>
                           )}
                           {mode === 'random2' && (
-                            <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[13px] md:text-[15px] mt-12" style={{ lineHeight: 1.25 }}>
+                            <div className="flex flex-col justify-center font-lincolnmitre text-red-400/90 text-left text-[13px] md:text-[15px] -mt-[20px]" style={{ lineHeight: 1.25 }}>
+                              <ScrambleText 
+                                text="SEIS PERSONAJES"
+                                className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
+                                delay={200} 
+                              />
+                              <ScrambleText 
+                                text="TRES SOÑADORES"
+                                className={`font-lincolnmitre text-red-500 text-[12px] leading-tight tracking-normal mb-4 ${styles.orangePulse}`} 
+                                delay={400} 
+                              />
                               <div className="flex items-center gap-4 mb-4">
                                 <img src="/images/kate1.jpg" alt="Kate" className="h-16 w-auto opacity-90 object-contain" />
                                 <div>
@@ -927,7 +957,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               <div className="flex items-center gap-4 mb-4">
                                 <img src="/images/covid3.jpg" alt="COVID" className="h-16 w-auto opacity-90 object-contain" />
                                 <div>
-                                  <span className="text-red-500 font-bold block">Invitación RANDOM 2020</span>
+                                  <a href="https://youtu.be/JtRa59EP3EM" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Invitación RANDOM 2020</a>
                                   * Machinima 60 segs.
                                 </div>
                               </div>
@@ -982,7 +1012,17 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               )}
                             </>
                           ) : (
-                            <div className="mt-12">
+                            <div className="mt-[5px]">
+                              <ScrambleText 
+                                text="SEIS PERSONAJES"
+                                className={`font-lincolnmitre text-red-500 text-[16px] leading-tight tracking-normal mb-1 ${styles.orangePulse}`} 
+                                delay={200} 
+                              />
+                              <ScrambleText 
+                                text="TRES COLABORADORES"
+                                className={`font-lincolnmitre text-red-500 text-[12px] leading-tight tracking-normal mb-4 ${styles.orangePulse}`} 
+                                delay={400} 
+                              />
                               <div className="flex items-center gap-4 mb-4">
                                 <img src="/images/pepo1.jpg" alt="Pepo" className="h-16 w-auto opacity-90 object-contain" />
                                 <div>
@@ -995,7 +1035,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               <div className="flex items-center gap-4 mb-4">
                                 <img src="/images/brbr1.jpg" alt="Bárbara" className="h-16 w-auto opacity-90 object-contain" />
                                 <div>
-                                  <span className="text-red-500 font-bold block">Bárbara – Animacion UE5</span>
+                                  <a href="https://youtu.be/bfmMWLYdPWU" target="_blank" rel="noopener noreferrer" className="text-red-500 font-bold block hover:underline">Bárbara – Animacion UE5</a>
                                   1 min. Performance musical<br/>
                                   2 mins. Entrevista real
                                 </div>

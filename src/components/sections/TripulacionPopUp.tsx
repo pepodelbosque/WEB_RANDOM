@@ -248,7 +248,7 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Composición musical: Marco Portilla – Lost Tropicales</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño de sonido (SFX): Sebastián Lagos Ossa</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Guion y narrativa: Pepo Sabatini – Barbara Oettinger</p>
-                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger</p>
                   </div>
 
                   <div className="mb-3 md:mb-4">
@@ -256,7 +256,7 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Dirección y montaje: Pepo Sabatini</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistadora y asistencia en terreno: Fernanda Aguirre</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Digitalización y creación de personajes: Pepo Sabatini</p>
-                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger – Pepo Sabatini</p>
+                    <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Producción: Barbara Oettinger</p>
                     <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Entrevistados y soñadores: Camila Estrella – Eduardo Vega – Kate Hosh</p>
                   </div>
 
@@ -300,10 +300,7 @@ const TripulacionPopUp: React.FC<TripulacionPopUpProps> = ({ isVisible, onClose,
                   <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Diseño y programación: Pepo Sabatini</p>
                 </div>
 
-                <div className="mb-3 md:mb-4">
-                  <h3 className="text-base md:text-xl font-black font-lincolnmitre text-orange-300 mb-1 md:mb-2">agradecimientos</h3>
-                  <p className="text-[10px] md:text-[12px] font-extrabold font-lincolnmitre text-orange-200/85 leading-[1.3] md:leading-[1.35]">Instituciones, apoyos, colaboradores</p>
-                </div>
+
                 </div>
               </div>
             </div>
