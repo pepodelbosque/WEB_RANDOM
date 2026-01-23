@@ -154,6 +154,15 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
   const [fontThird, setFontThird] = useState<number>(16);
   const [pageIndex, setPageIndex] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(0);
+  const [videoSrc, setVideoSrc] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    // Retrasar la carga del video un poco para que sea "despacito"
+    const timer = setTimeout(() => {
+      setVideoSrc("/images/pagina_gp1.mp4");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
   const [mode, setMode] = useState<'qr' | 'game' | 'honorem' | 'catalogo' | 'random' | 'random2' | 'backstage' | 'promo'>('qr');
   const activePulse = { scale: [1, 1.06, 1], transition: { duration: 1.2, repeat: Infinity, repeatType: 'reverse' } } as any;
   const [headerTopPx, setHeaderTopPx] = useState<number | undefined>(undefined);
@@ -1718,13 +1727,13 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
                             >
                               <video 
-                                src="/images/pagina_gp1.mp4" 
+                                src={videoSrc}
                                 autoPlay 
                                 loop 
                                 muted 
                                 playsInline 
                                 className="float-left mr-4 mb-2 max-w-[68%] h-auto object-contain"
-                                />
+                              />
                               Cuando el estallido social y una pandemia global paralizan la realidad, la única salida es hacia adentro. RANDOM 2.0 te invita a saltar el torniquete de una estación de metro laberíntica para adentrarte en una ensoñación digital compuesta por fragmentos de memoria colectiva. Tienes exactamente 2019 segundos antes de que el tiempo se agote, desafiándote a explorar un limbo interactivo donde las reglas de la física y la lógica social se han roto.
                             </p>
                           </div>
@@ -1761,13 +1770,13 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                           style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
                         >
                           <video 
-                            src="/images/pagina_gp1.mp4" 
+                            src={videoSrc}
                             autoPlay 
                             loop 
                             muted 
                             playsInline 
                             className="float-left mr-4 mb-2 max-w-[68%] h-auto object-contain"
-                            />
+                           />
                           Cuando el estallido social y una pandemia global paralizan la realidad, la única salida es hacia adentro. RANDOM 2.0 te invita a saltar el torniquete de una estación de metro laberíntica para adentrarte en una ensoñación digital compuesta por fragmentos de memoria colectiva. Tienes exactamente 2019 segundos antes de que el tiempo se agote, desafiándote a explorar un limbo interactivo donde las reglas de la física y la lógica social se han roto.
                         </p>
                         <div className="flex flex-col gap-2">
