@@ -613,16 +613,26 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                         >
                           <div style={{ width: `${pageWidth}px`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                             <a 
-                              href="https://steamcommunity.com/id/proyectorandom/" 
+                              href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="block hover:scale-105 transition-transform duration-300"
                             >
-                              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=Proyecto%20RANDOM&color=ff0000&bgcolor=000000`} alt="Código QR" style={{ width: '220px', height: '220px' }} />
+                              <img 
+                                src="/images/qr_form11.jpg" 
+                                alt="Código QR" 
+                                style={{ 
+                                  width: '220px', 
+                                  height: '220px',
+                                  // Asumiendo JPG Blanco/Negro -> Invertir (Fondo Negro/QR Blanco) -> Colorear QR Blanco a Rojo
+                                  filter: 'invert(100%) sepia(100%) saturate(7000%) hue-rotate(355deg) brightness(100%) contrast(110%)',
+                                  mixBlendMode: 'screen' // Ayuda a que el negro se funda si es necesario, o 'normal'
+                                }} 
+                              />
                             </a>
                             <div className="text-center px-2 leading-tight">
                               <a 
-                                href="https://steamcommunity.com/id/proyectorandom/" 
+                                href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="block hover:opacity-80 transition-opacity duration-300"
@@ -641,16 +651,25 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       <div className="grid" style={{ gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
                         <div className="w-full flex flex-col items-center justify-center gap-4">
                           <a 
-                            href="https://steamcommunity.com/id/proyectorandom/" 
+                            href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="block hover:scale-105 transition-transform duration-300"
                           >
-                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=Proyecto%20RANDOM&color=ff0000&bgcolor=000000`} alt="Código QR" style={{ width: '220px', height: '220px' }} />
+                            <img 
+                              src="/images/qr_form11.jpg" 
+                              alt="Código QR" 
+                              style={{ 
+                                width: '220px', 
+                                height: '220px',
+                                filter: 'invert(100%) sepia(100%) saturate(7000%) hue-rotate(355deg) brightness(100%) contrast(110%)',
+                                mixBlendMode: 'screen'
+                              }} 
+                            />
                           </a>
                           <div className="text-center leading-tight">
                             <a 
-                              href="https://steamcommunity.com/id/proyectorandom/" 
+                              href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="block hover:opacity-80 transition-opacity duration-300"
@@ -1698,7 +1717,14 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               className="font-lincolnmitre text-red-400/90 text-justify"
                               style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
                             >
-                              <img src="/images/GAME2.jpg" alt="Game" className="float-left mr-4 mb-2 max-w-[50%] h-auto" />
+                              <video 
+                                src="/images/pagina_gp1.mp4" 
+                                autoPlay 
+                                loop 
+                                muted 
+                                playsInline 
+                                className="float-left mr-4 mb-2 max-w-[68%] h-auto object-contain"
+                                />
                               Cuando el estallido social y una pandemia global paralizan la realidad, la única salida es hacia adentro. RANDOM 2.0 te invita a saltar el torniquete de una estación de metro laberíntica para adentrarte en una ensoñación digital compuesta por fragmentos de memoria colectiva. Tienes exactamente 2019 segundos antes de que el tiempo se agote, desafiándote a explorar un limbo interactivo donde las reglas de la física y la lógica social se han roto.
                             </p>
                           </div>
@@ -1708,6 +1734,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                               className="font-lincolnmitre text-red-400/90 text-justify"
                               style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontRight}px`, lineHeight: 1.25 }}
                             >
+                              <img src="/images/GAME2.jpg" alt="Game" className="float-left mr-4 mb-2 max-w-[50%] h-auto" />
                               Presentado como una "tecnología de duelo" y archivo vivo, el juego entrelaza testimonios reales con entornos oníricos desarrollados en Unreal Engine. A medida que los jugadores descienden por pasillos infinitos, se encontrarán con los sueños de tres protagonistas —Katherine, Camila y Eduardo— cuyos relatos de miedo, encierro y resistencia han cobrado vida digital. Una figura siniestra y un cuervo vigía acechan en la oscuridad, recordando que incluso en el mundo virtual, la libertad siempre está vigilada.
                             </p>
                           </div>
@@ -1733,11 +1760,19 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                           className="font-lincolnmitre text-red-400/90 text-justify"
                           style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontLeft}px`, lineHeight: 1.25 }}
                         >
-                          <img src="/images/GAME2.jpg" alt="Game" className="float-left mr-4 mb-2 max-w-[50%] h-auto" />
+                          <video 
+                            src="/images/pagina_gp1.mp4" 
+                            autoPlay 
+                            loop 
+                            muted 
+                            playsInline 
+                            className="float-left mr-4 mb-2 max-w-[68%] h-auto object-contain"
+                            />
                           Cuando el estallido social y una pandemia global paralizan la realidad, la única salida es hacia adentro. RANDOM 2.0 te invita a saltar el torniquete de una estación de metro laberíntica para adentrarte en una ensoñación digital compuesta por fragmentos de memoria colectiva. Tienes exactamente 2019 segundos antes de que el tiempo se agote, desafiándote a explorar un limbo interactivo donde las reglas de la física y la lógica social se han roto.
                         </p>
                         <div className="flex flex-col gap-2">
                           <p ref={rightParaRef} className="font-lincolnmitre text-red-400/90 text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontRight}px`, lineHeight: 1.25 }}>
+                            <img src="/images/GAME2.jpg" alt="Game" className="float-left mr-4 mb-2 max-w-[50%] h-auto" />
                             Presentado como una "tecnología de duelo" y archivo vivo, el proyecto despliega una interfaz que simula un sistema operativo en decadencia, donde el usuario navega entre fragmentos de memoria y registros de un futuro cancelado.
                           </p>
                           <p ref={thirdParaRef} className="font-lincolnmitre text-red-400/90 text-justify" style={{ hyphens: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word', fontSize: `${fontThird}px`, lineHeight: 1.25 }}>
