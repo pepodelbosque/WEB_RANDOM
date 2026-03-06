@@ -622,7 +622,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                         >
                           <div style={{ width: `${pageWidth}px`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                             <a 
-                              href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
+                              href="/dignidad.html" 
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="block hover:scale-105 transition-transform duration-300"
@@ -641,7 +641,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                             </a>
                             <div className="text-center px-2 leading-tight">
                               <a 
-                                href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
+                                href="/dignidad.html" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="block hover:opacity-80 transition-opacity duration-300"
@@ -660,7 +660,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                       <div className="grid" style={{ gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
                         <div className="w-full flex flex-col items-center justify-center gap-4">
                           <a 
-                            href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
+                            href="/dignidad.html" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="block hover:scale-105 transition-transform duration-300"
@@ -678,7 +678,7 @@ const VideogamePopup: React.FC<VideogamePopupProps> = ({ isVisible, onClose, min
                           </a>
                           <div className="text-center leading-tight">
                             <a 
-                              href="https://forms.gle/6XyMtDHCZcQX2Hg58" 
+                              href="/dignidad.html" 
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="block hover:opacity-80 transition-opacity duration-300"
