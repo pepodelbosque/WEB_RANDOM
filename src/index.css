@@ -207,7 +207,7 @@ body {
   left: 50%;
   bottom: 0.75rem;
   transform: translateX(-50%);
-  display: flex;
+  display: none !important; /* ocultar indicadores punteados */
   gap: 6px;
 }
 .auto-carousel-indicators .dot {
@@ -215,6 +215,7 @@ body {
   height: 6px;
   border-radius: 9999px;
   background: rgba(255,255,255,0.35);
+  display: none !important; /* asegurar que no se muestren */
 }
 .auto-carousel-indicators .dot.active {
   background: #ed254e;
