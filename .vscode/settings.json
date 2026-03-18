@@ -1,10 +1,6 @@
 {
   "git.enableSmartCommit": true,
-  "git.allowEmptyCommits": true,
-  "git.confirmEmptyCommits": false,
-  "scm.inputFontSize": 15,
-  "scm.alwaysShowActions": true,
-  "git.suggestSmartCommit": true,
-  "git.smartCommitChanges": "all",
-  "git.fetchOnPull": true
+  "git.suggestSmartCommit": false,
+  "git.confirmSync": false,
+  "git.postCommitCommand": "push"
 }
